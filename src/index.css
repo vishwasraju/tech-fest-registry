@@ -80,4 +80,33 @@
   .clip-path-slant {
     clip-path: polygon(0 0, 100% 0, 100% 85%, 0 100%);
   }
+  
+  /* Typing text animation */
+  .typing-text {
+    border-right: 2px solid #00E0FF;
+    animation: typing 4s steps(40) infinite, blink-caret 0.75s step-end infinite;
+    white-space: nowrap;
+    overflow: hidden;
+    display: inline-block;
+    max-width: 100%;
+  }
+  
+  @keyframes typing {
+    0%, 90%, 100% { width: 0 }
+    30%, 60% { width: 100% }
+  }
+  
+  @keyframes blink-caret {
+    from, to { border-color: transparent }
+    50% { border-color: #00E0FF }
+  }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-15px) rotate(5deg); }
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
 }
