@@ -3,6 +3,7 @@ import React from 'react';
 import { CalendarDays, MapPin, Cpu, BrainCircuit, Bot } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
+import { Badge } from '@/components/ui/badge';
 
 const HeroSection = () => {
   return (
@@ -37,9 +38,6 @@ const HeroSection = () => {
             <span className="bg-gradient-to-r from-techfest-neon-blue via-techfest-neon-purple to-techfest-neon-pink text-transparent bg-clip-text">
               Tech Fest 2K25
             </span>
-            <div className="text-xl md:text-2xl font-normal mt-2 text-gray-300">
-              <span className="typing-text">Robotics • AI • ML • Innovation</span>
-            </div>
           </h1>
           
           <p className="text-xl md:text-2xl text-gray-300 mb-8">
@@ -89,22 +87,6 @@ const HeroSection = () => {
           </div>
         </div>
       </div>
-    </div>
-  );
-};
-
-// The Badge component wasn't defined here so let's create it
-const Badge = ({ children, className, variant = "default" }) => {
-  const baseClasses = "inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2";
-  
-  const variantClasses = {
-    default: "bg-primary text-primary-foreground hover:bg-primary/80",
-    outline: "border border-input bg-background hover:bg-accent hover:text-accent-foreground"
-  };
-  
-  return (
-    <div className={`${baseClasses} ${variantClasses[variant]} ${className}`}>
-      {children}
     </div>
   );
 };
