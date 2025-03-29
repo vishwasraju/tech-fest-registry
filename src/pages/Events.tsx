@@ -4,19 +4,16 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import EventCard from '@/components/EventCard';
 import { EVENTS_DATA } from '@/data/events';
-import { Search, Filter } from 'lucide-react';
+import { Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 
 const Events = () => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [filterFree, setFilterFree] = useState(false);
   
-  // Filter events based on search term and free filter
+  // Filter events based on search term only
   const filteredEvents = EVENTS_DATA.filter(event => {
-    const matchesSearch = event.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                         event.description.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesFree = filterFree ? event.fees === 0 : true;
-    return matchesSearch && matchesFree;
+    return event.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+           event.description.toLowerCase().includes(searchTerm.toLowerCase());
   });
   
   return (
@@ -36,10 +33,10 @@ const Events = () => {
             </p>
           </div>
           
-          {/* Search and Filter */}
+          {/* Search Bar */}
           <div className="max-w-4xl mx-auto mb-12">
-            <div className="glass p-4 rounded-lg flex flex-col md:flex-row gap-4">
-              <div className="relative flex-grow">
+            <div className="glass p-4 rounded-lg">
+              <div className="relative">
                 <Search className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
                 <Input 
                   type="text"
@@ -48,20 +45,6 @@ const Events = () => {
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
-              </div>
-              
-              <div className="flex items-center space-x-2">
-                <Filter className="h-5 w-5 text-gray-400" />
-                <label className="inline-flex items-center cursor-pointer">
-                  <input 
-                    type="checkbox"
-                    className="sr-only peer"
-                    checked={filterFree}
-                    onChange={() => setFilterFree(!filterFree)}
-                  />
-                  <div className="relative w-11 h-6 bg-gray-700 peer-focus:outline-none peer-focus:ring-1 peer-focus:ring-techfest-neon-blue rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-techfest-neon-blue"></div>
-                  <span className="ml-2 text-sm font-medium text-gray-300">Free Events Only</span>
-                </label>
               </div>
             </div>
           </div>
