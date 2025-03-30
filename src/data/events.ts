@@ -11,6 +11,7 @@ export interface Event {
   cash_prize: number;
   background_image?: string;
   category?: string;
+  qr_code_url?: string;
 }
 
 export const EVENTS_DATA: Event[] = [

@@ -14,3 +14,9 @@ export interface QRCodeImageType {
   url: string;
   eventId: string;
 }
+
+export const BRANCH_OPTIONS = [
+  'ALL',
+  'AIML', 'CSE', 'CSD', 'AIDS', 'ECE', 'AEROSPACE', 
+  'AERONAUTICAL', 'MECHANICAL', 'CIVIL', 'MBA'
+];

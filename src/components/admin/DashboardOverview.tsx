@@ -3,7 +3,7 @@ import React from 'react';
 import { Calendar, Users } from 'lucide-react';
 import { Event } from '@/data/events';
 import { Registration } from '@/data/registrations';
-import { BRANCH_OPTIONS } from './AddEventDialog';
+import { BRANCH_OPTIONS } from '@/types/admin';
 
 interface DashboardOverviewProps {
   events: Event[];
