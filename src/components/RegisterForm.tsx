@@ -8,12 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { EVENTS_DATA } from '@/data/events';
 import QRCode from '@/components/QRCode';
 import { toast } from 'sonner';
-
-// Branch options for registration
-const BRANCH_OPTIONS = [
-  'AIML', 'CSE', 'CSD', 'AIDS', 'ECE', 'AEROSPACE', 
-  'AERONAUTICAL', 'MECHANICAL', 'CIVIL', 'MBA'
-];
+import { BRANCH_OPTIONS } from '@/types/admin';
 
 const RegisterForm = () => {
   const { eventId } = useParams<{ eventId: string }>();
@@ -111,7 +106,7 @@ const RegisterForm = () => {
                 <SelectValue placeholder="Select your branch" />
               </SelectTrigger>
               <SelectContent className="bg-gray-900 text-white border-gray-700">
-                {BRANCH_OPTIONS.map((branch) => (
+                {BRANCH_OPTIONS.filter(branch => branch !== 'ALL').map((branch) => (
                   <SelectItem key={branch} value={branch} className="hover:bg-gray-800">
                     {branch}
                   </SelectItem>
