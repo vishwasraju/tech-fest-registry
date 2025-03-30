@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -145,7 +144,7 @@ const AddEventDialog = ({ onAddEvent }: AddEventDialogProps) => {
                 <SelectValue placeholder="Select background image" />
               </SelectTrigger>
               <SelectContent className="bg-gray-900 text-white border-gray-700">
-                <SelectItem value="" className="hover:bg-gray-800">None</SelectItem>
+                <SelectItem value="none" className="hover:bg-gray-800">None</SelectItem>
                 {BACKGROUND_IMAGES.map((image) => (
                   <SelectItem key={image.url} value={image.url} className="hover:bg-gray-800">
                     {image.name}
