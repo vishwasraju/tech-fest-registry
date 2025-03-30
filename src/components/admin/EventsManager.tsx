@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { AddEventDialog, BRANCH_OPTIONS } from './AddEventDialog';
 import BackgroundImageDialog from './BackgroundImageDialog';
 import ConfirmDeleteDialog from './ConfirmDeleteDialog';
+import QRCodeUploadDialog from './QRCodeUploadDialog';
 
 interface EventsManagerProps {
   events: Event[];
@@ -16,6 +17,7 @@ interface EventsManagerProps {
   onAddEvent: (data: any) => void;
   onDeleteEvent: (id: string) => void;
   onUpdateEventBackground: (id: string, backgroundUrl: string) => void;
+  onUpdateEventQRCode?: (id: string, qrCodeUrl: string) => void;
 }
 
 const EventsManager = ({ 
@@ -23,7 +25,8 @@ const EventsManager = ({
   registrations, 
   onAddEvent, 
   onDeleteEvent, 
-  onUpdateEventBackground 
+  onUpdateEventBackground,
+  onUpdateEventQRCode
 }: EventsManagerProps) => {
   const [selectedCategory, setSelectedCategory] = useState<string>('ALL');
   
@@ -37,24 +40,6 @@ const EventsManager = ({
         <h2 className="text-xl font-bold">Manage Events</h2>
         
         <div className="flex items-center gap-4">
-          <div className="w-48">
-            <Select 
-              value={selectedCategory} 
-              onValueChange={setSelectedCategory}
-            >
-              <SelectTrigger className="bg-techfest-muted text-white border-gray-700">
-                <SelectValue placeholder="Filter by Category" />
-              </SelectTrigger>
-              <SelectContent className="bg-gray-900 text-white border-gray-700">
-                {BRANCH_OPTIONS.map((category) => (
-                  <SelectItem key={category} value={category} className="hover:bg-gray-800">
-                    {category}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          
           <AddEventDialog onAddEvent={onAddEvent} />
         </div>
       </div>
@@ -65,7 +50,6 @@ const EventsManager = ({
             <thead>
               <tr className="border-b border-gray-800">
                 <th className="py-3 px-4 text-left">Event Name</th>
-                <th className="py-3 px-4 text-center">Category</th>
                 <th className="py-3 px-4 text-center">Date & Time</th>
                 <th className="py-3 px-4 text-center">Venue</th>
                 <th className="py-3 px-4 text-center">Entry Fee</th>
@@ -77,7 +61,6 @@ const EventsManager = ({
               {filteredEvents.map(event => (
                 <tr key={event.id} className="border-b border-gray-800 hover:bg-gray-900/40">
                   <td className="py-3 px-4">{event.name}</td>
-                  <td className="py-3 px-4 text-center">{event.category || '-'}</td>
                   <td className="py-3 px-4 text-center">{event.date_time}</td>
                   <td className="py-3 px-4 text-center">{event.venue}</td>
                   <td className="py-3 px-4 text-center">
@@ -104,6 +87,15 @@ const EventsManager = ({
                         currentBackground={event.background_image}
                         onUpdate={onUpdateEventBackground}
                       />
+                      
+                      {onUpdateEventQRCode && event.fees > 0 && (
+                        <QRCodeUploadDialog 
+                          eventId={event.id} 
+                          eventName={event.name}
+                          currentQRUrl={event.qr_code_url}
+                          onUpdate={onUpdateEventQRCode}
+                        />
+                      )}
                       
                       <ConfirmDeleteDialog 
                         eventId={event.id} 

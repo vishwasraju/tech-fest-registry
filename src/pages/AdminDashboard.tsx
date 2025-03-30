@@ -83,6 +83,15 @@ const AdminDashboard = () => {
     toast.success('Event background updated successfully');
   };
   
+  const handleUpdateEventQRCode = (eventId: string, qrCodeUrl: string) => {
+    setEvents(events.map(event => 
+      event.id === eventId 
+        ? { ...event, qr_code_url: qrCodeUrl } 
+        : event
+    ));
+    toast.success('Event QR code updated successfully');
+  };
+  
   if (!isAuthenticated) {
     return null; // Will redirect via useEffect
   }
@@ -128,6 +137,7 @@ const AdminDashboard = () => {
               onAddEvent={handleAddEvent}
               onDeleteEvent={handleDeleteEvent}
               onUpdateEventBackground={handleUpdateEventBackground}
+              onUpdateEventQRCode={handleUpdateEventQRCode}
             />
           )}
           

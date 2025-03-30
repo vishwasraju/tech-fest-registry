@@ -166,7 +166,10 @@ const RegisterForm = () => {
                 </p>
                 
                 <div className="bg-white p-3 rounded-lg mx-auto w-48 h-48 mb-4">
-                  <QRCode value={`upi://pay?pa=example@upi&pn=TechFest&am=${event.fees}`} />
+                  <QRCode 
+                    value={`upi://pay?pa=example@upi&pn=TechFest&am=${event.fees}`} 
+                    imageUrl={event.qr_code_url}
+                  />
                 </div>
                 
                 <div className="text-center text-xs text-gray-500 mb-6">

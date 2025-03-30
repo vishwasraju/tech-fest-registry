@@ -9,3 +9,8 @@ export interface BackgroundImageType {
   url: string;
   name: string;
 }
+
+export interface QRCodeImageType {
+  url: string;
+  eventId: string;
+}

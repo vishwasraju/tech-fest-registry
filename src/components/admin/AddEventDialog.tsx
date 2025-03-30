@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -7,19 +8,15 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
-// Branch/categories options
-const BRANCH_OPTIONS = [
-  'AIML', 'CSE', 'CSD', 'AIDS', 'ECE', 'AEROSPACE', 
-  'AERONAUTICAL', 'MECHANICAL', 'CIVIL', 'MBA', 'ALL'
-];
-
 // Background image options
 const BACKGROUND_IMAGES = [
   { url: 'https://images.unsplash.com/photo-1518770660439-4636190af475', name: 'Circuit Board' },
   { url: 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e', name: 'Robot' },
   { url: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5', name: 'Matrix Code' },
   { url: 'https://images.unsplash.com/photo-1487058792275-0ad4aaf24ca7', name: 'Colorful Code' },
-  { url: 'https://images.unsplash.com/photo-1605810230434-7631ac76ec81', name: 'Display Screens' }
+  { url: 'https://images.unsplash.com/photo-1605810230434-7631ac76ec81', name: 'Display Screens' },
+  { url: 'https://images.unsplash.com/photo-1542751371-adc38448a05e', name: 'Gaming Setup' },
+  { url: 'https://images.unsplash.com/photo-1511512578047-dfb367046420', name: 'Gaming Controller' }
 ];
 
 interface AddEventDialogProps {
@@ -36,8 +33,8 @@ const AddEventDialog = ({ onAddEvent }: AddEventDialogProps) => {
     team_size: 1,
     fees: 0,
     cash_prize: 0,
-    category: '',
-    background_image: ''
+    background_image: '',
+    qr_code_url: ''
   });
   
   const [open, setOpen] = useState(false);
@@ -68,8 +65,8 @@ const AddEventDialog = ({ onAddEvent }: AddEventDialogProps) => {
       team_size: 1,
       fees: 0,
       cash_prize: 0,
-      category: '',
-      background_image: ''
+      background_image: '',
+      qr_code_url: ''
     });
     setOpen(false);
   };
@@ -115,25 +112,6 @@ const AddEventDialog = ({ onAddEvent }: AddEventDialogProps) => {
             />
           </div>
 
-          <div>
-            <Label htmlFor="category">Category</Label>
-            <Select 
-              value={formData.category} 
-              onValueChange={(value) => handleSelectChange('category', value)}
-            >
-              <SelectTrigger className="bg-techfest-muted text-white border-techfest-muted">
-                <SelectValue placeholder="Select event category" />
-              </SelectTrigger>
-              <SelectContent className="bg-gray-900 text-white border-gray-700">
-                {BRANCH_OPTIONS.filter(b => b !== 'ALL').map((category) => (
-                  <SelectItem key={category} value={category} className="hover:bg-gray-800">
-                    {category}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          
           <div>
             <Label htmlFor="background_image">Background Image</Label>
             <Select 
@@ -237,6 +215,20 @@ const AddEventDialog = ({ onAddEvent }: AddEventDialogProps) => {
             </div>
           </div>
           
+          {formData.fees > 0 && (
+            <div>
+              <Label htmlFor="qr_code_url">Payment QR Code URL (Optional)</Label>
+              <Input
+                id="qr_code_url"
+                name="qr_code_url"
+                value={formData.qr_code_url}
+                onChange={handleChange}
+                className="bg-techfest-muted text-white border-techfest-muted"
+                placeholder="Enter URL for payment QR code image"
+              />
+            </div>
+          )}
+          
           <DialogFooter>
             <Button type="submit">Add Event</Button>
           </DialogFooter>
@@ -246,4 +238,4 @@ const AddEventDialog = ({ onAddEvent }: AddEventDialogProps) => {
   );
 };
 
-export { AddEventDialog, BRANCH_OPTIONS, BACKGROUND_IMAGES };
+export { AddEventDialog, BACKGROUND_IMAGES };
