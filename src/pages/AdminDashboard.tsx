@@ -6,12 +6,28 @@ import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { EVENTS_DATA } from '@/data/events';
 import { REGISTRATIONS_DATA } from '@/data/registrations';
-import { AreaChart, Calendar, Users, LogOut, Plus, Trash2, Eye } from 'lucide-react';
+import { AreaChart, Calendar, Users, LogOut, Plus, Trash2, Eye, Image } from 'lucide-react';
 import { toast } from 'sonner';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+
+// Branch/categories options
+const BRANCH_OPTIONS = [
+  'AIML', 'CSE', 'CSD', 'AIDS', 'ECE', 'AEROSPACE', 
+  'AERONAUTICAL', 'MECHANICAL', 'CIVIL', 'MBA', 'ALL'
+];
+
+// Background image options
+const BACKGROUND_IMAGES = [
+  { url: 'https://images.unsplash.com/photo-1518770660439-4636190af475', name: 'Circuit Board' },
+  { url: 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e', name: 'Robot' },
+  { url: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5', name: 'Matrix Code' },
+  { url: 'https://images.unsplash.com/photo-1487058792275-0ad4aaf24ca7', name: 'Colorful Code' },
+  { url: 'https://images.unsplash.com/photo-1605810230434-7631ac76ec81', name: 'Display Screens' }
+];
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -20,6 +36,7 @@ const AdminDashboard = () => {
   const [events, setEvents] = useState(EVENTS_DATA);
   const [registrations, setRegistrations] = useState(REGISTRATIONS_DATA);
   const [selectedEvent, setSelectedEvent] = useState<string | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<string>('ALL');
   
   // Check admin authentication
   useEffect(() => {
@@ -72,11 +89,31 @@ const AdminDashboard = () => {
     setRegistrations(registrations.filter(reg => reg.event_id !== eventId));
     toast.success('Event deleted successfully');
   };
+
+  const handleUpdateEventBackground = (eventId: string, backgroundImage: string) => {
+    setEvents(events.map(event => 
+      event.id === eventId 
+        ? { ...event, background_image: backgroundImage } 
+        : event
+    ));
+    toast.success('Event background updated successfully');
+  };
+  
+  // Filter registrations by selected event and category
+  const filteredEvents = selectedCategory === 'ALL' 
+    ? events 
+    : events.filter(event => event.category === selectedCategory);
   
   // Filter registrations by selected event
   const filteredRegistrations = selectedEvent
     ? registrations.filter(reg => reg.event_id === selectedEvent)
     : registrations;
+  
+  // Get registration counts by branch
+  const registrationsByBranch = BRANCH_OPTIONS.filter(branch => branch !== 'ALL').map(branch => {
+    const count = registrations.filter(reg => reg.branch === branch).length;
+    return { branch, count };
+  });
   
   if (!isAuthenticated) {
     return null; // Will redirect via useEffect
@@ -188,32 +225,57 @@ const AdminDashboard = () => {
                 </div>
               </div>
               
-              <div className="glass p-6 rounded-xl">
-                <h3 className="text-lg font-semibold mb-4">Registration Summary by Event</h3>
-                
-                <div className="overflow-x-auto">
-                  <table className="w-full">
-                    <thead>
-                      <tr className="border-b border-gray-800">
-                        <th className="py-3 px-4 text-left">Event Name</th>
-                        <th className="py-3 px-4 text-center">Registrations</th>
-                        <th className="py-3 px-4 text-right">Entry Fee</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {events.map(event => (
-                        <tr key={event.id} className="border-b border-gray-800 hover:bg-gray-900/40">
-                          <td className="py-3 px-4">{event.name}</td>
-                          <td className="py-3 px-4 text-center">
-                            {registrations.filter(reg => reg.event_id === event.id).length}
-                          </td>
-                          <td className="py-3 px-4 text-right">
-                            {event.fees > 0 ? `₹${event.fees}` : 'Free'}
-                          </td>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                <div className="glass p-6 rounded-xl">
+                  <h3 className="text-lg font-semibold mb-4">Registration Summary by Event</h3>
+                  
+                  <div className="overflow-x-auto">
+                    <table className="w-full">
+                      <thead>
+                        <tr className="border-b border-gray-800">
+                          <th className="py-3 px-4 text-left">Event Name</th>
+                          <th className="py-3 px-4 text-center">Registrations</th>
+                          <th className="py-3 px-4 text-right">Entry Fee</th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                      </thead>
+                      <tbody>
+                        {events.map(event => (
+                          <tr key={event.id} className="border-b border-gray-800 hover:bg-gray-900/40">
+                            <td className="py-3 px-4">{event.name}</td>
+                            <td className="py-3 px-4 text-center">
+                              {registrations.filter(reg => reg.event_id === event.id).length}
+                            </td>
+                            <td className="py-3 px-4 text-right">
+                              {event.fees > 0 ? `₹${event.fees}` : 'Free'}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+                
+                <div className="glass p-6 rounded-xl">
+                  <h3 className="text-lg font-semibold mb-4">Registration Summary by Branch</h3>
+                  
+                  <div className="overflow-x-auto">
+                    <table className="w-full">
+                      <thead>
+                        <tr className="border-b border-gray-800">
+                          <th className="py-3 px-4 text-left">Branch</th>
+                          <th className="py-3 px-4 text-center">Registrations</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {registrationsByBranch.map(({ branch, count }) => (
+                          <tr key={branch} className="border-b border-gray-800 hover:bg-gray-900/40">
+                            <td className="py-3 px-4">{branch}</td>
+                            <td className="py-3 px-4 text-center">{count}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
               </div>
             </div>
@@ -224,7 +286,27 @@ const AdminDashboard = () => {
               <div className="flex justify-between items-center mb-6">
                 <h2 className="text-xl font-bold">Manage Events</h2>
                 
-                <AddEventDialog onAddEvent={handleAddEvent} />
+                <div className="flex items-center gap-4">
+                  <div className="w-48">
+                    <Select 
+                      value={selectedCategory} 
+                      onValueChange={setSelectedCategory}
+                    >
+                      <SelectTrigger className="bg-techfest-muted text-white border-gray-700">
+                        <SelectValue placeholder="Filter by Category" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-gray-900 text-white border-gray-700">
+                        {BRANCH_OPTIONS.map((category) => (
+                          <SelectItem key={category} value={category} className="hover:bg-gray-800">
+                            {category}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  <AddEventDialog onAddEvent={handleAddEvent} />
+                </div>
               </div>
               
               <div className="glass rounded-xl overflow-hidden">
@@ -233,6 +315,7 @@ const AdminDashboard = () => {
                     <thead>
                       <tr className="border-b border-gray-800">
                         <th className="py-3 px-4 text-left">Event Name</th>
+                        <th className="py-3 px-4 text-center">Category</th>
                         <th className="py-3 px-4 text-center">Date & Time</th>
                         <th className="py-3 px-4 text-center">Venue</th>
                         <th className="py-3 px-4 text-center">Entry Fee</th>
@@ -241,9 +324,10 @@ const AdminDashboard = () => {
                       </tr>
                     </thead>
                     <tbody>
-                      {events.map(event => (
+                      {filteredEvents.map(event => (
                         <tr key={event.id} className="border-b border-gray-800 hover:bg-gray-900/40">
                           <td className="py-3 px-4">{event.name}</td>
+                          <td className="py-3 px-4 text-center">{event.category || '-'}</td>
                           <td className="py-3 px-4 text-center">{event.date_time}</td>
                           <td className="py-3 px-4 text-center">{event.venue}</td>
                           <td className="py-3 px-4 text-center">
@@ -263,6 +347,13 @@ const AdminDashboard = () => {
                                   <Eye size={14} />
                                 </Button>
                               </Link>
+                              
+                              <BackgroundImageDialog 
+                                eventId={event.id} 
+                                eventName={event.name}
+                                currentBackground={event.background_image}
+                                onUpdate={handleUpdateEventBackground}
+                              />
                               
                               <ConfirmDeleteDialog 
                                 eventId={event.id} 
@@ -286,20 +377,24 @@ const AdminDashboard = () => {
                 <h2 className="text-xl font-bold mb-4">Registration Entries</h2>
                 
                 <div className="glass p-4 rounded-lg">
-                  <Label htmlFor="event-filter">Filter by Event</Label>
-                  <select
-                    id="event-filter"
-                    className="w-full bg-techfest-muted text-white border-gray-700 rounded-md p-2 mt-1"
-                    value={selectedEvent || ''}
-                    onChange={(e) => setSelectedEvent(e.target.value || null)}
-                  >
-                    <option value="">All Events</option>
-                    {events.map(event => (
-                      <option key={event.id} value={event.id}>
-                        {event.name}
-                      </option>
-                    ))}
-                  </select>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="event-filter">Filter by Event</Label>
+                      <select
+                        id="event-filter"
+                        className="w-full bg-techfest-muted text-white border-gray-700 rounded-md p-2 mt-1"
+                        value={selectedEvent || ''}
+                        onChange={(e) => setSelectedEvent(e.target.value || null)}
+                      >
+                        <option value="">All Events</option>
+                        {events.map(event => (
+                          <option key={event.id} value={event.id}>
+                            {event.name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
                 </div>
               </div>
               
@@ -310,6 +405,7 @@ const AdminDashboard = () => {
                       <tr className="border-b border-gray-800">
                         <th className="py-3 px-4 text-left">Student Name</th>
                         <th className="py-3 px-4 text-left">USN</th>
+                        <th className="py-3 px-4 text-left">Branch</th>
                         <th className="py-3 px-4 text-left">Event</th>
                         <th className="py-3 px-4 text-left">Contact</th>
                         <th className="py-3 px-4 text-left">UTR Number</th>
@@ -323,6 +419,7 @@ const AdminDashboard = () => {
                             <tr key={registration.id} className="border-b border-gray-800 hover:bg-gray-900/40">
                               <td className="py-3 px-4">{registration.name}</td>
                               <td className="py-3 px-4">{registration.usn}</td>
+                              <td className="py-3 px-4">{registration.branch}</td>
                               <td className="py-3 px-4">{event?.name || 'Unknown Event'}</td>
                               <td className="py-3 px-4">{registration.phone}</td>
                               <td className="py-3 px-4">
@@ -337,7 +434,7 @@ const AdminDashboard = () => {
                         })
                       ) : (
                         <tr>
-                          <td colSpan={5} className="py-8 text-center text-gray-400">
+                          <td colSpan={6} className="py-8 text-center text-gray-400">
                             No registrations found
                           </td>
                         </tr>
@@ -366,7 +463,9 @@ const AddEventDialog = ({ onAddEvent }: { onAddEvent: (data: any) => void }) => 
     rules: '',
     team_size: 1,
     fees: 0,
-    cash_prize: 0
+    cash_prize: 0,
+    category: '',
+    background_image: ''
   });
   
   const [open, setOpen] = useState(false);
@@ -380,6 +479,10 @@ const AddEventDialog = ({ onAddEvent }: { onAddEvent: (data: any) => void }) => 
         : value
     }));
   };
+
+  const handleSelectChange = (name: string, value: string) => {
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
   
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -392,7 +495,9 @@ const AddEventDialog = ({ onAddEvent }: { onAddEvent: (data: any) => void }) => 
       rules: '',
       team_size: 1,
       fees: 0,
-      cash_prize: 0
+      cash_prize: 0,
+      category: '',
+      background_image: ''
     });
     setOpen(false);
   };
@@ -436,6 +541,45 @@ const AddEventDialog = ({ onAddEvent }: { onAddEvent: (data: any) => void }) => 
               className="bg-techfest-muted text-white border-techfest-muted"
               required
             />
+          </div>
+
+          <div>
+            <Label htmlFor="category">Category</Label>
+            <Select 
+              value={formData.category} 
+              onValueChange={(value) => handleSelectChange('category', value)}
+            >
+              <SelectTrigger className="bg-techfest-muted text-white border-techfest-muted">
+                <SelectValue placeholder="Select event category" />
+              </SelectTrigger>
+              <SelectContent className="bg-gray-900 text-white border-gray-700">
+                {BRANCH_OPTIONS.filter(b => b !== 'ALL').map((category) => (
+                  <SelectItem key={category} value={category} className="hover:bg-gray-800">
+                    {category}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          
+          <div>
+            <Label htmlFor="background_image">Background Image</Label>
+            <Select 
+              value={formData.background_image} 
+              onValueChange={(value) => handleSelectChange('background_image', value)}
+            >
+              <SelectTrigger className="bg-techfest-muted text-white border-techfest-muted">
+                <SelectValue placeholder="Select background image" />
+              </SelectTrigger>
+              <SelectContent className="bg-gray-900 text-white border-gray-700">
+                <SelectItem value="" className="hover:bg-gray-800">None</SelectItem>
+                {BACKGROUND_IMAGES.map((image) => (
+                  <SelectItem key={image.url} value={image.url} className="hover:bg-gray-800">
+                    {image.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -525,6 +669,92 @@ const AddEventDialog = ({ onAddEvent }: { onAddEvent: (data: any) => void }) => 
             <Button type="submit">Add Event</Button>
           </DialogFooter>
         </form>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+// Background Image Dialog
+const BackgroundImageDialog = ({ 
+  eventId, 
+  eventName,
+  currentBackground,
+  onUpdate 
+}: { 
+  eventId: string, 
+  eventName: string,
+  currentBackground?: string,
+  onUpdate: (id: string, backgroundUrl: string) => void 
+}) => {
+  const [open, setOpen] = useState(false);
+  const [selectedImage, setSelectedImage] = useState(currentBackground || '');
+  
+  const handleUpdate = () => {
+    onUpdate(eventId, selectedImage);
+    setOpen(false);
+  };
+  
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button 
+          size="sm" 
+          variant="outline" 
+          className="h-8 w-8 p-0 border-gray-600 hover:bg-blue-900/20"
+        >
+          <Image size={14} className="text-blue-400" />
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="glass border-gray-700 text-white">
+        <DialogHeader>
+          <DialogTitle>Change Event Background</DialogTitle>
+          <DialogDescription className="text-gray-400">
+            Select a background image for "{eventName}"
+          </DialogDescription>
+        </DialogHeader>
+        
+        <div className="grid grid-cols-2 gap-4 my-4">
+          <div 
+            onClick={() => setSelectedImage('')}
+            className={`relative cursor-pointer rounded-lg overflow-hidden h-24 border-2 ${selectedImage === '' ? 'border-techfest-neon-blue' : 'border-transparent'}`}
+          >
+            <div className="absolute inset-0 flex items-center justify-center bg-gray-800">
+              <span className="text-sm text-gray-400">No Background</span>
+            </div>
+          </div>
+          
+          {BACKGROUND_IMAGES.map((image) => (
+            <div 
+              key={image.url}
+              onClick={() => setSelectedImage(image.url)}
+              className={`relative cursor-pointer rounded-lg overflow-hidden h-24 border-2 ${selectedImage === image.url ? 'border-techfest-neon-blue' : 'border-transparent'}`}
+            >
+              <img 
+                src={image.url} 
+                alt={image.name}
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-black/30 flex items-end p-2">
+                <span className="text-xs text-white">{image.name}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+        
+        <DialogFooter className="mt-4">
+          <Button 
+            variant="outline" 
+            onClick={() => setOpen(false)}
+            className="border-gray-600 hover:bg-gray-800"
+          >
+            Cancel
+          </Button>
+          <Button 
+            onClick={handleUpdate}
+          >
+            Update Background
+          </Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

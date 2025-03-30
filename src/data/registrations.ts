@@ -4,6 +4,7 @@ export interface Registration {
   event_id: string;
   name: string;
   usn: string;
+  branch: string;
   phone: string;
   email: string;
   utr?: string;
@@ -15,6 +16,7 @@ export const REGISTRATIONS_DATA: Registration[] = [
     event_id: "event-1",
     name: "Aditya Sharma",
     usn: "1CS19CS001",
+    branch: "CSE",
     phone: "9876543210",
     email: "aditya.s@example.com",
     utr: "UTR123456789"
@@ -24,6 +26,7 @@ export const REGISTRATIONS_DATA: Registration[] = [
     event_id: "event-1",
     name: "Priya Patel",
     usn: "1CS19CS045",
+    branch: "CSE",
     phone: "8765432109",
     email: "priya.p@example.com",
     utr: "UTR987654321"
@@ -33,6 +36,7 @@ export const REGISTRATIONS_DATA: Registration[] = [
     event_id: "event-2",
     name: "Rahul Kumar",
     usn: "1CS20CS078",
+    branch: "AIML",
     phone: "7654321098",
     email: "rahul.k@example.com",
     utr: "UTR456789012"
@@ -42,6 +46,7 @@ export const REGISTRATIONS_DATA: Registration[] = [
     event_id: "event-3",
     name: "Sneha Gupta",
     usn: "1CS19CS112",
+    branch: "CSD",
     phone: "6543210987",
     email: "sneha.g@example.com",
     utr: "UTR345678901"
@@ -51,6 +56,7 @@ export const REGISTRATIONS_DATA: Registration[] = [
     event_id: "event-4",
     name: "Varun Singh",
     usn: "1CS21CS067",
+    branch: "ECE",
     phone: "5432109876",
     email: "varun.s@example.com"
   },
@@ -59,6 +65,7 @@ export const REGISTRATIONS_DATA: Registration[] = [
     event_id: "event-4",
     name: "Divya Reddy",
     usn: "1CS20CS033",
+    branch: "AIDS",
     phone: "4321098765",
     email: "divya.r@example.com"
   },
@@ -67,6 +74,7 @@ export const REGISTRATIONS_DATA: Registration[] = [
     event_id: "event-5",
     name: "Karthik Nair",
     usn: "1CS19CS056",
+    branch: "MECHANICAL",
     phone: "3210987654",
     email: "karthik.n@example.com",
     utr: "UTR234567890"
@@ -76,6 +84,7 @@ export const REGISTRATIONS_DATA: Registration[] = [
     event_id: "event-6",
     name: "Ananya Mishra",
     usn: "1CS22CS012",
+    branch: "MBA",
     phone: "2109876543",
     email: "ananya.m@example.com"
   }

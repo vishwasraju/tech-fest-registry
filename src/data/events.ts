@@ -9,6 +9,8 @@ export interface Event {
   team_size: number;
   fees: number;
   cash_prize: number;
+  background_image?: string;
+  category?: string;
 }
 
 export const EVENTS_DATA: Event[] = [
@@ -21,7 +23,9 @@ export const EVENTS_DATA: Event[] = [
     rules: "1. Teams of 3-4 members.\n2. Bring your own laptops and necessary equipment.\n3. Internet access will be provided.\n4. Projects must be original work created during the event.\n5. Final presentations will be 5 minutes per team.",
     team_size: 4,
     fees: 500,
-    cash_prize: 10000
+    cash_prize: 10000,
+    category: "CSE",
+    background_image: "https://images.unsplash.com/photo-1487058792275-0ad4aaf24ca7"
   },
   {
     id: "event-2",
@@ -32,7 +36,9 @@ export const EVENTS_DATA: Event[] = [
     rules: "1. Individual participation only.\n2. Time limit: 3 hours.\n3. Participants must solve algorithmic problems in any programming language.\n4. Internet access will be restricted during the competition.\n5. Rankings will be based on number of problems solved and time taken.",
     team_size: 1,
     fees: 200,
-    cash_prize: 5000
+    cash_prize: 5000,
+    category: "CSE",
+    background_image: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5"
   },
   {
     id: "event-3",
@@ -43,7 +49,9 @@ export const EVENTS_DATA: Event[] = [
     rules: "1. Individual or team of 2 allowed.\n2. Bring your own design tools (laptop with design software).\n3. Problem statements will be provided on the spot.\n4. Final designs must be submitted within 5 hours.\n5. Judging based on creativity, usability, and presentation.",
     team_size: 2,
     fees: 300,
-    cash_prize: 6000
+    cash_prize: 6000,
+    category: "CSD",
+    background_image: "https://images.unsplash.com/photo-1605810230434-7631ac76ec81"
   },
   {
     id: "event-4",
@@ -54,7 +62,8 @@ export const EVENTS_DATA: Event[] = [
     rules: "1. Teams of 2 members.\n2. Multiple rounds including written elimination, rapid fire, and buzzer rounds.\n3. Quiz master's decision will be final.\n4. Use of mobile phones or other devices is prohibited during the quiz.",
     team_size: 2,
     fees: 0,
-    cash_prize: 3000
+    cash_prize: 3000,
+    category: "AIML"
   },
   {
     id: "event-5",
@@ -65,7 +74,9 @@ export const EVENTS_DATA: Event[] = [
     rules: "1. Teams of 3-5 members.\n2. Robots must be pre-built and brought to the event.\n3. No remote controls allowed - robots must be autonomous.\n4. Maximum robot dimensions: 30cm x 30cm x 30cm.\n5. Time limit for course completion: 5 minutes.",
     team_size: 5,
     fees: 800,
-    cash_prize: 12000
+    cash_prize: 12000,
+    category: "ECE",
+    background_image: "https://images.unsplash.com/photo-1485827404703-89b55fcc595e"
   },
   {
     id: "event-6",
@@ -76,7 +87,8 @@ export const EVENTS_DATA: Event[] = [
     rules: "1. Individual or team of 2 allowed.\n2. Abstract submission deadline: March 1, 2025.\n3. Selected participants will be notified by March 5, 2025.\n4. Presentation time: 8 minutes + 2 minutes Q&A.\n5. Judging based on innovation, research quality, and presentation skills.",
     team_size: 2,
     fees: 0,
-    cash_prize: 4000
+    cash_prize: 4000,
+    category: "MBA"
   },
   {
     id: "event-7",
@@ -87,7 +99,9 @@ export const EVENTS_DATA: Event[] = [
     rules: "1. Individual participation only.\n2. Time limit: 4 hours.\n3. Participants must document all discovered vulnerabilities.\n4. Points awarded based on severity and number of bugs found.\n5. Ethical hacking principles must be followed.",
     team_size: 1,
     fees: 250,
-    cash_prize: 7000
+    cash_prize: 7000,
+    category: "CSE",
+    background_image: "https://images.unsplash.com/photo-1518770660439-4636190af475"
   },
   {
     id: "event-8",
@@ -98,6 +112,7 @@ export const EVENTS_DATA: Event[] = [
     rules: "1. Teams of 2 members.\n2. Topics will be announced 3 days before the event.\n3. Each team gets 5 minutes for opening arguments, 3 minutes for rebuttal, and 2 minutes for closing.\n4. Judges' decision will be final.\n5. Professional and respectful conduct is required.",
     team_size: 2,
     fees: 0,
-    cash_prize: 2500
+    cash_prize: 2500,
+    category: "AIML"
   }
 ];

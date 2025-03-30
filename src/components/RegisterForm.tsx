@@ -4,9 +4,16 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { EVENTS_DATA } from '@/data/events';
 import QRCode from '@/components/QRCode';
 import { toast } from 'sonner';
+
+// Branch options for registration
+const BRANCH_OPTIONS = [
+  'AIML', 'CSE', 'CSD', 'AIDS', 'ECE', 'AEROSPACE', 
+  'AERONAUTICAL', 'MECHANICAL', 'CIVIL', 'MBA'
+];
 
 const RegisterForm = () => {
   const { eventId } = useParams<{ eventId: string }>();
@@ -18,6 +25,7 @@ const RegisterForm = () => {
     usn: '',
     phone: '',
     email: '',
+    branch: '',
     utr: ''
   });
   
@@ -25,6 +33,10 @@ const RegisterForm = () => {
   
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleSelectChange = (name: string, value: string) => {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
   
@@ -44,7 +56,7 @@ const RegisterForm = () => {
   };
   
   const nextStep = () => {
-    if (formData.name && formData.usn && formData.phone && formData.email) {
+    if (formData.name && formData.usn && formData.phone && formData.email && formData.branch) {
       setStep(2);
     } else {
       toast.error('Please fill all required fields');
@@ -87,6 +99,25 @@ const RegisterForm = () => {
               placeholder="Enter your USN"
               required
             />
+          </div>
+          
+          <div>
+            <Label htmlFor="branch">Branch</Label>
+            <Select 
+              value={formData.branch} 
+              onValueChange={(value) => handleSelectChange('branch', value)}
+            >
+              <SelectTrigger className="bg-techfest-muted text-white border-techfest-muted">
+                <SelectValue placeholder="Select your branch" />
+              </SelectTrigger>
+              <SelectContent className="bg-gray-900 text-white border-gray-700">
+                {BRANCH_OPTIONS.map((branch) => (
+                  <SelectItem key={branch} value={branch} className="hover:bg-gray-800">
+                    {branch}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
           
           <div>
