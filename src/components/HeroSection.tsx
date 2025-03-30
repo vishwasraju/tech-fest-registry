@@ -1,13 +1,10 @@
-
 import React from 'react';
 import { CalendarDays, MapPin, Cpu, BrainCircuit, Bot } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import { Badge } from '@/components/ui/badge';
-
 const HeroSection = () => {
-  return (
-    <div className="relative py-20 md:py-32 overflow-hidden">
+  return <div className="relative py-20 md:py-32 overflow-hidden">
       {/* Background elements */}
       <div className="absolute inset-0 grid-bg z-0"></div>
       <div className="absolute top-20 right-20 w-60 h-60 bg-techfest-neon-blue/20 rounded-full blur-[100px] z-0"></div>
@@ -17,19 +14,20 @@ const HeroSection = () => {
       <div className="absolute top-1/4 right-[10%] opacity-20 animate-float z-0">
         <BrainCircuit size={80} className="text-techfest-neon-purple" />
       </div>
-      <div className="absolute bottom-1/4 left-[15%] opacity-20 animate-float z-0" style={{ animationDelay: "1.5s" }}>
+      <div className="absolute bottom-1/4 left-[15%] opacity-20 animate-float z-0" style={{
+      animationDelay: "1.5s"
+    }}>
         <Cpu size={60} className="text-techfest-neon-blue" />
       </div>
-      <div className="absolute top-1/3 left-[5%] opacity-20 animate-float z-0" style={{ animationDelay: "0.7s" }}>
+      <div className="absolute top-1/3 left-[5%] opacity-20 animate-float z-0" style={{
+      animationDelay: "0.7s"
+    }}>
         <Bot size={70} className="text-techfest-neon-pink" />
       </div>
       
       <div className="container mx-auto px-4 relative z-10">
         <div className="max-w-3xl mx-auto text-center">
-          <Badge 
-            variant="outline" 
-            className="mb-6 py-1.5 px-3 text-sm border-techfest-neon-blue text-techfest-neon-blue animate-pulse-neon inline-flex items-center gap-1.5"
-          >
+          <Badge variant="outline" className="mb-6 py-1.5 px-3 text-sm border-techfest-neon-blue text-techfest-neon-blue animate-pulse-neon inline-flex items-center gap-1.5">
             <CalendarDays size={14} />
             <span>March 15-21, 2025</span>
           </Badge>
@@ -61,7 +59,7 @@ const HeroSection = () => {
           <div className="glass p-6 rounded-xl border border-white/10 mb-10">
             <div className="flex flex-wrap items-center justify-center gap-6 md:gap-10 text-sm">
               <div className="flex flex-col items-center">
-                <span className="text-3xl font-bold text-techfest-neon-blue mb-1">15+</span>
+                <span className="text-3xl font-bold text-techfest-neon-blue mb-1">5</span>
                 <span className="text-gray-400">Events</span>
               </div>
               
@@ -87,8 +85,6 @@ const HeroSection = () => {
           </div>
         </div>
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default HeroSection;
