@@ -66,14 +66,14 @@ const HeroSection = () => {
               <div className="h-10 w-px bg-gray-700"></div>
               
               <div className="flex flex-col items-center">
-                <span className="text-3xl font-bold text-techfest-neon-purple mb-1">₹2K+</span>
+                <span className="text-3xl font-bold text-techfest-neon-purple mb-1">₹50K+</span>
                 <span className="text-gray-400">Prize Pool</span>
               </div>
               
               <div className="h-10 w-px bg-gray-700"></div>
               
               <div className="flex flex-col items-center">
-                <span className="text-3xl font-bold text-techfest-neon-pink mb-1">50+</span>
+                <span className="text-3xl font-bold text-techfest-neon-pink mb-1">1000+</span>
                 <span className="text-gray-400">Participants</span>
               </div>
             </div>
