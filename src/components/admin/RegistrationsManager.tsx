@@ -3,6 +3,9 @@ import React, { useState } from 'react';
 import { Event } from '@/data/events';
 import { Registration } from '@/data/registrations';
 import { Label } from '@/components/ui/label';
+import { Button } from '@/components/ui/button';
+import { Download } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface RegistrationsManagerProps {
   events: Event[];
@@ -17,12 +20,57 @@ const RegistrationsManager = ({ events, registrations }: RegistrationsManagerPro
     ? registrations.filter(reg => reg.event_id === selectedEvent)
     : registrations;
     
+  // Function to export registrations to CSV
+  const exportToCSV = () => {
+    const eventName = selectedEvent 
+      ? events.find(e => e.id === selectedEvent)?.name || 'All Events'
+      : 'All Events';
+      
+    // Create CSV headers
+    const headers = ['Student Name', 'USN', 'Branch', 'Event', 'Contact', 'UTR Number'];
+    
+    // Create CSV rows
+    const rows = filteredRegistrations.map(registration => {
+      const event = events.find(e => e.id === registration.event_id);
+      const utrValue = event && event.fees > 0 
+        ? registration.utr || 'Not Paid'
+        : 'N/A (Free Event)';
+        
+      return [
+        registration.name,
+        registration.usn,
+        registration.branch,
+        event?.name || 'Unknown Event',
+        registration.phone,
+        utrValue
+      ];
+    });
+    
+    // Combine headers and rows
+    const csvContent = [
+      headers.join(','),
+      ...rows.map(row => row.join(','))
+    ].join('\n');
+    
+    // Create a download link
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', `registrations_${eventName.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    toast.success(`Exported registrations for ${eventName}`);
+  };
+    
   return (
     <div>
       <div className="mb-6">
         <h2 className="text-xl font-bold mb-4">Registration Entries</h2>
         
-        <div className="glass p-4 rounded-lg">
+        <div className="glass p-4 rounded-lg mb-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <Label htmlFor="event-filter">Filter by Event</Label>
@@ -39,6 +87,17 @@ const RegistrationsManager = ({ events, registrations }: RegistrationsManagerPro
                   </option>
                 ))}
               </select>
+            </div>
+            
+            <div className="flex items-end">
+              <Button 
+                variant="outline" 
+                className="border-techfest-neon-blue text-techfest-neon-blue hover:bg-techfest-neon-blue/10"
+                onClick={exportToCSV}
+              >
+                <Download size={16} className="mr-2" />
+                Export to CSV
+              </Button>
             </div>
           </div>
         </div>

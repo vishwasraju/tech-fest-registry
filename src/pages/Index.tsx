@@ -5,13 +5,11 @@ import Footer from '@/components/Footer';
 import HeroSection from '@/components/HeroSection';
 import EventCard from '@/components/EventCard';
 import { EVENTS_DATA } from '@/data/events';
-import { ArrowRight, Calendar, Zap, Trophy } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Link } from 'react-router-dom';
+import { Calendar, Zap, Trophy } from 'lucide-react';
 
 const Index = () => {
-  // Show only featured events on the homepage
-  const featuredEvents = EVENTS_DATA.slice(0, 3);
+  // Show only first 5 events on the homepage
+  const featuredEvents = EVENTS_DATA.slice(0, 5);
   
   return (
     <div className="min-h-screen flex flex-col">
@@ -23,7 +21,7 @@ const Index = () => {
         {/* Featured Events Section */}
         <section className="py-20 container mx-auto px-4">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4">Featured Events</h2>
+            <h2 className="text-3xl font-bold mb-4">Our Events</h2>
             <p className="text-gray-400 max-w-2xl mx-auto">
               Check out these exciting technical challenges and showcase your skills in our premier events.
             </p>
@@ -33,15 +31,6 @@ const Index = () => {
             {featuredEvents.map(event => (
               <EventCard key={event.id} event={event} />
             ))}
-          </div>
-          
-          <div className="text-center mt-12">
-            <Link to="/events">
-              <Button variant="outline" className="border-techfest-neon-purple text-techfest-neon-purple hover:bg-techfest-neon-purple/10">
-                View All Events
-                <ArrowRight size={16} className="ml-2" />
-              </Button>
-            </Link>
           </div>
         </section>
         
@@ -56,7 +45,7 @@ const Index = () => {
                 </div>
                 <h3 className="text-xl font-bold mb-3">Event Schedule</h3>
                 <p className="text-gray-400 text-sm">
-                  All events are scheduled between March 15-21, 2025. Check individual event details for exact timing.
+                  All events are scheduled for April 9, 2025. Check individual event details for exact timing.
                 </p>
               </div>
               

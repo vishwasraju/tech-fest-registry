@@ -40,9 +40,9 @@ const Footer = () => {
           <div>
             <h4 className="text-lg font-semibold mb-4 text-techfest-neon-pink">Contact</h4>
             <ul className="space-y-2 text-sm text-gray-400">
-              <li>Department of Computer Science</li>
-              <li>University Campus</li>
-              <li>techfest2k25@university.edu</li>
+              <li>Department of AI & ML</li>
+              <li>SJCIT</li>
+              <li>+91 9110438648</li>
             </ul>
           </div>
         </div>

@@ -1,5 +1,6 @@
+
 import React from 'react';
-import { CalendarDays, MapPin, Cpu, BrainCircuit, Bot } from 'lucide-react';
+import { CalendarDays, MapPin, Cpu, BrainCircuit, Bot, Instagram } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import { Badge } from '@/components/ui/badge';
@@ -29,7 +30,7 @@ const HeroSection = () => {
         <div className="max-w-3xl mx-auto text-center">
           <Badge variant="outline" className="mb-6 py-1.5 px-3 text-sm border-techfest-neon-blue text-techfest-neon-blue animate-pulse-neon inline-flex items-center gap-1.5">
             <CalendarDays size={14} />
-            <span>March 15-21, 2025</span>
+            <span>April 9, 2025</span>
           </Badge>
           
           <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
@@ -50,33 +51,12 @@ const HeroSection = () => {
               </Button>
             </Link>
             
-            <Button variant="outline" className="border-techfest-neon-pink text-techfest-neon-pink hover:bg-techfest-neon-pink/10 px-8 py-6 text-lg">
-              <MapPin size={16} className="mr-2" />
-              View Venue
-            </Button>
-          </div>
-          
-          <div className="glass p-6 rounded-xl border border-white/10 mb-10">
-            <div className="flex flex-wrap items-center justify-center gap-6 md:gap-10 text-sm">
-              <div className="flex flex-col items-center">
-                <span className="text-3xl font-bold text-techfest-neon-blue mb-1">5</span>
-                <span className="text-gray-400">Events</span>
-              </div>
-              
-              <div className="h-10 w-px bg-gray-700"></div>
-              
-              <div className="flex flex-col items-center">
-                <span className="text-3xl font-bold text-techfest-neon-purple mb-1">₹2K+</span>
-                <span className="text-gray-400">Prize Pool</span>
-              </div>
-              
-              <div className="h-10 w-px bg-gray-700"></div>
-              
-              <div className="flex flex-col items-center">
-                <span className="text-3xl font-bold text-techfest-neon-pink mb-1">50+</span>
-                <span className="text-gray-400">Participants</span>
-              </div>
-            </div>
+            <a href="https://www.instagram.com/sjcit.aiml/?igsh=MW91dnVrMXBobzFvZQ%3D%3D#" target="_blank" rel="noopener noreferrer">
+              <Button variant="outline" className="border-techfest-neon-pink text-techfest-neon-pink hover:bg-techfest-neon-pink/10 px-8 py-6 text-lg">
+                <Instagram size={16} className="mr-2" />
+                Know About Us
+              </Button>
+            </a>
           </div>
           
           <div className="text-sm text-gray-500 flex items-center justify-center gap-2">
