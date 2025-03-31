@@ -9,6 +9,7 @@ import { EVENTS_DATA } from '@/data/events';
 import QRCode from '@/components/QRCode';
 import { toast } from 'sonner';
 import { BRANCH_OPTIONS } from '@/types/admin';
+import { supabase } from '@/integrations/supabase/client';
 
 const RegisterForm = () => {
   const { eventId } = useParams<{ eventId: string }>();
@@ -25,6 +26,7 @@ const RegisterForm = () => {
   });
   
   const [step, setStep] = useState(1);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -35,19 +37,55 @@ const RegisterForm = () => {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
   
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // This would normally be a backend API call
-    console.log('Registration data:', { ...formData, eventId });
+    if (!eventId || !event) {
+      toast.error('Event information is missing');
+      return;
+    }
     
-    toast.success('Registration successful!', {
-      description: 'Thank you for registering for this event!',
-    });
+    setIsSubmitting(true);
     
-    setTimeout(() => {
-      navigate('/registration-success');
-    }, 1500);
+    try {
+      // Prepare registration data
+      const registrationData = {
+        ...formData,
+        eventId,
+        eventName: event.name,
+        registrationDate: new Date().toISOString(),
+        paymentStatus: event.fees > 0 ? (formData.utr ? 'paid' : 'pending') : 'free'
+      };
+      
+      // Save registration data to Supabase Storage
+      const fileName = `${formData.usn}_${eventId}_${Date.now()}.json`;
+      const { error } = await supabase.storage
+        .from('registrations')
+        .upload(fileName, JSON.stringify(registrationData), {
+          contentType: 'application/json',
+          upsert: false
+        });
+      
+      if (error) {
+        console.error('Error saving registration:', error);
+        throw new Error('Failed to save your registration');
+      }
+      
+      toast.success('Registration successful!', {
+        description: 'Thank you for registering for this event!',
+      });
+      
+      setTimeout(() => {
+        navigate('/registration-success');
+      }, 1500);
+    } catch (error) {
+      console.error('Registration error:', error);
+      toast.error('Registration failed', {
+        description: 'There was a problem with your registration. Please try again.',
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
   
   const nextStep = () => {
@@ -205,9 +243,9 @@ const RegisterForm = () => {
             <Button 
               type="submit" 
               className="w-1/2 bg-gradient-to-r from-techfest-neon-blue to-techfest-neon-purple hover:opacity-90"
-              disabled={event.fees > 0 && !formData.utr}
+              disabled={isSubmitting || (event.fees > 0 && !formData.utr)}
             >
-              Complete Registration
+              {isSubmitting ? 'Submitting...' : 'Complete Registration'}
             </Button>
           </div>
         </form>
