@@ -8,10 +8,12 @@ const Header = () => {
   return (
     <header className="glass sticky top-0 z-50 w-full">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
-        <Link to="/" className="flex items-center space-x-2">
-          <span className="text-2xl font-bold bg-gradient-to-r from-techfest-neon-blue via-techfest-neon-purple to-techfest-neon-pink text-transparent bg-clip-text">
-            Tech Fest <span className="font-mono text-techfest-neon-blue">2K25</span>
-          </span>
+        <Link to="/" className="flex items-center">
+          <img 
+            src="/lovable-uploads/24fe700b-9cd0-4745-a2af-a58676eaf367.png" 
+            alt="Tech Fest 2K25 Logo" 
+            className="h-10" 
+          />
         </Link>
         
         <nav className="hidden md:flex items-center space-x-6">
