@@ -12,7 +12,6 @@ import { toast } from 'sonner';
 export const BACKGROUND_IMAGES = [
   { name: 'Tech Pattern', url: '/lovable-uploads/0dfb5f28-6575-4422-8a3e-b97a9c059cbd.png' },
   { name: 'Circuit Board', url: '/lovable-uploads/24fe700b-9cd0-4745-a2af-a58676eaf367.png' },
-  { name: 'Pubg', 'BGMI.jpg' },
 ];
 
 interface AddEventDialogProps {
