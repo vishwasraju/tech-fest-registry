@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import { Eye } from 'lucide-react';
 import { Event } from '@/data/events';
@@ -9,31 +9,28 @@ import { AddEventDialog } from './AddEventDialog';
 import BackgroundImageDialog from './BackgroundImageDialog';
 import ConfirmDeleteDialog from './ConfirmDeleteDialog';
 import QRCodeUploadDialog from './QRCodeUploadDialog';
+import { useAdmin } from '@/contexts/AdminContext';
 
 interface EventsManagerProps {
   events: Event[];
   registrations: Registration[];
-  onAddEvent: (data: any) => void;
-  onDeleteEvent: (id: string) => void;
-  onUpdateEventBackground: (id: string, backgroundUrl: string) => void;
-  onUpdateEventQRCode?: (id: string, qrCodeUrl: string) => void;
 }
 
-const EventsManager = ({ 
-  events, 
-  registrations, 
-  onAddEvent, 
-  onDeleteEvent, 
-  onUpdateEventBackground,
-  onUpdateEventQRCode
-}: EventsManagerProps) => {
+const EventsManager = ({ events, registrations }: EventsManagerProps) => {
+  const { 
+    handleAddEvent, 
+    handleDeleteEvent, 
+    handleUpdateEventBackground, 
+    handleUpdateEventQRCode 
+  } = useAdmin();
+
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-xl font-bold">Manage Events</h2>
         
         <div className="flex items-center gap-4">
-          <AddEventDialog onAddEvent={onAddEvent} />
+          <AddEventDialog onAddEvent={handleAddEvent} />
         </div>
       </div>
       
@@ -78,22 +75,22 @@ const EventsManager = ({
                         eventId={event.id} 
                         eventName={event.name}
                         currentBackground={event.background_image}
-                        onUpdate={onUpdateEventBackground}
+                        onUpdate={handleUpdateEventBackground}
                       />
                       
-                      {onUpdateEventQRCode && event.fees > 0 && (
+                      {event.fees > 0 && (
                         <QRCodeUploadDialog 
                           eventId={event.id} 
                           eventName={event.name}
                           currentQRUrl={event.qr_code_url}
-                          onUpdate={onUpdateEventQRCode}
+                          onUpdate={handleUpdateEventQRCode}
                         />
                       )}
                       
                       <ConfirmDeleteDialog 
                         eventId={event.id} 
                         eventName={event.name}
-                        onDelete={onDeleteEvent}
+                        onDelete={handleDeleteEvent}
                       />
                     </div>
                   </td>
