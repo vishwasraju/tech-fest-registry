@@ -4,7 +4,7 @@ import { useParams, Link } from 'react-router-dom';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
-import { Calendar, User, MapPin, Trophy, CreditCard } from 'lucide-react';
+import { Calendar, User, MapPin, Trophy, CreditCard, Users } from 'lucide-react';
 import { Event } from '@/data/events';
 
 interface EventDetailsProps {
@@ -80,6 +80,41 @@ const EventDetails = ({ events }: EventDetailsProps) => {
             <div className="glass p-6 md:p-8 rounded-xl mb-8">
               <h2 className="text-xl font-semibold mb-4">About This Event</h2>
               <p className="mb-6 whitespace-pre-line">{event.description}</p>
+              
+              {/* Coordinators Section */}
+              {(event.coordinators?.length > 0 || event.student_coordinators?.length > 0) && (
+                <div className="mb-6 p-4 bg-gray-900/50 rounded-lg">
+                  <h3 className="text-lg font-semibold mb-3 text-techfest-neon-blue">Contact Information</h3>
+                  
+                  {event.coordinators && event.coordinators.length > 0 && (
+                    <div className="mb-3">
+                      <h4 className="text-md font-medium mb-2 flex items-center">
+                        <Users size={16} className="mr-2 text-techfest-neon-pink" />
+                        Faculty Coordinators
+                      </h4>
+                      <ul className="list-disc pl-6">
+                        {event.coordinators.map((coordinator, index) => (
+                          <li key={index} className="mb-1">{coordinator}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                  
+                  {event.student_coordinators && event.student_coordinators.length > 0 && (
+                    <div>
+                      <h4 className="text-md font-medium mb-2 flex items-center">
+                        <Users size={16} className="mr-2 text-techfest-neon-purple" />
+                        Student Coordinators
+                      </h4>
+                      <ul className="list-disc pl-6">
+                        {event.student_coordinators.map((coordinator, index) => (
+                          <li key={index} className="mb-1">{coordinator}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+              )}
               
               <h2 className="text-xl font-semibold mb-4">Rules & Guidelines</h2>
               <div className="whitespace-pre-line">{event.rules}</div>

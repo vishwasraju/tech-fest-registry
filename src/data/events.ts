@@ -12,6 +12,8 @@ export interface Event {
   background_image?: string;
   category?: string;
   qr_code_url?: string;
+  coordinators?: string[];
+  student_coordinators?: string[];
 }
 
 // Initial events data

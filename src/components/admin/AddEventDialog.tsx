@@ -1,74 +1,83 @@
 
 import React, { useState } from 'react';
-import { Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Label } from '@/components/ui/label';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { BRANCH_OPTIONS } from '@/types/admin';
-
-// Background image options
-const BACKGROUND_IMAGES = [
-  { url: 'https://images.unsplash.com/photo-1518770660439-4636190af475', name: 'Circuit Board' },
-  { url: 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e', name: 'Robot' },
-  { url: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5', name: 'Matrix Code' },
-  { url: 'https://images.unsplash.com/photo-1487058792275-0ad4aaf24ca7', name: 'Colorful Code' },
-  { url: 'https://images.unsplash.com/photo-1605810230434-7631ac76ec81', name: 'Display Screens' },
-  { url: 'https://images.unsplash.com/photo-1542751371-adc38448a05e', name: 'Gaming Setup' },
-  { url: 'https://images.unsplash.com/photo-1511512578047-dfb367046420', name: 'Gaming Controller' }
-];
+import { Plus } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface AddEventDialogProps {
   onAddEvent: (data: any) => void;
 }
 
-const AddEventDialog = ({ onAddEvent }: AddEventDialogProps) => {
-  const [formData, setFormData] = useState({
-    name: '',
-    description: '',
-    date_time: '',
-    venue: '',
-    rules: '',
-    team_size: 1,
-    fees: 0,
-    cash_prize: 0,
-    background_image: '',
-    qr_code_url: ''
-  });
-  
+export function AddEventDialog({ onAddEvent }: AddEventDialogProps) {
   const [open, setOpen] = useState(false);
   
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: name === 'team_size' || name === 'fees' || name === 'cash_prize'
-        ? parseInt(value) || 0
-        : value
-    }));
-  };
-
-  const handleSelectChange = (name: string, value: string) => {
-    setFormData(prev => ({ ...prev, [name]: value }));
+  // Form state
+  const [name, setName] = useState('');
+  const [description, setDescription] = useState('');
+  const [dateTime, setDateTime] = useState('');
+  const [venue, setVenue] = useState('');
+  const [rules, setRules] = useState('');
+  const [teamSize, setTeamSize] = useState('1');
+  const [fees, setFees] = useState('0');
+  const [category, setCategory] = useState('');
+  const [cashPrize, setCashPrize] = useState('0');
+  const [coordinators, setCoordinators] = useState('');
+  const [studentCoordinators, setStudentCoordinators] = useState('');
+  
+  // Reset form
+  const resetForm = () => {
+    setName('');
+    setDescription('');
+    setDateTime('');
+    setVenue('');
+    setRules('');
+    setTeamSize('1');
+    setFees('0');
+    setCategory('');
+    setCashPrize('0');
+    setCoordinators('');
+    setStudentCoordinators('');
   };
   
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    onAddEvent(formData);
-    setFormData({
-      name: '',
-      description: '',
-      date_time: '',
-      venue: '',
-      rules: '',
-      team_size: 1,
-      fees: 0,
-      cash_prize: 0,
-      background_image: '',
-      qr_code_url: ''
-    });
+  const handleSubmit = () => {
+    // Validate form
+    if (!name || !description || !dateTime || !venue || !category) {
+      toast.error("Please fill in all required fields");
+      return;
+    }
+    
+    // Process coordinators into arrays
+    const coordinatorsArray = coordinators.split(',')
+      .map(coord => coord.trim())
+      .filter(coord => coord.length > 0);
+      
+    const studentCoordinatorsArray = studentCoordinators.split(',')
+      .map(coord => coord.trim())
+      .filter(coord => coord.length > 0);
+    
+    // Create event data
+    const eventData = {
+      name,
+      description,
+      date_time: dateTime,
+      venue,
+      rules,
+      team_size: parseInt(teamSize),
+      fees: parseInt(fees),
+      cash_prize: parseInt(cashPrize),
+      category,
+      coordinators: coordinatorsArray,
+      student_coordinators: studentCoordinatorsArray
+    };
+    
+    onAddEvent(eventData);
+    resetForm();
     setOpen(false);
   };
   
@@ -77,166 +86,149 @@ const AddEventDialog = ({ onAddEvent }: AddEventDialogProps) => {
       <DialogTrigger asChild>
         <Button>
           <Plus size={16} className="mr-2" />
-          Add New Event
+          Add Event
         </Button>
       </DialogTrigger>
-      <DialogContent className="glass border-gray-700 text-white">
+      <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Add New Event</DialogTitle>
-          <DialogDescription className="text-gray-400">
-            Fill in the details to create a new event.
+          <DialogDescription>
+            Fill in the details for the new event.
           </DialogDescription>
         </DialogHeader>
         
-        <form onSubmit={handleSubmit} className="space-y-4 mt-4">
-          <div>
-            <Label htmlFor="name">Event Name</Label>
-            <Input
-              id="name"
-              name="name"
-              value={formData.name}
-              onChange={handleChange}
-              className="bg-techfest-muted text-white border-techfest-muted"
-              required
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 py-4">
+          <div className="grid gap-2">
+            <Label htmlFor="event-name">Event Name <span className="text-red-500">*</span></Label>
+            <Input 
+              id="event-name" 
+              value={name} 
+              onChange={(e) => setName(e.target.value)} 
+              placeholder="Enter event name"
             />
           </div>
           
-          <div>
-            <Label htmlFor="description">Description</Label>
-            <Textarea
-              id="description"
-              name="description"
-              value={formData.description}
-              onChange={handleChange}
-              className="bg-techfest-muted text-white border-techfest-muted"
-              required
+          <div className="grid gap-2">
+            <Label htmlFor="event-date">Date & Time <span className="text-red-500">*</span></Label>
+            <Input 
+              id="event-date" 
+              value={dateTime} 
+              onChange={(e) => setDateTime(e.target.value)} 
+              placeholder="e.g., March 15, 2025 - 10:00 AM"
             />
           </div>
-
-          <div>
-            <Label htmlFor="background_image">Background Image</Label>
-            <Select 
-              value={formData.background_image} 
-              onValueChange={(value) => handleSelectChange('background_image', value)}
-            >
-              <SelectTrigger className="bg-techfest-muted text-white border-techfest-muted">
-                <SelectValue placeholder="Select background image" />
+          
+          <div className="grid gap-2">
+            <Label htmlFor="event-venue">Venue <span className="text-red-500">*</span></Label>
+            <Input 
+              id="event-venue" 
+              value={venue} 
+              onChange={(e) => setVenue(e.target.value)} 
+              placeholder="Enter venue"
+            />
+          </div>
+          
+          <div className="grid gap-2">
+            <Label htmlFor="event-category">Category <span className="text-red-500">*</span></Label>
+            <Select value={category} onValueChange={setCategory}>
+              <SelectTrigger id="event-category">
+                <SelectValue placeholder="Select category" />
               </SelectTrigger>
-              <SelectContent className="bg-gray-900 text-white border-gray-700">
-                <SelectItem value="none" className="hover:bg-gray-800">None</SelectItem>
-                {BACKGROUND_IMAGES.map((image) => (
-                  <SelectItem key={image.url} value={image.url} className="hover:bg-gray-800">
-                    {image.name}
+              <SelectContent>
+                {BRANCH_OPTIONS.filter(opt => opt !== 'ALL').map((branch) => (
+                  <SelectItem key={branch} value={branch}>
+                    {branch}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="date_time">Date & Time</Label>
-              <Input
-                id="date_time"
-                name="date_time"
-                value={formData.date_time}
-                onChange={handleChange}
-                className="bg-techfest-muted text-white border-techfest-muted"
-                placeholder="e.g. March 15, 2025 - 10:00 AM"
-                required
-              />
-            </div>
-            
-            <div>
-              <Label htmlFor="venue">Venue</Label>
-              <Input
-                id="venue"
-                name="venue"
-                value={formData.venue}
-                onChange={handleChange}
-                className="bg-techfest-muted text-white border-techfest-muted"
-                required
-              />
-            </div>
-          </div>
-          
-          <div>
-            <Label htmlFor="rules">Rules</Label>
-            <Textarea
-              id="rules"
-              name="rules"
-              value={formData.rules}
-              onChange={handleChange}
-              className="bg-techfest-muted text-white border-techfest-muted"
-              required
+          <div className="grid gap-2">
+            <Label htmlFor="event-team-size">Team Size</Label>
+            <Input 
+              id="event-team-size" 
+              type="number" 
+              min="1" 
+              value={teamSize} 
+              onChange={(e) => setTeamSize(e.target.value)}
             />
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <Label htmlFor="team_size">Team Size</Label>
-              <Input
-                id="team_size"
-                name="team_size"
-                type="number"
-                min="1"
-                value={formData.team_size}
-                onChange={handleChange}
-                className="bg-techfest-muted text-white border-techfest-muted"
-                required
-              />
-            </div>
-            
-            <div>
-              <Label htmlFor="fees">Entry Fee (₹)</Label>
-              <Input
-                id="fees"
-                name="fees"
-                type="number"
-                min="0"
-                value={formData.fees}
-                onChange={handleChange}
-                className="bg-techfest-muted text-white border-techfest-muted"
-                required
-              />
-            </div>
-            
-            <div>
-              <Label htmlFor="cash_prize">Cash Prize (₹)</Label>
-              <Input
-                id="cash_prize"
-                name="cash_prize"
-                type="number"
-                min="0"
-                value={formData.cash_prize}
-                onChange={handleChange}
-                className="bg-techfest-muted text-white border-techfest-muted"
-                required
-              />
-            </div>
+          <div className="grid gap-2">
+            <Label htmlFor="event-fees">Entry Fee (₹)</Label>
+            <Input 
+              id="event-fees" 
+              type="number" 
+              min="0" 
+              value={fees} 
+              onChange={(e) => setFees(e.target.value)}
+            />
           </div>
           
-          {formData.fees > 0 && (
-            <div>
-              <Label htmlFor="qr_code_url">Payment QR Code URL (Optional)</Label>
-              <Input
-                id="qr_code_url"
-                name="qr_code_url"
-                value={formData.qr_code_url}
-                onChange={handleChange}
-                className="bg-techfest-muted text-white border-techfest-muted"
-                placeholder="Enter URL for payment QR code image"
-              />
-            </div>
-          )}
+          <div className="grid gap-2">
+            <Label htmlFor="event-prize">Cash Prize (₹)</Label>
+            <Input 
+              id="event-prize" 
+              type="number" 
+              min="0" 
+              value={cashPrize} 
+              onChange={(e) => setCashPrize(e.target.value)}
+            />
+          </div>
           
-          <DialogFooter>
-            <Button type="submit">Add Event</Button>
-          </DialogFooter>
-        </form>
+          <div className="grid gap-2 md:col-span-2">
+            <Label htmlFor="event-coordinators">Coordinators (comma separated)</Label>
+            <Input 
+              id="event-coordinators" 
+              value={coordinators} 
+              onChange={(e) => setCoordinators(e.target.value)} 
+              placeholder="Dr. John Doe, Prof. Jane Smith"
+            />
+          </div>
+          
+          <div className="grid gap-2 md:col-span-2">
+            <Label htmlFor="event-student-coordinators">Student Coordinators (comma separated)</Label>
+            <Input 
+              id="event-student-coordinators" 
+              value={studentCoordinators} 
+              onChange={(e) => setStudentCoordinators(e.target.value)} 
+              placeholder="Alex Johnson, Sarah Williams"
+            />
+          </div>
+          
+          <div className="grid gap-2 md:col-span-2">
+            <Label htmlFor="event-description">Description <span className="text-red-500">*</span></Label>
+            <Textarea 
+              id="event-description" 
+              value={description} 
+              onChange={(e) => setDescription(e.target.value)} 
+              placeholder="Event description"
+              rows={4}
+            />
+          </div>
+          
+          <div className="grid gap-2 md:col-span-2">
+            <Label htmlFor="event-rules">Rules & Guidelines</Label>
+            <Textarea 
+              id="event-rules" 
+              value={rules} 
+              onChange={(e) => setRules(e.target.value)} 
+              placeholder="Event rules (one per line)"
+              rows={4}
+            />
+          </div>
+        </div>
+        
+        <DialogFooter>
+          <Button variant="outline" onClick={() => setOpen(false)}>
+            Cancel
+          </Button>
+          <Button onClick={handleSubmit}>
+            Add Event
+          </Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );
-};
-
-export { AddEventDialog, BACKGROUND_IMAGES };
+}
