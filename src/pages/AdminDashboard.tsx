@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
-import { EVENTS_DATA } from '@/data/events';
+import { EVENTS_DATA, loadEventsFromStorage, saveEventsToStorage } from '@/data/events';
 import { REGISTRATIONS_DATA } from '@/data/registrations';
 import { LogOut } from 'lucide-react';
 import { toast } from 'sonner';
@@ -21,6 +21,7 @@ const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState('overview');
   const [events, setEvents] = useState(EVENTS_DATA);
   const [registrations, setRegistrations] = useState(REGISTRATIONS_DATA);
+  const [isLoading, setIsLoading] = useState(true);
   
   // Check admin authentication
   useEffect(() => {
@@ -49,47 +50,101 @@ const AdminDashboard = () => {
     }
   }, [navigate]);
   
+  // Load events from storage
+  useEffect(() => {
+    const loadEvents = async () => {
+      setIsLoading(true);
+      try {
+        const loadedEvents = await loadEventsFromStorage();
+        setEvents(loadedEvents);
+      } catch (error) {
+        console.error('Error loading events:', error);
+        toast.error('Failed to load events data');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    if (isAuthenticated) {
+      loadEvents();
+    }
+  }, [isAuthenticated]);
+  
   const handleLogout = () => {
     localStorage.removeItem('techfest-admin');
     toast.success('Logged out successfully');
     navigate('/admin');
   };
   
-  const handleAddEvent = (formData: any) => {
+  const handleAddEvent = async (formData: any) => {
     // In a real app, this would be an API call
     const newEvent = {
       id: `event-${events.length + 1}`,
       ...formData
     };
     
-    setEvents([...events, newEvent]);
-    toast.success('Event added successfully');
+    const updatedEvents = [...events, newEvent];
+    setEvents(updatedEvents);
+    
+    // Save to storage
+    const saved = await saveEventsToStorage(updatedEvents);
+    if (saved) {
+      toast.success('Event added successfully');
+    } else {
+      toast.error('Failed to save event');
+    }
   };
   
-  const handleDeleteEvent = (eventId: string) => {
-    // In a real app, this would be an API call
-    setEvents(events.filter(event => event.id !== eventId));
+  const handleDeleteEvent = async (eventId: string) => {
+    // Filter out the deleted event
+    const updatedEvents = events.filter(event => event.id !== eventId);
+    setEvents(updatedEvents);
+    
     // Also filter out registrations for this event
-    setRegistrations(registrations.filter(reg => reg.event_id !== eventId));
-    toast.success('Event deleted successfully');
+    const updatedRegistrations = registrations.filter(reg => reg.event_id !== eventId);
+    setRegistrations(updatedRegistrations);
+    
+    // Save to storage
+    const saved = await saveEventsToStorage(updatedEvents);
+    if (saved) {
+      toast.success('Event deleted successfully');
+    } else {
+      toast.error('Failed to delete event');
+    }
   };
 
-  const handleUpdateEventBackground = (eventId: string, backgroundImage: string) => {
-    setEvents(events.map(event => 
+  const handleUpdateEventBackground = async (eventId: string, backgroundImage: string) => {
+    const updatedEvents = events.map(event => 
       event.id === eventId 
         ? { ...event, background_image: backgroundImage } 
         : event
-    ));
-    toast.success('Event background updated successfully');
+    );
+    setEvents(updatedEvents);
+    
+    // Save to storage
+    const saved = await saveEventsToStorage(updatedEvents);
+    if (saved) {
+      toast.success('Event background updated successfully');
+    } else {
+      toast.error('Failed to update event background');
+    }
   };
   
-  const handleUpdateEventQRCode = (eventId: string, qrCodeUrl: string) => {
-    setEvents(events.map(event => 
+  const handleUpdateEventQRCode = async (eventId: string, qrCodeUrl: string) => {
+    const updatedEvents = events.map(event => 
       event.id === eventId 
         ? { ...event, qr_code_url: qrCodeUrl } 
         : event
-    ));
-    toast.success('Event QR code updated successfully');
+    );
+    setEvents(updatedEvents);
+    
+    // Save to storage
+    const saved = await saveEventsToStorage(updatedEvents);
+    if (saved) {
+      toast.success('Event QR code updated successfully');
+    } else {
+      toast.error('Failed to update event QR code');
+    }
   };
   
   if (!isAuthenticated) {
@@ -122,30 +177,39 @@ const AdminDashboard = () => {
           {/* Admin Tabs */}
           <AdminTabNav activeTab={activeTab} onTabChange={setActiveTab} />
           
-          {/* Tab Content */}
-          {activeTab === 'overview' && (
-            <DashboardOverview 
-              events={events} 
-              registrations={registrations} 
-            />
-          )}
-          
-          {activeTab === 'events' && (
-            <EventsManager 
-              events={events} 
-              registrations={registrations} 
-              onAddEvent={handleAddEvent}
-              onDeleteEvent={handleDeleteEvent}
-              onUpdateEventBackground={handleUpdateEventBackground}
-              onUpdateEventQRCode={handleUpdateEventQRCode}
-            />
-          )}
-          
-          {activeTab === 'registrations' && (
-            <RegistrationsManager 
-              events={events} 
-              registrations={registrations} 
-            />
+          {/* Loading state */}
+          {isLoading ? (
+            <div className="flex justify-center items-center py-20">
+              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-techfest-neon-blue"></div>
+            </div>
+          ) : (
+            <>
+              {/* Tab Content */}
+              {activeTab === 'overview' && (
+                <DashboardOverview 
+                  events={events} 
+                  registrations={registrations} 
+                />
+              )}
+              
+              {activeTab === 'events' && (
+                <EventsManager 
+                  events={events} 
+                  registrations={registrations} 
+                  onAddEvent={handleAddEvent}
+                  onDeleteEvent={handleDeleteEvent}
+                  onUpdateEventBackground={handleUpdateEventBackground}
+                  onUpdateEventQRCode={handleUpdateEventQRCode}
+                />
+              )}
+              
+              {activeTab === 'registrations' && (
+                <RegistrationsManager 
+                  events={events} 
+                  registrations={registrations} 
+                />
+              )}
+            </>
           )}
         </div>
       </main>

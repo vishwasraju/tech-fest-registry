@@ -14,6 +14,7 @@ export interface Event {
   qr_code_url?: string;
 }
 
+// Initial events data
 export const EVENTS_DATA: Event[] = [
   {
     id: "event-1",
@@ -117,3 +118,71 @@ export const EVENTS_DATA: Event[] = [
     category: "AIML"
   }
 ];
+
+// Function to load events from Supabase Storage
+export const loadEventsFromStorage = async (): Promise<Event[]> => {
+  try {
+    // Try to load from localStorage first (for quick access)
+    const cachedEvents = localStorage.getItem('techfest-events');
+    if (cachedEvents) {
+      return JSON.parse(cachedEvents);
+    }
+    
+    // If not in localStorage, try to load from Supabase Storage
+    const { supabase } = await import('@/integrations/supabase/client');
+    
+    const { data, error } = await supabase.storage
+      .from('registrations')
+      .download('events.json');
+      
+    if (error || !data) {
+      console.log('No saved events found, using default data');
+      // Save the default events to storage for future use
+      await saveEventsToStorage(EVENTS_DATA);
+      return EVENTS_DATA;
+    }
+    
+    const events: Event[] = JSON.parse(await data.text());
+    // Update localStorage for quick access next time
+    localStorage.setItem('techfest-events', JSON.stringify(events));
+    return events;
+  } catch (error) {
+    console.error('Error loading events:', error);
+    return EVENTS_DATA;
+  }
+};
+
+// Function to save events to Supabase Storage
+export const saveEventsToStorage = async (events: Event[]): Promise<boolean> => {
+  try {
+    const { supabase } = await import('@/integrations/supabase/client');
+    
+    // Convert events to JSON string
+    const eventsJson = JSON.stringify(events);
+    
+    // Save to localStorage for quick access
+    localStorage.setItem('techfest-events', eventsJson);
+    
+    // Create a blob from the JSON string
+    const blob = new Blob([eventsJson], { type: 'application/json' });
+    const file = new File([blob], 'events.json', { type: 'application/json' });
+    
+    // Upload to Supabase Storage
+    const { error } = await supabase.storage
+      .from('registrations')
+      .upload('events.json', file, {
+        cacheControl: '3600',
+        upsert: true
+      });
+      
+    if (error) {
+      console.error('Error saving events:', error);
+      return false;
+    }
+    
+    return true;
+  } catch (error) {
+    console.error('Error saving events:', error);
+    return false;
+  }
+};
