@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
-import { EVENTS_DATA, loadEventsFromStorage, saveEventsToStorage } from '@/data/events';
+import { Event } from '@/data/events';
 import { REGISTRATIONS_DATA } from '@/data/registrations';
 import { SPONSORS_DATA, loadSponsorsFromStorage, saveSponsorsToStorage } from '@/data/sponsors';
 import { LogOut } from 'lucide-react';
@@ -16,12 +16,17 @@ import DashboardOverview from '@/components/admin/DashboardOverview';
 import EventsManager from '@/components/admin/EventsManager';
 import RegistrationsManager from '@/components/admin/RegistrationsManager';
 import SponsorsManager from '@/components/admin/SponsorsManager';
+import AdminPasswordChange from '@/components/admin/AdminPasswordChange';
 
-const AdminDashboard = () => {
+interface AdminDashboardProps {
+  events: Event[];
+  onUpdateEvents: (events: Event[]) => Promise<void>;
+}
+
+const AdminDashboard = ({ events, onUpdateEvents }: AdminDashboardProps) => {
   const navigate = useNavigate();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [activeTab, setActiveTab] = useState('overview');
-  const [events, setEvents] = useState(EVENTS_DATA);
   const [registrations, setRegistrations] = useState(REGISTRATIONS_DATA);
   const [sponsors, setSponsors] = useState(SPONSORS_DATA);
   const [isLoading, setIsLoading] = useState(true);
@@ -53,14 +58,11 @@ const AdminDashboard = () => {
     }
   }, [navigate]);
   
-  // Load events from storage
+  // Load sponsors from storage
   useEffect(() => {
     const loadData = async () => {
       setIsLoading(true);
       try {
-        const loadedEvents = await loadEventsFromStorage();
-        setEvents(loadedEvents);
-        
         const loadedSponsors = await loadSponsorsFromStorage();
         setSponsors(loadedSponsors);
       } catch (error) {
@@ -90,33 +92,21 @@ const AdminDashboard = () => {
     };
     
     const updatedEvents = [...events, newEvent];
-    setEvents(updatedEvents);
-    
-    // Save to storage
-    const saved = await saveEventsToStorage(updatedEvents);
-    if (saved) {
-      toast.success('Event added successfully');
-    } else {
-      toast.error('Failed to save event');
-    }
+    await onUpdateEvents(updatedEvents);
+    toast.success('Event added successfully');
   };
   
   const handleDeleteEvent = async (eventId: string) => {
     // Filter out the deleted event
     const updatedEvents = events.filter(event => event.id !== eventId);
-    setEvents(updatedEvents);
     
     // Also filter out registrations for this event
     const updatedRegistrations = registrations.filter(reg => reg.event_id !== eventId);
     setRegistrations(updatedRegistrations);
     
     // Save to storage
-    const saved = await saveEventsToStorage(updatedEvents);
-    if (saved) {
-      toast.success('Event deleted successfully');
-    } else {
-      toast.error('Failed to delete event');
-    }
+    await onUpdateEvents(updatedEvents);
+    toast.success('Event deleted successfully');
   };
 
   const handleUpdateEventBackground = async (eventId: string, backgroundImage: string) => {
@@ -125,15 +115,9 @@ const AdminDashboard = () => {
         ? { ...event, background_image: backgroundImage } 
         : event
     );
-    setEvents(updatedEvents);
     
-    // Save to storage
-    const saved = await saveEventsToStorage(updatedEvents);
-    if (saved) {
-      toast.success('Event background updated successfully');
-    } else {
-      toast.error('Failed to update event background');
-    }
+    await onUpdateEvents(updatedEvents);
+    toast.success('Event background updated successfully');
   };
   
   const handleUpdateEventQRCode = async (eventId: string, qrCodeUrl: string) => {
@@ -142,15 +126,9 @@ const AdminDashboard = () => {
         ? { ...event, qr_code_url: qrCodeUrl } 
         : event
     );
-    setEvents(updatedEvents);
     
-    // Save to storage
-    const saved = await saveEventsToStorage(updatedEvents);
-    if (saved) {
-      toast.success('Event QR code updated successfully');
-    } else {
-      toast.error('Failed to update event QR code');
-    }
+    await onUpdateEvents(updatedEvents);
+    toast.success('Event QR code updated successfully');
   };
   
   // Sponsor handlers
@@ -229,7 +207,7 @@ const AdminDashboard = () => {
             </Button>
           </div>
           
-          {/* Admin Tabs - Update this component to include sponsors tab */}
+          {/* Admin Tabs */}
           <div className="border-b border-gray-800 mb-8">
             <div className="flex flex-wrap -mb-px">
               <button
@@ -275,6 +253,17 @@ const AdminDashboard = () => {
               >
                 Sponsors
               </button>
+              
+              <button
+                className={`mr-4 py-2 px-1 border-b-2 ${
+                  activeTab === 'settings' 
+                    ? 'border-green-500 text-green-500' 
+                    : 'border-transparent text-gray-400 hover:text-gray-300'
+                }`}
+                onClick={() => setActiveTab('settings')}
+              >
+                Settings
+              </button>
             </div>
           </div>
           
@@ -318,6 +307,10 @@ const AdminDashboard = () => {
                   onUpdateSponsor={handleUpdateSponsor}
                   onDeleteSponsor={handleDeleteSponsor}
                 />
+              )}
+              
+              {activeTab === 'settings' && (
+                <AdminPasswordChange />
               )}
             </>
           )}

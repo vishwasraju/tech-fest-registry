@@ -5,7 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { loadEventsFromStorage, EVENTS_DATA, Event } from "./data/events";
+import { loadEventsFromStorage, saveEventsToStorage, EVENTS_DATA, Event } from "./data/events";
 import Index from "./pages/Index";
 import Events from "./pages/Events";
 import EventDetails from "./pages/EventDetails";
@@ -21,8 +21,9 @@ const App = () => {
   const [events, setEvents] = useState<Event[]>(EVENTS_DATA);
   const [isLoading, setIsLoading] = useState(true);
 
+  // Load events from storage on initial mount
   useEffect(() => {
-    const loadEvents = async () => {
+    const loadData = async () => {
       try {
         const loadedEvents = await loadEventsFromStorage();
         setEvents(loadedEvents);
@@ -33,8 +34,14 @@ const App = () => {
       }
     };
     
-    loadEvents();
+    loadData();
   }, []);
+
+  // Function to update events
+  const updateEvents = async (newEvents: Event[]) => {
+    setEvents(newEvents);
+    await saveEventsToStorage(newEvents);
+  };
 
   if (isLoading) {
     return <div className="min-h-screen flex items-center justify-center">
@@ -55,7 +62,7 @@ const App = () => {
             <Route path="/register/:eventId" element={<Register events={events} />} />
             <Route path="/registration-success" element={<RegistrationSuccess />} />
             <Route path="/admin" element={<Admin />} />
-            <Route path="/admin/dashboard" element={<AdminDashboard />} />
+            <Route path="/admin/dashboard" element={<AdminDashboard events={events} onUpdateEvents={updateEvents} />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

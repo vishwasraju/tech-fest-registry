@@ -4,9 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { BRANCH_OPTIONS } from '@/types/admin';
 import { Plus } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -31,7 +29,6 @@ export function AddEventDialog({ onAddEvent }: AddEventDialogProps) {
   const [rules, setRules] = useState('');
   const [teamSize, setTeamSize] = useState('1');
   const [fees, setFees] = useState('0');
-  const [category, setCategory] = useState('');
   const [cashPrize, setCashPrize] = useState('0');
   const [coordinators, setCoordinators] = useState('');
   const [studentCoordinators, setStudentCoordinators] = useState('');
@@ -45,7 +42,6 @@ export function AddEventDialog({ onAddEvent }: AddEventDialogProps) {
     setRules('');
     setTeamSize('1');
     setFees('0');
-    setCategory('');
     setCashPrize('0');
     setCoordinators('');
     setStudentCoordinators('');
@@ -53,7 +49,7 @@ export function AddEventDialog({ onAddEvent }: AddEventDialogProps) {
   
   const handleSubmit = () => {
     // Validate form
-    if (!name || !description || !dateTime || !venue || !category) {
+    if (!name || !description || !dateTime || !venue) {
       toast.error("Please fill in all required fields");
       return;
     }
@@ -77,7 +73,6 @@ export function AddEventDialog({ onAddEvent }: AddEventDialogProps) {
       team_size: parseInt(teamSize),
       fees: parseInt(fees),
       cash_prize: parseInt(cashPrize),
-      category,
       coordinators: coordinatorsArray,
       student_coordinators: studentCoordinatorsArray
     };
@@ -132,22 +127,6 @@ export function AddEventDialog({ onAddEvent }: AddEventDialogProps) {
               onChange={(e) => setVenue(e.target.value)} 
               placeholder="Enter venue"
             />
-          </div>
-          
-          <div className="grid gap-2">
-            <Label htmlFor="event-category">Category <span className="text-red-500">*</span></Label>
-            <Select value={category} onValueChange={setCategory}>
-              <SelectTrigger id="event-category">
-                <SelectValue placeholder="Select category" />
-              </SelectTrigger>
-              <SelectContent>
-                {BRANCH_OPTIONS.filter(opt => opt !== 'ALL').map((branch) => (
-                  <SelectItem key={branch} value={branch}>
-                    {branch}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
           </div>
           
           <div className="grid gap-2">

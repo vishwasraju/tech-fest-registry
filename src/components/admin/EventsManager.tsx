@@ -5,8 +5,6 @@ import { Eye } from 'lucide-react';
 import { Event } from '@/data/events';
 import { Registration } from '@/data/registrations';
 import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { BRANCH_OPTIONS } from '@/types/admin';
 import { AddEventDialog } from './AddEventDialog';
 import BackgroundImageDialog from './BackgroundImageDialog';
 import ConfirmDeleteDialog from './ConfirmDeleteDialog';
@@ -29,12 +27,6 @@ const EventsManager = ({
   onUpdateEventBackground,
   onUpdateEventQRCode
 }: EventsManagerProps) => {
-  const [selectedCategory, setSelectedCategory] = useState<string>('ALL');
-  
-  const filteredEvents = selectedCategory === 'ALL' 
-    ? events 
-    : events.filter(event => event.category === selectedCategory);
-    
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
@@ -59,7 +51,7 @@ const EventsManager = ({
               </tr>
             </thead>
             <tbody>
-              {filteredEvents.map(event => (
+              {events.map(event => (
                 <tr key={event.id} className="border-b border-gray-800 hover:bg-gray-900/40">
                   <td className="py-3 px-4">{event.name}</td>
                   <td className="py-3 px-4 text-center">{event.date_time}</td>
