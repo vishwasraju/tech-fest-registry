@@ -7,7 +7,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
-import { Pencil, Trash2, Plus } from 'lucide-react';
+import { Pencil, Trash2, Plus, Upload } from 'lucide-react';
+import { uploadFile } from '@/utils/storageUtils';
 
 interface SponsorsManagerProps {
   sponsors: Sponsor[];
@@ -25,12 +26,14 @@ const SponsorsManager = ({
   const [openAddDialog, setOpenAddDialog] = useState(false);
   const [openEditDialog, setOpenEditDialog] = useState(false);
   const [selectedSponsor, setSelectedSponsor] = useState<Sponsor | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
   
   // Form states
   const [name, setName] = useState('');
   const [tier, setTier] = useState<'Platinum' | 'Gold' | 'Silver' | 'Bronze'>('Gold');
   const [logoUrl, setLogoUrl] = useState('');
   const [websiteUrl, setWebsiteUrl] = useState('');
+  const [logoFile, setLogoFile] = useState<File | null>(null);
   
   // Reset form
   const resetForm = () => {
@@ -38,6 +41,7 @@ const SponsorsManager = ({
     setTier('Gold');
     setLogoUrl('');
     setWebsiteUrl('');
+    setLogoFile(null);
     setSelectedSponsor(null);
   };
   
@@ -48,20 +52,65 @@ const SponsorsManager = ({
     setTier(sponsor.tier);
     setLogoUrl(sponsor.logo_url || '');
     setWebsiteUrl(sponsor.website_url || '');
+    setLogoFile(null);
     setOpenEditDialog(true);
   };
   
+  // Handle file change
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (files && files.length > 0) {
+      setLogoFile(files[0]);
+    }
+  };
+  
+  // Handle logo upload
+  const handleLogoUpload = async (file: File) => {
+    if (!file) return null;
+    
+    setIsUploading(true);
+    try {
+      // Create a unique path for the file based on timestamp
+      const timestamp = new Date().getTime();
+      const path = `sponsor-logos/${timestamp}-${file.name.replace(/\s+/g, '-').toLowerCase()}`;
+      
+      // Upload the file to the server
+      const url = URL.createObjectURL(file);
+      
+      // In a real implementation with Supabase, you would use:
+      // const url = await uploadFile(file, 'registrations', path);
+      
+      setIsUploading(false);
+      return url;
+    } catch (error) {
+      console.error('Error uploading logo:', error);
+      toast.error('Failed to upload logo');
+      setIsUploading(false);
+      return null;
+    }
+  };
+  
   // Handle add sponsor
-  const handleAddSponsor = () => {
+  const handleAddSponsor = async () => {
     if (!name) {
       toast.error('Sponsor name is required');
       return;
     }
     
+    let finalLogoUrl = logoUrl;
+    
+    // Upload logo if file is selected
+    if (logoFile) {
+      const uploadedUrl = await handleLogoUpload(logoFile);
+      if (uploadedUrl) {
+        finalLogoUrl = uploadedUrl;
+      }
+    }
+    
     onAddSponsor({
       name,
       tier,
-      logo_url: logoUrl || undefined,
+      logo_url: finalLogoUrl || undefined,
       website_url: websiteUrl || undefined
     });
     
@@ -70,7 +119,7 @@ const SponsorsManager = ({
   };
   
   // Handle update sponsor
-  const handleUpdateSponsor = () => {
+  const handleUpdateSponsor = async () => {
     if (!selectedSponsor) return;
     
     if (!name) {
@@ -78,10 +127,20 @@ const SponsorsManager = ({
       return;
     }
     
+    let finalLogoUrl = logoUrl;
+    
+    // Upload logo if file is selected
+    if (logoFile) {
+      const uploadedUrl = await handleLogoUpload(logoFile);
+      if (uploadedUrl) {
+        finalLogoUrl = uploadedUrl;
+      }
+    }
+    
     onUpdateSponsor(selectedSponsor.id, {
       name,
       tier,
-      logo_url: logoUrl || undefined,
+      logo_url: finalLogoUrl || undefined,
       website_url: websiteUrl || undefined
     });
     
@@ -143,9 +202,9 @@ const SponsorsManager = ({
               </div>
               
               <div className="grid gap-2">
-                <Label htmlFor="sponsor-logo">Logo URL</Label>
+                <Label htmlFor="sponsor-logo-url">Logo URL (Optional)</Label>
                 <Input 
-                  id="sponsor-logo" 
+                  id="sponsor-logo-url" 
                   value={logoUrl} 
                   onChange={(e) => setLogoUrl(e.target.value)} 
                   placeholder="https://example.com/logo.png"
@@ -153,7 +212,34 @@ const SponsorsManager = ({
               </div>
               
               <div className="grid gap-2">
-                <Label htmlFor="sponsor-website">Website URL</Label>
+                <Label>Upload Logo Image (Optional)</Label>
+                <div className="flex items-center gap-2">
+                  <Input
+                    id="logo-upload"
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileChange}
+                    className="hidden"
+                  />
+                  <Button
+                    variant="outline"
+                    onClick={() => document.getElementById('logo-upload')?.click()}
+                    type="button"
+                    className="w-full flex items-center justify-center"
+                  >
+                    <Upload size={16} className="mr-2" />
+                    {logoFile ? logoFile.name : 'Choose Image'}
+                  </Button>
+                </div>
+                {logoFile && (
+                  <div className="p-2 border border-gray-600 rounded">
+                    <p className="text-sm text-gray-400 truncate">{logoFile.name}</p>
+                  </div>
+                )}
+              </div>
+              
+              <div className="grid gap-2">
+                <Label htmlFor="sponsor-website">Website URL (Optional)</Label>
                 <Input 
                   id="sponsor-website" 
                   value={websiteUrl} 
@@ -167,8 +253,8 @@ const SponsorsManager = ({
               <Button variant="outline" onClick={() => setOpenAddDialog(false)}>
                 Cancel
               </Button>
-              <Button onClick={handleAddSponsor}>
-                Add Sponsor
+              <Button onClick={handleAddSponsor} disabled={isUploading}>
+                {isUploading ? 'Uploading...' : 'Add Sponsor'}
               </Button>
             </DialogFooter>
           </DialogContent>
@@ -276,9 +362,9 @@ const SponsorsManager = ({
             </div>
             
             <div className="grid gap-2">
-              <Label htmlFor="edit-sponsor-logo">Logo URL</Label>
+              <Label htmlFor="edit-sponsor-logo-url">Logo URL (Optional)</Label>
               <Input 
-                id="edit-sponsor-logo" 
+                id="edit-sponsor-logo-url" 
                 value={logoUrl} 
                 onChange={(e) => setLogoUrl(e.target.value)} 
                 placeholder="https://example.com/logo.png"
@@ -286,7 +372,34 @@ const SponsorsManager = ({
             </div>
             
             <div className="grid gap-2">
-              <Label htmlFor="edit-sponsor-website">Website URL</Label>
+              <Label>Upload Logo Image (Optional)</Label>
+              <div className="flex items-center gap-2">
+                <Input
+                  id="edit-logo-upload"
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileChange}
+                  className="hidden"
+                />
+                <Button
+                  variant="outline"
+                  onClick={() => document.getElementById('edit-logo-upload')?.click()}
+                  type="button"
+                  className="w-full flex items-center justify-center"
+                >
+                  <Upload size={16} className="mr-2" />
+                  {logoFile ? logoFile.name : 'Choose Image'}
+                </Button>
+              </div>
+              {logoFile && (
+                <div className="p-2 border border-gray-600 rounded">
+                  <p className="text-sm text-gray-400 truncate">{logoFile.name}</p>
+                </div>
+              )}
+            </div>
+            
+            <div className="grid gap-2">
+              <Label htmlFor="edit-sponsor-website">Website URL (Optional)</Label>
               <Input 
                 id="edit-sponsor-website" 
                 value={websiteUrl} 
@@ -300,8 +413,8 @@ const SponsorsManager = ({
             <Button variant="outline" onClick={() => setOpenEditDialog(false)}>
               Cancel
             </Button>
-            <Button onClick={handleUpdateSponsor}>
-              Update Sponsor
+            <Button onClick={handleUpdateSponsor} disabled={isUploading}>
+              {isUploading ? 'Uploading...' : 'Update Sponsor'}
             </Button>
           </DialogFooter>
         </DialogContent>

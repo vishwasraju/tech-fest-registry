@@ -5,6 +5,7 @@ import Footer from '@/components/Footer';
 import HeroSection from '@/components/HeroSection';
 import EventCard from '@/components/EventCard';
 import SponsorsSection from '@/components/SponsorsSection';
+import FloatingSponsorButton from '@/components/FloatingSponsorButton';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Event } from '@/data/events';
@@ -96,6 +97,7 @@ const Index = ({ events }: IndexProps) => {
         </section>
       </main>
       <Footer />
+      <FloatingSponsorButton />
     </div>
   );
 };

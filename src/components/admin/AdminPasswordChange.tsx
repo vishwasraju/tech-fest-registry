@@ -25,10 +25,11 @@ const AdminPasswordChange = () => {
         return;
       }
       
-      // Check current password
-      const { password } = JSON.parse(adminAuth);
+      // Parse the stored auth data
+      const authData = JSON.parse(adminAuth);
       
-      if (password !== currentPassword) {
+      // Check current password
+      if (authData.password !== currentPassword) {
         toast.error('Current password is incorrect');
         setIsLoading(false);
         return;
@@ -49,10 +50,9 @@ const AdminPasswordChange = () => {
       }
       
       // Update admin password
-      const updatedAuth = JSON.parse(adminAuth);
-      updatedAuth.password = newPassword;
+      authData.password = newPassword;
       
-      localStorage.setItem('techfest-admin', JSON.stringify(updatedAuth));
+      localStorage.setItem('techfest-admin', JSON.stringify(authData));
       toast.success('Password changed successfully');
       
       // Reset form
