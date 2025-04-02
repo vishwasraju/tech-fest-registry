@@ -7,6 +7,15 @@ import { Label } from '@/components/ui/label';
 import { Lock, User } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from "@/integrations/supabase/client";
+import { Database } from "@/integrations/supabase/types";
+
+type AdminCredentials = {
+  id: string;
+  username: string;
+  password: string;
+  created_at: string;
+  updated_at: string;
+};
 
 const AdminLogin = () => {
   const [username, setUsername] = useState('');
@@ -19,12 +28,15 @@ const AdminLogin = () => {
     setLoading(true);
     
     try {
-      // Fetch admin credentials from Supabase
+      // Fetch admin credentials from Supabase with proper type assertion
       const { data: adminCredentials, error } = await supabase
         .from('admin_credentials')
         .select('username, password')
         .eq('username', username)
-        .single();
+        .single() as unknown as { 
+          data: AdminCredentials | null; 
+          error: any;
+        };
       
       if (error) {
         console.error('Error fetching admin credentials:', error);

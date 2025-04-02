@@ -6,6 +6,14 @@ import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import { supabase } from "@/integrations/supabase/client";
 
+type AdminCredentials = {
+  id: string;
+  username: string;
+  password: string;
+  created_at: string;
+  updated_at: string;
+};
+
 const AdminPasswordChange = () => {
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
@@ -29,12 +37,15 @@ const AdminPasswordChange = () => {
         return;
       }
       
-      // Get admin credentials
+      // Get admin credentials with proper type assertion
       const { data: adminCredentials, error: fetchError } = await supabase
         .from('admin_credentials')
         .select('id, username, password')
         .eq('username', 'admin')
-        .single();
+        .single() as unknown as { 
+          data: AdminCredentials | null; 
+          error: any;
+        };
       
       if (fetchError) {
         console.error('Error fetching admin credentials:', fetchError);
@@ -44,20 +55,20 @@ const AdminPasswordChange = () => {
       }
       
       // Validate current password
-      if (currentPassword !== adminCredentials.password) {
+      if (!adminCredentials || currentPassword !== adminCredentials.password) {
         toast.error('Current password is incorrect');
         setIsLoading(false);
         return;
       }
       
-      // Update password in Supabase
+      // Update password in Supabase with proper type assertion
       const { error: updateError } = await supabase
         .from('admin_credentials')
         .update({ 
           password: newPassword,
           updated_at: new Date().toISOString()
         })
-        .eq('id', adminCredentials.id);
+        .eq('id', adminCredentials.id) as unknown as { error: any };
       
       if (updateError) {
         console.error('Error updating password:', updateError);
