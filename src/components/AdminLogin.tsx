@@ -28,6 +28,8 @@ const AdminLogin = () => {
     setLoading(true);
     
     try {
+      console.log("Attempting login with:", { username });
+      
       // Fetch admin credentials from Supabase with proper type assertion
       const { data: adminCredentials, error } = await supabase
         .from('admin_credentials')
@@ -45,8 +47,12 @@ const AdminLogin = () => {
         return;
       }
       
+      console.log("Admin credentials found:", adminCredentials ? "yes" : "no");
+      
       // Verify credentials
       if (adminCredentials && adminCredentials.password === password) {
+        console.log("Password matched, logging in");
+        
         // Store authentication state in localStorage
         localStorage.setItem('techfest-admin', JSON.stringify({
           isAuthenticated: true,
@@ -56,6 +62,7 @@ const AdminLogin = () => {
         toast.success('Login successful');
         navigate('/admin/dashboard');
       } else {
+        console.log("Password mismatch");
         toast.error('Invalid credentials');
       }
     } catch (error) {
@@ -108,6 +115,7 @@ const AdminLogin = () => {
             />
             <Lock className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
           </div>
+          <p className="text-xs text-gray-400 mt-1">Default: username: admin, password: admin123</p>
         </div>
         
         <Button 

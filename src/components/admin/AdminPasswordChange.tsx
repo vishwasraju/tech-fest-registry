@@ -37,6 +37,8 @@ const AdminPasswordChange = () => {
         return;
       }
       
+      console.log("Fetching admin credentials");
+      
       // Get admin credentials with proper type assertion
       const { data: adminCredentials, error: fetchError } = await supabase
         .from('admin_credentials')
@@ -54,12 +56,16 @@ const AdminPasswordChange = () => {
         return;
       }
       
+      console.log("Admin credentials found:", adminCredentials ? "yes" : "no");
+      
       // Validate current password
       if (!adminCredentials || currentPassword !== adminCredentials.password) {
         toast.error('Current password is incorrect');
         setIsLoading(false);
         return;
       }
+      
+      console.log("Updating password for admin ID:", adminCredentials.id);
       
       // Update password in Supabase with proper type assertion
       const { error: updateError } = await supabase
@@ -110,7 +116,7 @@ const AdminPasswordChange = () => {
               onChange={(e) => setCurrentPassword(e.target.value)}
               placeholder="Enter current password"
             />
-            <p className="text-xs text-gray-400">Default password is "aiml2k25"</p>
+            <p className="text-xs text-gray-400">Current password is "admin123"</p>
           </div>
           
           <div className="grid gap-2">
