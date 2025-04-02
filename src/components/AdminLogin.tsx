@@ -6,16 +6,6 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Lock, User } from 'lucide-react';
 import { toast } from 'sonner';
-import { supabase } from "@/integrations/supabase/client";
-import { Database } from "@/integrations/supabase/types";
-
-type AdminCredentials = {
-  id: string;
-  username: string;
-  password: string;
-  created_at: string;
-  updated_at: string;
-};
 
 const AdminLogin = () => {
   const [username, setUsername] = useState('');
@@ -23,54 +13,72 @@ const AdminLogin = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     
-    try {
-      console.log("Attempting login with:", { username });
-      
-      // Fetch admin credentials from Supabase with proper type assertion
-      const { data: adminCredentials, error } = await supabase
-        .from('admin_credentials')
-        .select('username, password')
-        .eq('username', username)
-        .single() as unknown as { 
-          data: AdminCredentials | null; 
-          error: any;
-        };
-      
-      if (error) {
-        console.error('Error fetching admin credentials:', error);
-        toast.error('Authentication failed');
-        setLoading(false);
-        return;
-      }
-      
-      console.log("Admin credentials found:", adminCredentials ? "yes" : "no");
-      
-      // Verify credentials
-      if (adminCredentials && adminCredentials.password === password) {
-        console.log("Password matched, logging in");
-        
-        // Store authentication state in localStorage
-        localStorage.setItem('techfest-admin', JSON.stringify({
-          isAuthenticated: true,
-          timestamp: new Date().toISOString()
-        }));
-        
-        toast.success('Login successful');
-        navigate('/admin/dashboard');
+    // Get the current admin auth data if it exists
+    const adminAuth = localStorage.getItem('techfest-admin');
+    const defaultUsername = 'admin';
+    const defaultPassword = 'aiml2k25'; // Default password as specified
+    
+    setTimeout(() => {
+      // Check if admin auth exists and has a custom password
+      if (adminAuth) {
+        try {
+          const authData = JSON.parse(adminAuth);
+          
+          // Check if username matches and password matches stored password or default
+          if (username === defaultUsername && 
+              (password === (authData.password || defaultPassword))) {
+            
+            // Update auth data with valid authentication
+            const updatedAuthData = {
+              ...authData,
+              isAuthenticated: true,
+              timestamp: new Date().toISOString(),
+              password: authData.password || defaultPassword // Preserve custom password if exists
+            };
+            
+            localStorage.setItem('techfest-admin', JSON.stringify(updatedAuthData));
+            toast.success('Login successful');
+            navigate('/admin/dashboard');
+          } else {
+            toast.error('Invalid credentials');
+          }
+        } catch (error) {
+          // If JSON parsing fails, reset to default authentication
+          if (username === defaultUsername && password === defaultPassword) {
+            localStorage.setItem('techfest-admin', JSON.stringify({
+              isAuthenticated: true,
+              timestamp: new Date().toISOString(),
+              password: defaultPassword
+            }));
+            
+            toast.success('Login successful');
+            navigate('/admin/dashboard');
+          } else {
+            toast.error('Invalid credentials');
+          }
+        }
       } else {
-        console.log("Password mismatch");
-        toast.error('Invalid credentials');
+        // First time login with default credentials
+        if (username === defaultUsername && password === defaultPassword) {
+          localStorage.setItem('techfest-admin', JSON.stringify({
+            isAuthenticated: true,
+            timestamp: new Date().toISOString(),
+            password: defaultPassword
+          }));
+          
+          toast.success('Login successful');
+          navigate('/admin/dashboard');
+        } else {
+          toast.error('Invalid credentials');
+        }
       }
-    } catch (error) {
-      console.error('Error during login:', error);
-      toast.error('Authentication failed');
-    } finally {
+      
       setLoading(false);
-    }
+    }, 1000);
   };
   
   return (
@@ -115,7 +123,6 @@ const AdminLogin = () => {
             />
             <Lock className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
           </div>
-          <p className="text-xs text-gray-400 mt-1">Default: username: admin, password: admin123</p>
         </div>
         
         <Button 

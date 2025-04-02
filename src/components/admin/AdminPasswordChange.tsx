@@ -4,15 +4,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
-import { supabase } from "@/integrations/supabase/client";
-
-type AdminCredentials = {
-  id: string;
-  username: string;
-  password: string;
-  created_at: string;
-  updated_at: string;
-};
 
 const AdminPasswordChange = () => {
   const [currentPassword, setCurrentPassword] = useState('');
@@ -20,69 +11,49 @@ const AdminPasswordChange = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   
-  const handleChangePassword = async () => {
+  const handleChangePassword = () => {
     setIsLoading(true);
     
     try {
-      // Validate form inputs
+      // Get current admin auth data
+      const adminAuth = localStorage.getItem('techfest-admin');
+      if (!adminAuth) {
+        toast.error('Admin session not found');
+        setIsLoading(false);
+        return;
+      }
+      
+      // Parse the stored auth data
+      const authData = JSON.parse(adminAuth);
+      
+      // Default password as specified
+      const defaultPassword = 'aiml2k25';
+      
+      // Validate current password if provided
+      if (currentPassword && currentPassword !== (authData.password || defaultPassword)) {
+        toast.error('Current password is incorrect');
+        setIsLoading(false);
+        return;
+      }
+      
+      // Validate new password
       if (newPassword.length < 6) {
         toast.error('New password must be at least 6 characters');
         setIsLoading(false);
         return;
       }
       
+      // Check if passwords match
       if (newPassword !== confirmPassword) {
         toast.error('New passwords do not match');
         setIsLoading(false);
         return;
       }
       
-      console.log("Fetching admin credentials");
+      // Update admin password
+      authData.password = newPassword;
       
-      // Get admin credentials with proper type assertion
-      const { data: adminCredentials, error: fetchError } = await supabase
-        .from('admin_credentials')
-        .select('id, username, password')
-        .eq('username', 'admin')
-        .single() as unknown as { 
-          data: AdminCredentials | null; 
-          error: any;
-        };
-      
-      if (fetchError) {
-        console.error('Error fetching admin credentials:', fetchError);
-        toast.error('Failed to verify current password');
-        setIsLoading(false);
-        return;
-      }
-      
-      console.log("Admin credentials found:", adminCredentials ? "yes" : "no");
-      
-      // Validate current password
-      if (!adminCredentials || currentPassword !== adminCredentials.password) {
-        toast.error('Current password is incorrect');
-        setIsLoading(false);
-        return;
-      }
-      
-      console.log("Updating password for admin ID:", adminCredentials.id);
-      
-      // Update password in Supabase with proper type assertion
-      const { error: updateError } = await supabase
-        .from('admin_credentials')
-        .update({ 
-          password: newPassword,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', adminCredentials.id) as unknown as { error: any };
-      
-      if (updateError) {
-        console.error('Error updating password:', updateError);
-        toast.error('Failed to change password');
-        setIsLoading(false);
-        return;
-      }
-      
+      localStorage.setItem('techfest-admin', JSON.stringify(authData));
       toast.success('Password changed successfully');
       
       // Reset form
@@ -90,7 +61,7 @@ const AdminPasswordChange = () => {
       setNewPassword('');
       setConfirmPassword('');
       
-      console.log('Password updated successfully');
+      console.log('Password updated to:', newPassword);
     } catch (error) {
       console.error('Error changing password:', error);
       toast.error('Failed to change password');
@@ -116,7 +87,7 @@ const AdminPasswordChange = () => {
               onChange={(e) => setCurrentPassword(e.target.value)}
               placeholder="Enter current password"
             />
-            <p className="text-xs text-gray-400">Current password is "admin123"</p>
+            <p className="text-xs text-gray-400">Default password is "aiml2k25"</p>
           </div>
           
           <div className="grid gap-2">

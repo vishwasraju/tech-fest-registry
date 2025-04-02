@@ -1,8 +1,6 @@
 
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from "@/integrations/supabase/client";
-import { toast } from 'sonner';
 
 export const useAdminAuth = () => {
   const navigate = useNavigate();
@@ -10,16 +8,14 @@ export const useAdminAuth = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const checkAuth = async () => {
+    const checkAuth = () => {
+      const adminAuth = localStorage.getItem('techfest-admin');
+      if (!adminAuth) {
+        navigate('/admin');
+        return;
+      }
+      
       try {
-        // Check if there's a session in localStorage
-        const adminAuth = localStorage.getItem('techfest-admin');
-        if (!adminAuth) {
-          navigate('/admin');
-          setIsLoading(false);
-          return;
-        }
-        
         const { isAuthenticated, timestamp } = JSON.parse(adminAuth);
         const authTime = new Date(timestamp).getTime();
         const currentTime = new Date().getTime();
@@ -33,7 +29,6 @@ export const useAdminAuth = () => {
           setIsAuthenticated(true);
         }
       } catch (error) {
-        console.error('Error checking auth:', error);
         localStorage.removeItem('techfest-admin');
         navigate('/admin');
       } finally {
@@ -45,10 +40,27 @@ export const useAdminAuth = () => {
   }, [navigate]);
 
   const handleLogout = () => {
-    localStorage.removeItem('techfest-admin');
+    // Preserve the password when logging out
+    try {
+      const adminAuth = localStorage.getItem('techfest-admin');
+      if (adminAuth) {
+        const authData = JSON.parse(adminAuth);
+        if (authData.password) {
+          // Store just the password
+          localStorage.setItem('techfest-admin', JSON.stringify({
+            isAuthenticated: false,
+            password: authData.password
+          }));
+        } else {
+          localStorage.removeItem('techfest-admin');
+        }
+      }
+    } catch (error) {
+      localStorage.removeItem('techfest-admin');
+    }
+    
     setIsAuthenticated(false);
     navigate('/admin');
-    toast.success('Logged out successfully');
   };
 
   return { isAuthenticated, isLoading, handleLogout };
