@@ -1,34 +1,16 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 
 const AdminPasswordChange = () => {
-  const navigate = useNavigate();
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [defaultPassword, setDefaultPassword] = useState('');
-
-  // Set default password on initial load
-  useEffect(() => {
-    // For this specific case, set the password to aiml2k25 as requested
-    setDefaultPassword('aiml2k25');
-    
-    // Also update the stored password in localStorage if it exists
-    const adminAuth = localStorage.getItem('techfest-admin');
-    if (adminAuth) {
-      const authData = JSON.parse(adminAuth);
-      authData.password = 'aiml2k25';
-      localStorage.setItem('techfest-admin', JSON.stringify(authData));
-      console.log('Admin password has been reset to default');
-    }
-  }, []);
-
+  
   const handleChangePassword = () => {
     setIsLoading(true);
     
@@ -37,19 +19,22 @@ const AdminPasswordChange = () => {
       const adminAuth = localStorage.getItem('techfest-admin');
       if (!adminAuth) {
         toast.error('Admin session not found');
-        navigate('/admin');
+        setIsLoading(false);
         return;
       }
       
       // Parse the stored auth data
       const authData = JSON.parse(adminAuth);
       
-      // Set default password for first time or reset
-      if (defaultPassword) {
-        authData.password = defaultPassword;
-      }
+      // Default password as specified
+      const defaultPassword = 'aiml2k25';
       
-      // Skip current password check as requested and just verify new password
+      // Validate current password if provided
+      if (currentPassword && currentPassword !== (authData.password || defaultPassword)) {
+        toast.error('Current password is incorrect');
+        setIsLoading(false);
+        return;
+      }
       
       // Validate new password
       if (newPassword.length < 6) {
@@ -75,6 +60,8 @@ const AdminPasswordChange = () => {
       setCurrentPassword('');
       setNewPassword('');
       setConfirmPassword('');
+      
+      console.log('Password updated to:', newPassword);
     } catch (error) {
       console.error('Error changing password:', error);
       toast.error('Failed to change password');
@@ -98,9 +85,9 @@ const AdminPasswordChange = () => {
               type="password" 
               value={currentPassword}
               onChange={(e) => setCurrentPassword(e.target.value)}
-              placeholder="Enter current password (optional)"
+              placeholder="Enter current password"
             />
-            <p className="text-xs text-gray-400">Leave blank to reset password</p>
+            <p className="text-xs text-gray-400">Default password is "aiml2k25"</p>
           </div>
           
           <div className="grid gap-2">

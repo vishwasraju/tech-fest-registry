@@ -17,21 +17,66 @@ const AdminLogin = () => {
     e.preventDefault();
     setLoading(true);
     
-    // Simple admin authentication for demo purposes
-    // In a real app, this would be a server-side authentication
+    // Get the current admin auth data if it exists
+    const adminAuth = localStorage.getItem('techfest-admin');
+    const defaultUsername = 'admin';
+    const defaultPassword = 'aiml2k25'; // Default password as specified
+    
     setTimeout(() => {
-      if (username === 'admin' && password === 'admin123') {
-        // Set admin authentication in localStorage
-        localStorage.setItem('techfest-admin', JSON.stringify({
-          isAuthenticated: true,
-          timestamp: new Date().toISOString()
-        }));
-        
-        toast.success('Login successful');
-        navigate('/admin/dashboard');
+      // Check if admin auth exists and has a custom password
+      if (adminAuth) {
+        try {
+          const authData = JSON.parse(adminAuth);
+          
+          // Check if username matches and password matches stored password or default
+          if (username === defaultUsername && 
+              (password === (authData.password || defaultPassword))) {
+            
+            // Update auth data with valid authentication
+            const updatedAuthData = {
+              ...authData,
+              isAuthenticated: true,
+              timestamp: new Date().toISOString(),
+              password: authData.password || defaultPassword // Preserve custom password if exists
+            };
+            
+            localStorage.setItem('techfest-admin', JSON.stringify(updatedAuthData));
+            toast.success('Login successful');
+            navigate('/admin/dashboard');
+          } else {
+            toast.error('Invalid credentials');
+          }
+        } catch (error) {
+          // If JSON parsing fails, reset to default authentication
+          if (username === defaultUsername && password === defaultPassword) {
+            localStorage.setItem('techfest-admin', JSON.stringify({
+              isAuthenticated: true,
+              timestamp: new Date().toISOString(),
+              password: defaultPassword
+            }));
+            
+            toast.success('Login successful');
+            navigate('/admin/dashboard');
+          } else {
+            toast.error('Invalid credentials');
+          }
+        }
       } else {
-        toast.error('Invalid credentials');
+        // First time login with default credentials
+        if (username === defaultUsername && password === defaultPassword) {
+          localStorage.setItem('techfest-admin', JSON.stringify({
+            isAuthenticated: true,
+            timestamp: new Date().toISOString(),
+            password: defaultPassword
+          }));
+          
+          toast.success('Login successful');
+          navigate('/admin/dashboard');
+        } else {
+          toast.error('Invalid credentials');
+        }
       }
+      
       setLoading(false);
     }, 1000);
   };

@@ -40,7 +40,25 @@ export const useAdminAuth = () => {
   }, [navigate]);
 
   const handleLogout = () => {
-    localStorage.removeItem('techfest-admin');
+    // Preserve the password when logging out
+    try {
+      const adminAuth = localStorage.getItem('techfest-admin');
+      if (adminAuth) {
+        const authData = JSON.parse(adminAuth);
+        if (authData.password) {
+          // Store just the password
+          localStorage.setItem('techfest-admin', JSON.stringify({
+            isAuthenticated: false,
+            password: authData.password
+          }));
+        } else {
+          localStorage.removeItem('techfest-admin');
+        }
+      }
+    } catch (error) {
+      localStorage.removeItem('techfest-admin');
+    }
+    
     setIsAuthenticated(false);
     navigate('/admin');
   };
