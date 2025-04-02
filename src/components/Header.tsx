@@ -6,7 +6,7 @@ const Header = () => {
   return <header className="glass sticky top-0 z-50 w-full">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         <Link to="/" className="flex items-center">
-          <img alt="Tech Fest 2K25 Logo" src="/lovable-uploads/4966c3d9-47d0-4928-a0a0-cb15312a1a01.png" className="h-30 object-contain" />
+          <img alt="Tech Fest 2K25 Logo" className="h-12" src="/lovable-uploads/b48f0e78-d806-4c37-b311-4cd931398c4f.png" />
         </Link>
         
         <nav className="hidden md:flex items-center space-x-6">
