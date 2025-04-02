@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
+import { supabase } from "@/integrations/supabase/client";
 
 const AdminPasswordChange = () => {
   const [currentPassword, setCurrentPassword] = useState('');
@@ -11,49 +12,60 @@ const AdminPasswordChange = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   
-  const handleChangePassword = () => {
+  const handleChangePassword = async () => {
     setIsLoading(true);
     
     try {
-      // Get current admin auth data
-      const adminAuth = localStorage.getItem('techfest-admin');
-      if (!adminAuth) {
-        toast.error('Admin session not found');
-        setIsLoading(false);
-        return;
-      }
-      
-      // Parse the stored auth data
-      const authData = JSON.parse(adminAuth);
-      
-      // Default password as specified
-      const defaultPassword = 'aiml2k25';
-      
-      // Validate current password if provided
-      if (currentPassword && currentPassword !== (authData.password || defaultPassword)) {
-        toast.error('Current password is incorrect');
-        setIsLoading(false);
-        return;
-      }
-      
-      // Validate new password
+      // Validate form inputs
       if (newPassword.length < 6) {
         toast.error('New password must be at least 6 characters');
         setIsLoading(false);
         return;
       }
       
-      // Check if passwords match
       if (newPassword !== confirmPassword) {
         toast.error('New passwords do not match');
         setIsLoading(false);
         return;
       }
       
-      // Update admin password
-      authData.password = newPassword;
+      // Get admin credentials
+      const { data: adminCredentials, error: fetchError } = await supabase
+        .from('admin_credentials')
+        .select('id, username, password')
+        .eq('username', 'admin')
+        .single();
       
-      localStorage.setItem('techfest-admin', JSON.stringify(authData));
+      if (fetchError) {
+        console.error('Error fetching admin credentials:', fetchError);
+        toast.error('Failed to verify current password');
+        setIsLoading(false);
+        return;
+      }
+      
+      // Validate current password
+      if (currentPassword !== adminCredentials.password) {
+        toast.error('Current password is incorrect');
+        setIsLoading(false);
+        return;
+      }
+      
+      // Update password in Supabase
+      const { error: updateError } = await supabase
+        .from('admin_credentials')
+        .update({ 
+          password: newPassword,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', adminCredentials.id);
+      
+      if (updateError) {
+        console.error('Error updating password:', updateError);
+        toast.error('Failed to change password');
+        setIsLoading(false);
+        return;
+      }
+      
       toast.success('Password changed successfully');
       
       // Reset form
@@ -61,7 +73,7 @@ const AdminPasswordChange = () => {
       setNewPassword('');
       setConfirmPassword('');
       
-      console.log('Password updated to:', newPassword);
+      console.log('Password updated successfully');
     } catch (error) {
       console.error('Error changing password:', error);
       toast.error('Failed to change password');

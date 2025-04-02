@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Lock, User } from 'lucide-react';
 import { toast } from 'sonner';
+import { supabase } from "@/integrations/supabase/client";
 
 const AdminLogin = () => {
   const [username, setUsername] = useState('');
@@ -13,72 +14,44 @@ const AdminLogin = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     
-    // Get the current admin auth data if it exists
-    const adminAuth = localStorage.getItem('techfest-admin');
-    const defaultUsername = 'admin';
-    const defaultPassword = 'aiml2k25'; // Default password as specified
-    
-    setTimeout(() => {
-      // Check if admin auth exists and has a custom password
-      if (adminAuth) {
-        try {
-          const authData = JSON.parse(adminAuth);
-          
-          // Check if username matches and password matches stored password or default
-          if (username === defaultUsername && 
-              (password === (authData.password || defaultPassword))) {
-            
-            // Update auth data with valid authentication
-            const updatedAuthData = {
-              ...authData,
-              isAuthenticated: true,
-              timestamp: new Date().toISOString(),
-              password: authData.password || defaultPassword // Preserve custom password if exists
-            };
-            
-            localStorage.setItem('techfest-admin', JSON.stringify(updatedAuthData));
-            toast.success('Login successful');
-            navigate('/admin/dashboard');
-          } else {
-            toast.error('Invalid credentials');
-          }
-        } catch (error) {
-          // If JSON parsing fails, reset to default authentication
-          if (username === defaultUsername && password === defaultPassword) {
-            localStorage.setItem('techfest-admin', JSON.stringify({
-              isAuthenticated: true,
-              timestamp: new Date().toISOString(),
-              password: defaultPassword
-            }));
-            
-            toast.success('Login successful');
-            navigate('/admin/dashboard');
-          } else {
-            toast.error('Invalid credentials');
-          }
-        }
-      } else {
-        // First time login with default credentials
-        if (username === defaultUsername && password === defaultPassword) {
-          localStorage.setItem('techfest-admin', JSON.stringify({
-            isAuthenticated: true,
-            timestamp: new Date().toISOString(),
-            password: defaultPassword
-          }));
-          
-          toast.success('Login successful');
-          navigate('/admin/dashboard');
-        } else {
-          toast.error('Invalid credentials');
-        }
+    try {
+      // Fetch admin credentials from Supabase
+      const { data: adminCredentials, error } = await supabase
+        .from('admin_credentials')
+        .select('username, password')
+        .eq('username', username)
+        .single();
+      
+      if (error) {
+        console.error('Error fetching admin credentials:', error);
+        toast.error('Authentication failed');
+        setLoading(false);
+        return;
       }
       
+      // Verify credentials
+      if (adminCredentials && adminCredentials.password === password) {
+        // Store authentication state in localStorage
+        localStorage.setItem('techfest-admin', JSON.stringify({
+          isAuthenticated: true,
+          timestamp: new Date().toISOString()
+        }));
+        
+        toast.success('Login successful');
+        navigate('/admin/dashboard');
+      } else {
+        toast.error('Invalid credentials');
+      }
+    } catch (error) {
+      console.error('Error during login:', error);
+      toast.error('Authentication failed');
+    } finally {
       setLoading(false);
-    }, 1000);
+    }
   };
   
   return (
