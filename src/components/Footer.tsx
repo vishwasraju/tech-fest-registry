@@ -42,7 +42,8 @@ const Footer = () => {
             <ul className="space-y-2 text-sm text-gray-400">
               <li>Department of AI & ML</li>
               <li>SJCIT</li>
-              <li>+91 9110438648</li>
+              <li>+91 9448769592</li>
+              <li>+91 9902567101</li>
             </ul>
           </div>
         </div>
