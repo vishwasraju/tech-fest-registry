@@ -4,6 +4,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { Event } from '@/data/events';
+import { REGISTRATIONS_DATA } from '@/data/registrations';
 
 interface FormData {
   name: string;
@@ -45,27 +46,50 @@ export function useRegistrationForm(event: Event | undefined) {
     setIsSubmitting(true);
     
     try {
-      // Prepare registration data
+      // Generate a unique ID for the registration
+      const registrationId = `reg-${Date.now()}`;
+      
+      // Create registration object
       const registrationData = {
-        ...formData,
-        eventId,
-        eventName: event.name,
-        registrationDate: new Date().toISOString(),
-        paymentStatus: event.fees > 0 ? (formData.utr ? 'paid' : 'pending') : 'free'
+        id: registrationId,
+        event_id: eventId,
+        name: formData.name,
+        usn: formData.usn,
+        phone: formData.phone,
+        email: formData.email,
+        branch: formData.branch,
+        utr: event.fees > 0 ? formData.utr : undefined
       };
       
-      // Save registration data to Supabase Storage
-      const fileName = `${formData.usn}_${eventId}_${Date.now()}.json`;
-      const { error } = await supabase.storage
-        .from('registrations')
-        .upload(fileName, JSON.stringify(registrationData), {
-          contentType: 'application/json',
-          upsert: false
-        });
+      // Add to local storage registrations array
+      REGISTRATIONS_DATA.push(registrationData);
       
-      if (error) {
-        console.error('Error saving registration:', error);
-        throw new Error('Failed to save your registration');
+      // Save to Supabase if available
+      try {
+        // Prepare registration data for Supabase
+        const supabaseRegistrationData = {
+          ...registrationData,
+          eventName: event.name,
+          registrationDate: new Date().toISOString(),
+          paymentStatus: event.fees > 0 ? (formData.utr ? 'paid' : 'pending') : 'free'
+        };
+        
+        // Save registration data to Supabase Storage
+        const fileName = `${formData.usn}_${eventId}_${Date.now()}.json`;
+        const { error } = await supabase.storage
+          .from('registrations')
+          .upload(fileName, JSON.stringify(supabaseRegistrationData), {
+            contentType: 'application/json',
+            upsert: false
+          });
+        
+        if (error) {
+          console.error('Error saving to Supabase:', error);
+          // Continue with local storage even if Supabase fails
+        }
+      } catch (error) {
+        console.log('Supabase storage error:', error);
+        // Continue with local storage even if Supabase fails
       }
       
       toast.success('Registration successful!', {

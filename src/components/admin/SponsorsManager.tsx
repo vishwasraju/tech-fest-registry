@@ -1,156 +1,129 @@
 
-import React, { useState } from 'react';
-import { Sponsor } from '@/data/sponsors';
+import React, { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Globe, Pencil, Trash2, Upload } from 'lucide-react';
 import { toast } from 'sonner';
-import { Pencil, Trash2, Plus, Upload } from 'lucide-react';
-import { uploadFile } from '@/utils/storageUtils';
+
+interface Sponsor {
+  id: string;
+  name: string;
+  logo_url: string;
+  website_url: string;
+  tier: string;
+}
 
 interface SponsorsManagerProps {
   sponsors: Sponsor[];
-  onAddSponsor: (data: Omit<Sponsor, 'id'>) => void;
-  onUpdateSponsor: (id: string, data: Partial<Sponsor>) => void;
-  onDeleteSponsor: (id: string) => void;
+  onAddSponsor: (data: Partial<Sponsor>) => Promise<void>;
+  onUpdateSponsor: (id: string, data: Partial<Sponsor>) => Promise<void>;
+  onDeleteSponsor: (id: string) => Promise<void>;
 }
 
-const SponsorsManager = ({ 
-  sponsors, 
-  onAddSponsor, 
-  onUpdateSponsor, 
-  onDeleteSponsor 
-}: SponsorsManagerProps) => {
-  const [openAddDialog, setOpenAddDialog] = useState(false);
-  const [openEditDialog, setOpenEditDialog] = useState(false);
-  const [selectedSponsor, setSelectedSponsor] = useState<Sponsor | null>(null);
-  const [isUploading, setIsUploading] = useState(false);
+const SponsorsManager = ({ sponsors, onAddSponsor, onUpdateSponsor, onDeleteSponsor }: SponsorsManagerProps) => {
+  const [addDialogOpen, setAddDialogOpen] = useState(false);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [currentSponsor, setCurrentSponsor] = useState<Sponsor | null>(null);
   
-  // Form states
+  // Form state
   const [name, setName] = useState('');
-  const [tier, setTier] = useState<'Platinum' | 'Gold' | 'Silver' | 'Bronze'>('Gold');
-  const [logoUrl, setLogoUrl] = useState('');
+  const [tier, setTier] = useState('gold');
   const [websiteUrl, setWebsiteUrl] = useState('');
   const [logoFile, setLogoFile] = useState<File | null>(null);
+  const [logoPreview, setLogoPreview] = useState('');
+  
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const editFileInputRef = useRef<HTMLInputElement>(null);
   
   // Reset form
   const resetForm = () => {
     setName('');
-    setTier('Gold');
-    setLogoUrl('');
+    setTier('gold');
     setWebsiteUrl('');
     setLogoFile(null);
-    setSelectedSponsor(null);
+    setLogoPreview('');
   };
   
-  // Open edit dialog
-  const openEdit = (sponsor: Sponsor) => {
-    setSelectedSponsor(sponsor);
-    setName(sponsor.name);
-    setTier(sponsor.tier);
-    setLogoUrl(sponsor.logo_url || '');
-    setWebsiteUrl(sponsor.website_url || '');
-    setLogoFile(null);
-    setOpenEditDialog(true);
-  };
-  
-  // Handle file change
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (files && files.length > 0) {
-      setLogoFile(files[0]);
+    const file = e.target.files?.[0];
+    if (file) {
+      setLogoFile(file);
+      // Create preview URL
+      const objectUrl = URL.createObjectURL(file);
+      setLogoPreview(objectUrl);
     }
   };
   
-  // Handle logo upload
-  const handleLogoUpload = async (file: File) => {
-    if (!file) return null;
-    
-    setIsUploading(true);
-    try {
-      // Create a unique path for the file based on timestamp
-      const timestamp = new Date().getTime();
-      const path = `sponsor-logos/${timestamp}-${file.name.replace(/\s+/g, '-').toLowerCase()}`;
-      
-      // Upload the file to the server
-      const url = URL.createObjectURL(file);
-      
-      // In a real implementation with Supabase, you would use:
-      // const url = await uploadFile(file, 'registrations', path);
-      
-      setIsUploading(false);
-      return url;
-    } catch (error) {
-      console.error('Error uploading logo:', error);
-      toast.error('Failed to upload logo');
-      setIsUploading(false);
-      return null;
+  const handleButtonClick = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
     }
   };
   
-  // Handle add sponsor
-  const handleAddSponsor = async () => {
-    if (!name) {
-      toast.error('Sponsor name is required');
+  const handleEditButtonClick = () => {
+    if (editFileInputRef.current) {
+      editFileInputRef.current.click();
+    }
+  };
+  
+  const handleAddSponsor = () => {
+    if (!name || !websiteUrl || !logoPreview) {
+      toast.error('Please fill in all fields and upload a logo');
       return;
-    }
-    
-    let finalLogoUrl = logoUrl;
-    
-    // Upload logo if file is selected
-    if (logoFile) {
-      const uploadedUrl = await handleLogoUpload(logoFile);
-      if (uploadedUrl) {
-        finalLogoUrl = uploadedUrl;
-      }
     }
     
     onAddSponsor({
       name,
       tier,
-      logo_url: finalLogoUrl || undefined,
-      website_url: websiteUrl || undefined
+      website_url: websiteUrl,
+      logo_url: logoPreview
     });
     
     resetForm();
-    setOpenAddDialog(false);
+    setAddDialogOpen(false);
   };
   
-  // Handle update sponsor
-  const handleUpdateSponsor = async () => {
-    if (!selectedSponsor) return;
+  const handleEditSponsor = (sponsor: Sponsor) => {
+    setCurrentSponsor(sponsor);
+    setName(sponsor.name);
+    setTier(sponsor.tier);
+    setWebsiteUrl(sponsor.website_url);
+    setLogoPreview(sponsor.logo_url);
+    setEditDialogOpen(true);
+  };
+  
+  const handleUpdateSponsor = () => {
+    if (!currentSponsor) return;
     
-    if (!name) {
-      toast.error('Sponsor name is required');
+    if (!name || !websiteUrl || !logoPreview) {
+      toast.error('Please fill in all fields and upload a logo');
       return;
     }
     
-    let finalLogoUrl = logoUrl;
-    
-    // Upload logo if file is selected
-    if (logoFile) {
-      const uploadedUrl = await handleLogoUpload(logoFile);
-      if (uploadedUrl) {
-        finalLogoUrl = uploadedUrl;
-      }
-    }
-    
-    onUpdateSponsor(selectedSponsor.id, {
+    onUpdateSponsor(currentSponsor.id, {
       name,
       tier,
-      logo_url: finalLogoUrl || undefined,
-      website_url: websiteUrl || undefined
+      website_url: websiteUrl,
+      logo_url: logoPreview
     });
     
     resetForm();
-    setOpenEditDialog(false);
+    setEditDialogOpen(false);
   };
   
-  // Handle delete sponsor
-  const handleDeleteSponsor = (id: string) => {
-    if (confirm('Are you sure you want to delete this sponsor?')) {
+  const handleEditFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      // Create preview URL
+      const objectUrl = URL.createObjectURL(file);
+      setLogoPreview(objectUrl);
+    }
+  };
+  
+  const confirmDeleteSponsor = (id: string, name: string) => {
+    if (confirm(`Are you sure you want to delete ${name}?`)) {
       onDeleteSponsor(id);
     }
   };
@@ -158,263 +131,243 @@ const SponsorsManager = ({
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-xl font-bold">Manage Sponsors</h2>
+        <h2 className="text-xl font-bold">Sponsors</h2>
         
-        <Dialog open={openAddDialog} onOpenChange={setOpenAddDialog}>
+        <Dialog open={addDialogOpen} onOpenChange={setAddDialogOpen}>
           <DialogTrigger asChild>
-            <Button>
-              <Plus size={16} className="mr-2" />
-              Add Sponsor
-            </Button>
+            <Button>Add Sponsor</Button>
           </DialogTrigger>
-          <DialogContent>
+          <DialogContent className="glass border-gray-700 text-white">
             <DialogHeader>
-              <DialogTitle>Add New Sponsor</DialogTitle>
-              <DialogDescription>
-                Add a new sponsor to the TechFest.
+              <DialogTitle>Add Sponsor</DialogTitle>
+              <DialogDescription className="text-gray-400">
+                Add a new sponsor to the event
               </DialogDescription>
             </DialogHeader>
             
             <div className="grid gap-4 py-4">
               <div className="grid gap-2">
-                <Label htmlFor="sponsor-name">Name</Label>
+                <Label htmlFor="sponsor-name">Sponsor Name</Label>
                 <Input 
                   id="sponsor-name" 
                   value={name} 
                   onChange={(e) => setName(e.target.value)} 
-                  placeholder="Sponsor name"
+                  placeholder="Enter sponsor name"
+                  className="bg-techfest-muted text-white border-techfest-muted"
                 />
               </div>
               
               <div className="grid gap-2">
-                <Label htmlFor="sponsor-tier">Tier</Label>
-                <Select value={tier} onValueChange={(value: any) => setTier(value)}>
-                  <SelectTrigger id="sponsor-tier">
-                    <SelectValue placeholder="Select tier" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Platinum">Platinum</SelectItem>
-                    <SelectItem value="Gold">Gold</SelectItem>
-                    <SelectItem value="Silver">Silver</SelectItem>
-                    <SelectItem value="Bronze">Bronze</SelectItem>
-                  </SelectContent>
-                </Select>
+                <Label htmlFor="sponsor-tier">Sponsor Tier</Label>
+                <select 
+                  id="sponsor-tier" 
+                  value={tier} 
+                  onChange={(e) => setTier(e.target.value)}
+                  className="bg-techfest-muted text-white border-techfest-muted rounded-md p-2"
+                >
+                  <option value="platinum">Platinum</option>
+                  <option value="gold">Gold</option>
+                  <option value="silver">Silver</option>
+                  <option value="bronze">Bronze</option>
+                </select>
               </div>
               
               <div className="grid gap-2">
-                <Label htmlFor="sponsor-logo-url">Logo URL (Optional)</Label>
-                <Input 
-                  id="sponsor-logo-url" 
-                  value={logoUrl} 
-                  onChange={(e) => setLogoUrl(e.target.value)} 
-                  placeholder="https://example.com/logo.png"
-                />
-              </div>
-              
-              <div className="grid gap-2">
-                <Label>Upload Logo Image (Optional)</Label>
-                <div className="flex items-center gap-2">
-                  <Input
-                    id="logo-upload"
-                    type="file"
-                    accept="image/*"
-                    onChange={handleFileChange}
-                    className="hidden"
-                  />
-                  <Button
-                    variant="outline"
-                    onClick={() => document.getElementById('logo-upload')?.click()}
-                    type="button"
-                    className="w-full flex items-center justify-center"
-                  >
-                    <Upload size={16} className="mr-2" />
-                    {logoFile ? logoFile.name : 'Choose Image'}
-                  </Button>
-                </div>
-                {logoFile && (
-                  <div className="p-2 border border-gray-600 rounded">
-                    <p className="text-sm text-gray-400 truncate">{logoFile.name}</p>
-                  </div>
-                )}
-              </div>
-              
-              <div className="grid gap-2">
-                <Label htmlFor="sponsor-website">Website URL (Optional)</Label>
+                <Label htmlFor="sponsor-website">Website URL</Label>
                 <Input 
                   id="sponsor-website" 
                   value={websiteUrl} 
                   onChange={(e) => setWebsiteUrl(e.target.value)} 
                   placeholder="https://example.com"
+                  className="bg-techfest-muted text-white border-techfest-muted"
                 />
+              </div>
+              
+              <div className="grid gap-2">
+                <Label htmlFor="sponsor-logo">Logo</Label>
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  className="hidden"
+                  accept="image/*"
+                  onChange={handleFileChange}
+                />
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  className="w-full" 
+                  onClick={handleButtonClick}
+                >
+                  <Upload size={16} className="mr-2" />
+                  {logoFile ? 'Change Logo' : 'Upload Logo'}
+                </Button>
+                
+                {logoPreview && (
+                  <div className="mt-2 rounded-md overflow-hidden h-32 bg-white flex items-center justify-center p-2">
+                    <img 
+                      src={logoPreview} 
+                      alt="Logo preview" 
+                      className="max-h-full max-w-full object-contain" 
+                    />
+                  </div>
+                )}
               </div>
             </div>
             
             <DialogFooter>
-              <Button variant="outline" onClick={() => setOpenAddDialog(false)}>
+              <Button variant="outline" onClick={() => setAddDialogOpen(false)}>
                 Cancel
               </Button>
-              <Button onClick={handleAddSponsor} disabled={isUploading}>
-                {isUploading ? 'Uploading...' : 'Add Sponsor'}
+              <Button onClick={handleAddSponsor}>
+                Add Sponsor
               </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
       </div>
       
-      <div className="glass rounded-xl overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead>
-              <tr className="border-b border-gray-800">
-                <th className="py-3 px-4 text-left">Name</th>
-                <th className="py-3 px-4 text-center">Tier</th>
-                <th className="py-3 px-4 text-center">Logo</th>
-                <th className="py-3 px-4 text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {sponsors.map(sponsor => (
-                <tr key={sponsor.id} className="border-b border-gray-800 hover:bg-gray-900/40">
-                  <td className="py-3 px-4">{sponsor.name}</td>
-                  <td className="py-3 px-4 text-center">
-                    <span className={`px-2 py-1 rounded text-xs ${
-                      sponsor.tier === 'Platinum' ? 'bg-gray-300 text-gray-900' :
-                      sponsor.tier === 'Gold' ? 'bg-yellow-500/30 text-yellow-300' :
-                      sponsor.tier === 'Silver' ? 'bg-gray-400/30 text-gray-300' :
-                      'bg-amber-700/30 text-amber-500'
-                    }`}>
-                      {sponsor.tier}
-                    </span>
-                  </td>
-                  <td className="py-3 px-4 text-center">
-                    {sponsor.logo_url ? (
-                      <img 
-                        src={sponsor.logo_url} 
-                        alt={sponsor.name} 
-                        className="h-10 max-w-[100px] object-contain mx-auto"
-                      />
-                    ) : (
-                      <span className="text-gray-500">No logo</span>
-                    )}
-                  </td>
-                  <td className="py-3 px-4 text-right">
-                    <div className="flex justify-end gap-2">
-                      <Button 
-                        size="sm" 
-                        variant="outline"
-                        className="h-8 w-8 p-0 border-gray-600"
-                        onClick={() => openEdit(sponsor)}
-                      >
-                        <Pencil size={14} />
-                      </Button>
-                      
-                      <Button 
-                        size="sm" 
-                        variant="outline"
-                        className="h-8 w-8 p-0 border-gray-600 hover:bg-red-900/30 hover:border-red-600"
-                        onClick={() => handleDeleteSponsor(sponsor.id)}
-                      >
-                        <Trash2 size={14} />
-                      </Button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+      <div className="glass rounded-xl">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
+          {sponsors.length > 0 ? (
+            sponsors.map(sponsor => (
+              <div key={sponsor.id} className="bg-techfest-muted rounded-xl p-4 relative group">
+                <div className="absolute top-2 right-2 space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="h-7 w-7 p-0"
+                    onClick={() => handleEditSponsor(sponsor)}
+                  >
+                    <Pencil size={14} />
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="h-7 w-7 p-0 border-red-800 hover:bg-red-900/20"
+                    onClick={() => confirmDeleteSponsor(sponsor.id, sponsor.name)}
+                  >
+                    <Trash2 size={14} className="text-red-500" />
+                  </Button>
+                </div>
+                
+                <div className="flex flex-col items-center">
+                  <div className="h-24 w-full mb-4 flex items-center justify-center bg-white rounded-md p-2">
+                    <img 
+                      src={sponsor.logo_url} 
+                      alt={sponsor.name} 
+                      className="max-h-full max-w-full object-contain"
+                    />
+                  </div>
+                  
+                  <h3 className="text-lg font-medium mb-1">{sponsor.name}</h3>
+                  <span className="text-sm px-2 py-0.5 rounded bg-gray-800 capitalize mb-2">
+                    {sponsor.tier}
+                  </span>
+                  
+                  <a 
+                    href={sponsor.website_url} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center text-techfest-neon-blue hover:underline"
+                  >
+                    <Globe size={14} className="mr-1" /> Website
+                  </a>
+                </div>
+              </div>
+            ))
+          ) : (
+            <div className="col-span-full text-center py-10 text-gray-400">
+              No sponsors added yet
+            </div>
+          )}
         </div>
       </div>
       
       {/* Edit Dialog */}
-      <Dialog open={openEditDialog} onOpenChange={setOpenEditDialog}>
-        <DialogContent>
+      <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
+        <DialogContent className="glass border-gray-700 text-white">
           <DialogHeader>
             <DialogTitle>Edit Sponsor</DialogTitle>
-            <DialogDescription>
-              Update the sponsor information.
+            <DialogDescription className="text-gray-400">
+              Update sponsor information
             </DialogDescription>
           </DialogHeader>
           
           <div className="grid gap-4 py-4">
             <div className="grid gap-2">
-              <Label htmlFor="edit-sponsor-name">Name</Label>
+              <Label htmlFor="edit-sponsor-name">Sponsor Name</Label>
               <Input 
                 id="edit-sponsor-name" 
                 value={name} 
                 onChange={(e) => setName(e.target.value)} 
-                placeholder="Sponsor name"
+                placeholder="Enter sponsor name"
+                className="bg-techfest-muted text-white border-techfest-muted"
               />
             </div>
             
             <div className="grid gap-2">
-              <Label htmlFor="edit-sponsor-tier">Tier</Label>
-              <Select value={tier} onValueChange={(value: any) => setTier(value)}>
-                <SelectTrigger id="edit-sponsor-tier">
-                  <SelectValue placeholder="Select tier" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Platinum">Platinum</SelectItem>
-                  <SelectItem value="Gold">Gold</SelectItem>
-                  <SelectItem value="Silver">Silver</SelectItem>
-                  <SelectItem value="Bronze">Bronze</SelectItem>
-                </SelectContent>
-              </Select>
+              <Label htmlFor="edit-sponsor-tier">Sponsor Tier</Label>
+              <select 
+                id="edit-sponsor-tier" 
+                value={tier} 
+                onChange={(e) => setTier(e.target.value)}
+                className="bg-techfest-muted text-white border-techfest-muted rounded-md p-2"
+              >
+                <option value="platinum">Platinum</option>
+                <option value="gold">Gold</option>
+                <option value="silver">Silver</option>
+                <option value="bronze">Bronze</option>
+              </select>
             </div>
             
             <div className="grid gap-2">
-              <Label htmlFor="edit-sponsor-logo-url">Logo URL (Optional)</Label>
-              <Input 
-                id="edit-sponsor-logo-url" 
-                value={logoUrl} 
-                onChange={(e) => setLogoUrl(e.target.value)} 
-                placeholder="https://example.com/logo.png"
-              />
-            </div>
-            
-            <div className="grid gap-2">
-              <Label>Upload Logo Image (Optional)</Label>
-              <div className="flex items-center gap-2">
-                <Input
-                  id="edit-logo-upload"
-                  type="file"
-                  accept="image/*"
-                  onChange={handleFileChange}
-                  className="hidden"
-                />
-                <Button
-                  variant="outline"
-                  onClick={() => document.getElementById('edit-logo-upload')?.click()}
-                  type="button"
-                  className="w-full flex items-center justify-center"
-                >
-                  <Upload size={16} className="mr-2" />
-                  {logoFile ? logoFile.name : 'Choose Image'}
-                </Button>
-              </div>
-              {logoFile && (
-                <div className="p-2 border border-gray-600 rounded">
-                  <p className="text-sm text-gray-400 truncate">{logoFile.name}</p>
-                </div>
-              )}
-            </div>
-            
-            <div className="grid gap-2">
-              <Label htmlFor="edit-sponsor-website">Website URL (Optional)</Label>
+              <Label htmlFor="edit-sponsor-website">Website URL</Label>
               <Input 
                 id="edit-sponsor-website" 
                 value={websiteUrl} 
                 onChange={(e) => setWebsiteUrl(e.target.value)} 
                 placeholder="https://example.com"
+                className="bg-techfest-muted text-white border-techfest-muted"
               />
+            </div>
+            
+            <div className="grid gap-2">
+              <Label htmlFor="edit-sponsor-logo">Logo</Label>
+              <input
+                type="file"
+                ref={editFileInputRef}
+                className="hidden"
+                accept="image/*"
+                onChange={handleEditFileChange}
+              />
+              <Button 
+                type="button" 
+                variant="outline" 
+                className="w-full" 
+                onClick={handleEditButtonClick}
+              >
+                <Upload size={16} className="mr-2" />
+                Change Logo
+              </Button>
+              
+              {logoPreview && (
+                <div className="mt-2 rounded-md overflow-hidden h-32 bg-white flex items-center justify-center p-2">
+                  <img 
+                    src={logoPreview} 
+                    alt="Logo preview" 
+                    className="max-h-full max-w-full object-contain" 
+                  />
+                </div>
+              )}
             </div>
           </div>
           
           <DialogFooter>
-            <Button variant="outline" onClick={() => setOpenEditDialog(false)}>
+            <Button variant="outline" onClick={() => setEditDialogOpen(false)}>
               Cancel
             </Button>
-            <Button onClick={handleUpdateSponsor} disabled={isUploading}>
-              {isUploading ? 'Uploading...' : 'Update Sponsor'}
+            <Button onClick={handleUpdateSponsor}>
+              Update Sponsor
             </Button>
           </DialogFooter>
         </DialogContent>

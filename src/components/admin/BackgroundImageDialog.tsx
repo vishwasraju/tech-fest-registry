@@ -1,6 +1,6 @@
 
-import React, { useState } from 'react';
-import { Paintbrush } from 'lucide-react';
+import React, { useState, useRef } from 'react';
+import { Paintbrush, Upload } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -21,10 +21,38 @@ const BackgroundImageDialog = ({
 }: BackgroundImageDialogProps) => {
   const [open, setOpen] = useState(false);
   const [selectedBackground, setSelectedBackground] = useState(currentBackground || 'none');
+  const [customBackground, setCustomBackground] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string>('');
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setCustomBackground(file);
+      // Create preview URL for the selected image
+      const objectUrl = URL.createObjectURL(file);
+      setPreviewUrl(objectUrl);
+      setSelectedBackground('custom');
+    }
+  };
+  
+  const handleButtonClick = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  };
   
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onUpdate(eventId, selectedBackground === 'none' ? '' : selectedBackground);
+    
+    if (selectedBackground === 'custom' && previewUrl) {
+      onUpdate(eventId, previewUrl);
+    } else if (selectedBackground !== 'none' && selectedBackground !== 'custom') {
+      onUpdate(eventId, selectedBackground);
+    } else {
+      onUpdate(eventId, '');
+    }
+    
     setOpen(false);
   };
   
@@ -58,6 +86,7 @@ const BackgroundImageDialog = ({
               </SelectTrigger>
               <SelectContent className="bg-gray-900 text-white border-gray-700">
                 <SelectItem value="none" className="hover:bg-gray-800">None</SelectItem>
+                <SelectItem value="custom" className="hover:bg-gray-800">Custom Upload</SelectItem>
                 {BACKGROUND_IMAGES.map((image) => (
                   <SelectItem key={image.url} value={image.url} className="hover:bg-gray-800">
                     {image.name}
@@ -67,10 +96,32 @@ const BackgroundImageDialog = ({
             </Select>
           </div>
           
-          {selectedBackground && selectedBackground !== 'none' && (
+          {selectedBackground === 'custom' && (
+            <div>
+              <input
+                type="file"
+                ref={fileInputRef}
+                className="hidden"
+                accept="image/*"
+                onChange={handleFileChange}
+              />
+              <Button 
+                type="button" 
+                variant="outline" 
+                className="w-full" 
+                onClick={handleButtonClick}
+              >
+                <Upload size={16} className="mr-2" />
+                {customBackground ? 'Change Image' : 'Upload Image'}
+              </Button>
+            </div>
+          )}
+          
+          {((selectedBackground && selectedBackground !== 'none' && selectedBackground !== 'custom') || 
+            (selectedBackground === 'custom' && previewUrl)) && (
             <div className="h-40 rounded-lg overflow-hidden">
               <img 
-                src={selectedBackground} 
+                src={selectedBackground === 'custom' ? previewUrl : selectedBackground} 
                 alt="Selected background" 
                 className="w-full h-full object-cover"
               />

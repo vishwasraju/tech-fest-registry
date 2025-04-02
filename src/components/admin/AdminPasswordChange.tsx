@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -12,6 +12,22 @@ const AdminPasswordChange = () => {
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [defaultPassword, setDefaultPassword] = useState('');
+
+  // Set default password on initial load
+  useEffect(() => {
+    // For this specific case, set the password to aiml2k25 as requested
+    setDefaultPassword('aiml2k25');
+    
+    // Also update the stored password in localStorage if it exists
+    const adminAuth = localStorage.getItem('techfest-admin');
+    if (adminAuth) {
+      const authData = JSON.parse(adminAuth);
+      authData.password = 'aiml2k25';
+      localStorage.setItem('techfest-admin', JSON.stringify(authData));
+      console.log('Admin password has been reset to default');
+    }
+  }, []);
 
   const handleChangePassword = () => {
     setIsLoading(true);
@@ -28,12 +44,12 @@ const AdminPasswordChange = () => {
       // Parse the stored auth data
       const authData = JSON.parse(adminAuth);
       
-      // Check current password
-      if (authData.password !== currentPassword) {
-        toast.error('Current password is incorrect');
-        setIsLoading(false);
-        return;
+      // Set default password for first time or reset
+      if (defaultPassword) {
+        authData.password = defaultPassword;
       }
+      
+      // Skip current password check as requested and just verify new password
       
       // Validate new password
       if (newPassword.length < 6) {
@@ -82,8 +98,9 @@ const AdminPasswordChange = () => {
               type="password" 
               value={currentPassword}
               onChange={(e) => setCurrentPassword(e.target.value)}
-              placeholder="Enter current password"
+              placeholder="Enter current password (optional)"
             />
+            <p className="text-xs text-gray-400">Leave blank to reset password</p>
           </div>
           
           <div className="grid gap-2">
@@ -110,7 +127,7 @@ const AdminPasswordChange = () => {
           
           <Button 
             onClick={handleChangePassword} 
-            disabled={isLoading || !currentPassword || !newPassword || !confirmPassword}
+            disabled={isLoading || !newPassword || !confirmPassword}
             className="w-full"
           >
             {isLoading ? 'Changing Password...' : 'Change Password'}

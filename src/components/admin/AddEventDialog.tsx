@@ -1,11 +1,11 @@
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Plus } from 'lucide-react';
+import { Plus, Upload } from 'lucide-react';
 import { toast } from 'sonner';
 
 // Add and export the background images data
@@ -20,6 +20,7 @@ interface AddEventDialogProps {
 
 export function AddEventDialog({ onAddEvent }: AddEventDialogProps) {
   const [open, setOpen] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   
   // Form state
   const [name, setName] = useState('');
@@ -32,6 +33,8 @@ export function AddEventDialog({ onAddEvent }: AddEventDialogProps) {
   const [cashPrize, setCashPrize] = useState('0');
   const [coordinators, setCoordinators] = useState('');
   const [studentCoordinators, setStudentCoordinators] = useState('');
+  const [backgroundImage, setBackgroundImage] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string>('');
   
   // Reset form
   const resetForm = () => {
@@ -45,6 +48,18 @@ export function AddEventDialog({ onAddEvent }: AddEventDialogProps) {
     setCashPrize('0');
     setCoordinators('');
     setStudentCoordinators('');
+    setBackgroundImage(null);
+    setPreviewUrl('');
+  };
+  
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setBackgroundImage(file);
+      // Create preview URL for the selected image
+      const objectUrl = URL.createObjectURL(file);
+      setPreviewUrl(objectUrl);
+    }
   };
   
   const handleSubmit = () => {
@@ -63,23 +78,50 @@ export function AddEventDialog({ onAddEvent }: AddEventDialogProps) {
       .map(coord => coord.trim())
       .filter(coord => coord.length > 0);
     
-    // Create event data
-    const eventData = {
-      name,
-      description,
-      date_time: dateTime,
-      venue,
-      rules,
-      team_size: parseInt(teamSize),
-      fees: parseInt(fees),
-      cash_prize: parseInt(cashPrize),
-      coordinators: coordinatorsArray,
-      student_coordinators: studentCoordinatorsArray
-    };
+    // Convert background image to data URL if it exists
+    if (backgroundImage && previewUrl) {
+      // Create event data with background image
+      const eventData = {
+        name,
+        description,
+        date_time: dateTime,
+        venue,
+        rules,
+        team_size: parseInt(teamSize),
+        fees: parseInt(fees),
+        cash_prize: parseInt(cashPrize),
+        coordinators: coordinatorsArray,
+        student_coordinators: studentCoordinatorsArray,
+        background_image: previewUrl
+      };
+      
+      onAddEvent(eventData);
+    } else {
+      // Create event data without background image
+      const eventData = {
+        name,
+        description,
+        date_time: dateTime,
+        venue,
+        rules,
+        team_size: parseInt(teamSize),
+        fees: parseInt(fees),
+        cash_prize: parseInt(cashPrize),
+        coordinators: coordinatorsArray,
+        student_coordinators: studentCoordinatorsArray
+      };
+      
+      onAddEvent(eventData);
+    }
     
-    onAddEvent(eventData);
     resetForm();
     setOpen(false);
+  };
+  
+  const handleButtonClick = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
   };
   
   return (
@@ -160,6 +202,37 @@ export function AddEventDialog({ onAddEvent }: AddEventDialogProps) {
               value={cashPrize} 
               onChange={(e) => setCashPrize(e.target.value)}
             />
+          </div>
+          
+          <div className="grid gap-2 md:col-span-2">
+            <Label htmlFor="event-background">Background Image</Label>
+            <input
+              type="file"
+              ref={fileInputRef}
+              className="hidden"
+              accept="image/*"
+              onChange={handleFileChange}
+            />
+            <div className="flex items-center gap-2">
+              <Button 
+                type="button" 
+                variant="outline" 
+                className="w-full" 
+                onClick={handleButtonClick}
+              >
+                <Upload size={16} className="mr-2" />
+                {backgroundImage ? 'Change Image' : 'Upload Image'}
+              </Button>
+            </div>
+            {previewUrl && (
+              <div className="mt-2 rounded-md overflow-hidden h-32 w-full">
+                <img 
+                  src={previewUrl} 
+                  alt="Background preview" 
+                  className="w-full h-full object-cover" 
+                />
+              </div>
+            )}
           </div>
           
           <div className="grid gap-2 md:col-span-2">
