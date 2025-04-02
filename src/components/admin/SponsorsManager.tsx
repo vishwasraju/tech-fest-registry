@@ -1,4 +1,3 @@
-
 import React, { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -6,14 +5,7 @@ import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Globe, Pencil, Trash2, Upload } from 'lucide-react';
 import { toast } from 'sonner';
-
-interface Sponsor {
-  id: string;
-  name: string;
-  logo_url: string;
-  website_url: string;
-  tier: string;
-}
+import { Sponsor } from '@/data/sponsors';
 
 interface SponsorsManagerProps {
   sponsors: Sponsor[];
@@ -29,7 +21,7 @@ const SponsorsManager = ({ sponsors, onAddSponsor, onUpdateSponsor, onDeleteSpon
   
   // Form state
   const [name, setName] = useState('');
-  const [tier, setTier] = useState('gold');
+  const [tier, setTier] = useState('Gold');
   const [websiteUrl, setWebsiteUrl] = useState('');
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [logoPreview, setLogoPreview] = useState('');
@@ -40,7 +32,7 @@ const SponsorsManager = ({ sponsors, onAddSponsor, onUpdateSponsor, onDeleteSpon
   // Reset form
   const resetForm = () => {
     setName('');
-    setTier('gold');
+    setTier('Gold');
     setWebsiteUrl('');
     setLogoFile(null);
     setLogoPreview('');
@@ -76,7 +68,7 @@ const SponsorsManager = ({ sponsors, onAddSponsor, onUpdateSponsor, onDeleteSpon
     
     onAddSponsor({
       name,
-      tier,
+      tier: tier as 'Platinum' | 'Gold' | 'Silver' | 'Bronze',
       website_url: websiteUrl,
       logo_url: logoPreview
     });
@@ -89,8 +81,8 @@ const SponsorsManager = ({ sponsors, onAddSponsor, onUpdateSponsor, onDeleteSpon
     setCurrentSponsor(sponsor);
     setName(sponsor.name);
     setTier(sponsor.tier);
-    setWebsiteUrl(sponsor.website_url);
-    setLogoPreview(sponsor.logo_url);
+    setWebsiteUrl(sponsor.website_url || '');
+    setLogoPreview(sponsor.logo_url || '');
     setEditDialogOpen(true);
   };
   
@@ -104,7 +96,7 @@ const SponsorsManager = ({ sponsors, onAddSponsor, onUpdateSponsor, onDeleteSpon
     
     onUpdateSponsor(currentSponsor.id, {
       name,
-      tier,
+      tier: tier as 'Platinum' | 'Gold' | 'Silver' | 'Bronze',
       website_url: websiteUrl,
       logo_url: logoPreview
     });

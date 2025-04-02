@@ -4,7 +4,7 @@ import { Rocket } from 'lucide-react';
 
 const FloatingSponsorButton = () => {
   const scrollToSponsors = () => {
-    const sponsorsSection = document.getElementById('sponsors-section');
+    const sponsorsSection = document.getElementById('sponsors');
     if (sponsorsSection) {
       sponsorsSection.scrollIntoView({ behavior: 'smooth' });
     }

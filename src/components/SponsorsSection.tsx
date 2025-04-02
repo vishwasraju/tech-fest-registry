@@ -1,10 +1,10 @@
 
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { loadSponsorsFromStorage } from '@/data/sponsors';
+import { loadSponsorsFromStorage, Sponsor } from '@/data/sponsors';
 
 const SponsorsSection = () => {
-  const { data: sponsors = [], isLoading } = useQuery({
+  const { data: sponsors = [], isLoading } = useQuery<Sponsor[]>({
     queryKey: ['sponsors'],
     queryFn: loadSponsorsFromStorage,
   });

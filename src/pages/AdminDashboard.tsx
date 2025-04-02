@@ -1,11 +1,10 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Event } from '@/data/events';
 import { REGISTRATIONS_DATA } from '@/data/registrations';
-import { SPONSORS_DATA, loadSponsorsFromStorage, saveSponsorsToStorage } from '@/data/sponsors';
+import { SPONSORS_DATA, loadSponsorsFromStorage, saveSponsorsToStorage, Sponsor } from '@/data/sponsors';
 import { toast } from 'sonner';
 
 // Import refactored components
@@ -29,7 +28,8 @@ const AdminDashboard = ({ events, onUpdateEvents }: AdminDashboardProps) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [activeTab, setActiveTab] = useState('overview');
   const [registrations, setRegistrations] = useState(REGISTRATIONS_DATA);
-  const [sponsors, setSponsors] = useState(SPONSORS_DATA);
+  
+  const [sponsors, setSponsors] = useState<Sponsor[]>(SPONSORS_DATA);
   const [isLoading, setIsLoading] = useState(true);
   
   // Check admin authentication
@@ -86,10 +86,13 @@ const AdminDashboard = ({ events, onUpdateEvents }: AdminDashboardProps) => {
   };
   
   // Sponsor handlers
-  const handleAddSponsor = async (formData: any) => {
-    const newSponsor = {
+  const handleAddSponsor = async (formData: Partial<Sponsor>) => {
+    const newSponsor: Sponsor = {
       id: `sponsor-${sponsors.length + 1}`,
-      ...formData
+      name: formData.name || '',
+      tier: formData.tier || 'Gold',
+      logo_url: formData.logo_url,
+      website_url: formData.website_url
     };
     
     const updatedSponsors = [...sponsors, newSponsor];
@@ -104,7 +107,7 @@ const AdminDashboard = ({ events, onUpdateEvents }: AdminDashboardProps) => {
     }
   };
   
-  const handleUpdateSponsor = async (id: string, data: Partial<any>) => {
+  const handleUpdateSponsor = async (id: string, data: Partial<Sponsor>) => {
     const updatedSponsors = sponsors.map(sponsor => 
       sponsor.id === id 
         ? { ...sponsor, ...data } 
