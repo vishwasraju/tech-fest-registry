@@ -28,19 +28,33 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
     onDataChange(name, value);
   };
 
+  const isTeamEvent = event.team_size && event.team_size > 1;
+  const eventFees = event.fees || 0;
+  
+  // If it's a team event and has team_registration_fees set, use that instead
+  const feesToPay = isTeamEvent && event.team_registration_fees ? event.team_registration_fees : eventFees;
+
   return (
     <form onSubmit={onSubmit} className="space-y-6">
-      {event.fees > 0 ? (
+      {feesToPay > 0 ? (
         <>
           <div className="text-center mb-4">
             <p className="text-sm text-gray-400 mb-4">
-              Please pay ₹{event.fees} to complete your registration. Scan the QR code below:
+              Please pay ₹{feesToPay} to complete your registration. 
+              {isTeamEvent && 
+                " This is a team registration fee (one payment covers the entire team)."}
+              <br />Scan the QR code below:
             </p>
             
             <div className="bg-white p-3 rounded-lg mx-auto w-48 h-48 mb-4">
               <QRCode 
-                value={`upi://pay?pa=example@upi&pn=TechFest&am=${event.fees}`} 
-                imageUrl={event.qr_code_url}
+                value={`upi://pay?pa=example@upi&pn=TechFest&am=${feesToPay}`} 
+                imageUrl={
+                  // Use a team-specific QR code if available, otherwise use the regular one
+                  isTeamEvent && event.team_qr_code_url 
+                    ? event.team_qr_code_url 
+                    : event.qr_code_url
+                }
               />
             </div>
             
@@ -82,7 +96,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
         <Button 
           type="submit" 
           className="w-1/2 bg-gradient-to-r from-techfest-neon-blue to-techfest-neon-purple hover:opacity-90"
-          disabled={isSubmitting || (event.fees > 0 && !utr)}
+          disabled={isSubmitting || (feesToPay > 0 && !utr)}
         >
           {isSubmitting ? 'Submitting...' : 'Complete Registration'}
         </Button>

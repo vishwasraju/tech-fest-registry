@@ -17,7 +17,10 @@ const RegisterForm = () => {
     handleChange,
     handleSubmit,
     nextStep,
-    previousStep
+    previousStep,
+    handleTeamMemberChange,
+    addTeamMember,
+    removeTeamMember
   } = useRegistrationForm(event);
   
   if (!event) {
@@ -33,7 +36,11 @@ const RegisterForm = () => {
       {step === 1 ? (
         <PersonalDetailsForm 
           formData={formData}
+          event={event}
           onDataChange={handleChange}
+          onTeamMemberChange={handleTeamMemberChange}
+          onAddTeamMember={addTeamMember}
+          onRemoveTeamMember={removeTeamMember}
           onNext={nextStep}
         />
       ) : (

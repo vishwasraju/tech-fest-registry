@@ -13,6 +13,11 @@ interface FormData {
   email: string;
   branch: string;
   utr: string;
+  team_members?: Array<{
+    name: string;
+    usn: string;
+    branch?: string;
+  }>;
 }
 
 export function useRegistrationForm(event: Event | undefined) {
@@ -25,7 +30,8 @@ export function useRegistrationForm(event: Event | undefined) {
     phone: '',
     email: '',
     branch: '',
-    utr: ''
+    utr: '',
+    team_members: event?.team_size && event.team_size > 1 ? [] : undefined
   });
   
   const [step, setStep] = useState(1);
@@ -33,6 +39,32 @@ export function useRegistrationForm(event: Event | undefined) {
   
   const handleChange = (name: string, value: string) => {
     setFormData(prev => ({ ...prev, [name]: value }));
+  };
+  
+  const handleTeamMemberChange = (index: number, field: string, value: string) => {
+    setFormData(prev => {
+      const updatedTeamMembers = [...(prev.team_members || [])];
+      updatedTeamMembers[index] = {
+        ...updatedTeamMembers[index],
+        [field]: value
+      };
+      return { ...prev, team_members: updatedTeamMembers };
+    });
+  };
+  
+  const addTeamMember = () => {
+    setFormData(prev => {
+      const updatedTeamMembers = [...(prev.team_members || []), { name: '', usn: '', branch: '' }];
+      return { ...prev, team_members: updatedTeamMembers };
+    });
+  };
+  
+  const removeTeamMember = (index: number) => {
+    setFormData(prev => {
+      const updatedTeamMembers = [...(prev.team_members || [])];
+      updatedTeamMembers.splice(index, 1);
+      return { ...prev, team_members: updatedTeamMembers };
+    });
   };
   
   const handleSubmit = async (e: React.FormEvent) => {
@@ -58,38 +90,52 @@ export function useRegistrationForm(event: Event | undefined) {
         phone: formData.phone,
         email: formData.email,
         branch: formData.branch,
-        utr: event.fees > 0 ? formData.utr : undefined
+        utr: event.fees > 0 ? formData.utr : undefined,
+        team_members: event.team_size && event.team_size > 1 ? formData.team_members : undefined
       };
       
       // Add to local storage registrations array
       REGISTRATIONS_DATA.push(registrationData);
       
-      // Save to Supabase if available
+      // Save to Supabase
       try {
-        // Prepare registration data for Supabase
-        const supabaseRegistrationData = {
-          ...registrationData,
-          eventName: event.name,
-          registrationDate: new Date().toISOString(),
-          paymentStatus: event.fees > 0 ? (formData.utr ? 'paid' : 'pending') : 'free'
-        };
-        
-        // Save registration data to Supabase Storage
-        const fileName = `${formData.usn}_${eventId}_${Date.now()}.json`;
-        const { error } = await supabase.storage
+        // Insert registration record into Supabase
+        const { error } = await supabase
           .from('registrations')
-          .upload(fileName, JSON.stringify(supabaseRegistrationData), {
-            contentType: 'application/json',
-            upsert: false
-          });
+          .insert(registrationData);
         
         if (error) {
           console.error('Error saving to Supabase:', error);
           // Continue with local storage even if Supabase fails
         }
+        
+        // Also try the storage backup method as fallback
+        try {
+          // Prepare registration data for Supabase Storage
+          const supabaseRegistrationData = {
+            ...registrationData,
+            eventName: event.name,
+            registrationDate: new Date().toISOString(),
+            paymentStatus: event.fees > 0 ? (formData.utr ? 'paid' : 'pending') : 'free'
+          };
+          
+          // Save registration data to Supabase Storage
+          const fileName = `${formData.usn}_${eventId}_${Date.now()}.json`;
+          const { error: storageError } = await supabase.storage
+            .from('registrations')
+            .upload(fileName, JSON.stringify(supabaseRegistrationData), {
+              contentType: 'application/json',
+              upsert: false
+            });
+          
+          if (storageError) {
+            console.error('Error saving to Supabase Storage:', storageError);
+          }
+        } catch (error) {
+          console.log('Supabase storage error:', error);
+        }
       } catch (error) {
-        console.log('Supabase storage error:', error);
-        // Continue with local storage even if Supabase fails
+        console.log('Supabase database error:', error);
       }
       
       toast.success('Registration successful!', {
@@ -124,6 +170,9 @@ export function useRegistrationForm(event: Event | undefined) {
     handleChange,
     handleSubmit,
     nextStep,
-    previousStep
+    previousStep,
+    handleTeamMemberChange,
+    addTeamMember,
+    removeTeamMember
   };
 }

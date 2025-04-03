@@ -8,6 +8,11 @@ export interface Registration {
   phone: string;
   email: string;
   utr?: string;
+  team_members?: Array<{
+    name: string;
+    usn: string;
+    branch?: string;
+  }>;
 }
 
 export const REGISTRATIONS_DATA: Registration[] = [];

@@ -5,7 +5,7 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import RegisterForm from '@/components/RegisterForm';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Users, UserRound } from 'lucide-react';
 import { Event } from '@/data/events';
 
 interface RegisterProps {
@@ -35,7 +35,23 @@ const Register = ({ events }: RegisterProps) => {
           
           <div className="mb-8 text-center">
             <h1 className="text-3xl font-bold mb-2">Register for {event.name}</h1>
-            <p className="text-gray-400">Fill out the form below to register for this event.</p>
+            <p className="text-gray-400 mb-4">Fill out the form below to register for this event.</p>
+            
+            <div className="flex justify-center items-center mb-4">
+              <div className="glass px-4 py-2 rounded-full flex items-center">
+                {event.team_size > 1 ? (
+                  <>
+                    <Users size={16} className="mr-2 text-techfest-neon-purple" />
+                    <span>Team Event ({event.team_size} members)</span>
+                  </>
+                ) : (
+                  <>
+                    <UserRound size={16} className="mr-2 text-techfest-neon-blue" />
+                    <span>Individual Event</span>
+                  </>
+                )}
+              </div>
+            </div>
           </div>
           
           <RegisterForm />
