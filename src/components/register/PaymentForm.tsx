@@ -32,7 +32,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
   const eventFees = event.fees || 0;
   
   // If it's a team event and has team_registration_fees set, use that instead
-  const feesToPay = isTeamEvent && event.team_registration_fees ? event.team_registration_fees : eventFees;
+  const feesToPay = isTeamEvent && event.team_registration_fees !== undefined ? event.team_registration_fees : eventFees;
 
   return (
     <form onSubmit={onSubmit} className="space-y-6">

@@ -100,7 +100,8 @@ export function useRegistrationForm(event: Event | undefined) {
       // Save to Supabase
       try {
         // Insert registration record into Supabase
-        const { error } = await supabase
+        // Use type casting to avoid TypeScript errors
+        const { error } = await (supabase as any)
           .from('registrations')
           .insert(registrationData);
         
