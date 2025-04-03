@@ -84,7 +84,7 @@ export function EditEventDialog({ event, onUpdateEvent }: EditEventDialogProps) 
       .filter(coord => coord.length > 0);
     
     // Create event data
-    const eventData = {
+    const eventData: any = {
       name,
       description,
       date_time: dateTime,
@@ -99,8 +99,11 @@ export function EditEventDialog({ event, onUpdateEvent }: EditEventDialogProps) 
       has_solo_option: hasSoloOption
     };
     
-    // Add background image if it exists
-    if (backgroundImage && previewUrl) {
+    // Add background image if it exists and was newly uploaded
+    if (backgroundImage) {
+      eventData.background_image = previewUrl;
+    } else if (previewUrl) {
+      // If there's a preview URL but no new background image, it's using the existing one
       eventData.background_image = previewUrl;
     }
     
