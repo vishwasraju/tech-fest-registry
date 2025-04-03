@@ -5,6 +5,7 @@ import { toast } from 'sonner';
 
 interface AdminContextType {
   handleAddEvent: (formData: any) => Promise<void>;
+  handleEditEvent: (eventId: string, formData: any) => Promise<void>;
   handleDeleteEvent: (eventId: string) => Promise<void>;
   handleUpdateEventBackground: (eventId: string, backgroundImage: string) => Promise<void>;
   handleUpdateEventQRCode: (eventId: string, qrCodeUrl: string, isTeamQR?: boolean) => Promise<void>;
@@ -37,6 +38,18 @@ export const AdminProvider: React.FC<AdminProviderProps> = ({
     const updatedEvents = [...events, newEvent];
     await onUpdateEvents(updatedEvents);
     toast.success('Event added successfully');
+  };
+  
+  const handleEditEvent = async (eventId: string, formData: any) => {
+    // Update the existing event with new form data
+    const updatedEvents = events.map(event => 
+      event.id === eventId 
+        ? { ...event, ...formData } 
+        : event
+    );
+    
+    await onUpdateEvents(updatedEvents);
+    toast.success('Event updated successfully');
   };
   
   const handleDeleteEvent = async (eventId: string) => {
@@ -82,6 +95,7 @@ export const AdminProvider: React.FC<AdminProviderProps> = ({
   return (
     <AdminContext.Provider value={{
       handleAddEvent,
+      handleEditEvent,
       handleDeleteEvent,
       handleUpdateEventBackground,
       handleUpdateEventQRCode

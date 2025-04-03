@@ -16,7 +16,7 @@ export interface Event {
   team_registration_fees?: number;
   coordinators?: string[];
   student_coordinators?: string[];
-  has_solo_option?: boolean; // New property to enable solo registration option
+  has_solo_option?: boolean; // Property to enable solo registration option
 }
 
 // Initial events data
