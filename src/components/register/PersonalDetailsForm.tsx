@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+
+import React from 'react';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -43,7 +44,8 @@ const PersonalDetailsForm: React.FC<PersonalDetailsFormProps> = ({
   onNext
 }) => {
   const isTeamEvent = event && event.team_size && event.team_size > 1;
-  const hasSoloOption = event?.has_solo_option;
+  const allowSoloRegistration = event?.registration_type === 'solo' || event?.registration_type === 'both';
+  const allowTeamRegistration = event?.registration_type === 'team' || event?.registration_type === 'both';
   
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -88,7 +90,7 @@ const PersonalDetailsForm: React.FC<PersonalDetailsFormProps> = ({
       <h3 className="text-lg font-medium mb-2">Team Leader / Primary Participant</h3>
       
       {/* Registration Type Selection (Solo or Team) */}
-      {isTeamEvent && hasSoloOption && (
+      {isTeamEvent && allowSoloRegistration && allowTeamRegistration && (
         <div className="mb-6">
           <Label className="mb-2 block">Registration Type</Label>
           <RadioGroup 
@@ -190,7 +192,7 @@ const PersonalDetailsForm: React.FC<PersonalDetailsFormProps> = ({
       
       {/* Team Members Section - Show only if team registration is selected */}
       {isTeamEvent && 
-       ((hasSoloOption && formData.registration_type === 'team') || !hasSoloOption) && 
+       formData.registration_type === 'team' && 
        onTeamMemberChange && onAddTeamMember && onRemoveTeamMember && (
         <div className="mt-8">
           <div className="flex justify-between items-center mb-4">

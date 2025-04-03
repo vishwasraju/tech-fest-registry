@@ -9,6 +9,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Edit, Upload } from 'lucide-react';
 import { toast } from 'sonner';
 import { Event } from '@/data/events';
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 interface EditEventDialogProps {
   event: Event;
@@ -31,7 +32,7 @@ export function EditEventDialog({ event, onUpdateEvent }: EditEventDialogProps) 
   const [cashPrize, setCashPrize] = useState('0');
   const [coordinators, setCoordinators] = useState('');
   const [studentCoordinators, setStudentCoordinators] = useState('');
-  const [hasSoloOption, setHasSoloOption] = useState(false);
+  const [registrationType, setRegistrationType] = useState<'solo' | 'team' | 'both'>('solo');
   const [backgroundImage, setBackgroundImage] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string>('');
   
@@ -47,7 +48,18 @@ export function EditEventDialog({ event, onUpdateEvent }: EditEventDialogProps) 
       setFees(event.fees.toString());
       setTeamFees(event.team_registration_fees?.toString() || event.fees.toString());
       setCashPrize(event.cash_prize.toString());
-      setHasSoloOption(event.has_solo_option || false);
+      
+      // Determine registration type from event data
+      if (event.team_size > 1) {
+        if (event.has_solo_option) {
+          setRegistrationType('both');
+        } else {
+          setRegistrationType('team');
+        }
+      } else {
+        setRegistrationType('solo');
+      }
+      
       setCoordinators(event.coordinators?.join(', ') || '');
       setStudentCoordinators(event.student_coordinators?.join(', ') || '');
       
@@ -83,6 +95,9 @@ export function EditEventDialog({ event, onUpdateEvent }: EditEventDialogProps) 
       .map(coord => coord.trim())
       .filter(coord => coord.length > 0);
     
+    // Determine if team event should have solo option
+    const hasSoloOption = registrationType === 'both';
+    
     // Create event data
     const eventData: any = {
       name,
@@ -92,12 +107,21 @@ export function EditEventDialog({ event, onUpdateEvent }: EditEventDialogProps) 
       rules,
       team_size: parseInt(teamSize),
       fees: parseInt(fees),
-      team_registration_fees: parseInt(teamFees),
       cash_prize: parseInt(cashPrize),
       coordinators: coordinatorsArray,
       student_coordinators: studentCoordinatorsArray,
-      has_solo_option: hasSoloOption
+      registration_type: registrationType
     };
+    
+    // Add team fees if it's a team event
+    if (registrationType === 'team' || registrationType === 'both') {
+      eventData.team_registration_fees = parseInt(teamFees);
+      
+      // Add has_solo_option if registration type is 'both'
+      if (registrationType === 'both') {
+        eventData.has_solo_option = true;
+      }
+    }
     
     // Add background image if it exists and was newly uploaded
     if (backgroundImage) {
@@ -116,6 +140,9 @@ export function EditEventDialog({ event, onUpdateEvent }: EditEventDialogProps) 
       fileInputRef.current.click();
     }
   };
+  
+  // Determine if we should show team size input
+  const showTeamSizeInput = registrationType === 'team' || registrationType === 'both';
   
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -167,27 +194,38 @@ export function EditEventDialog({ event, onUpdateEvent }: EditEventDialogProps) 
             />
           </div>
           
-          <div className="grid gap-2">
-            <Label htmlFor="event-team-size">Team Size</Label>
-            <Input 
-              id="event-team-size" 
-              type="number" 
-              min="1" 
-              value={teamSize} 
-              onChange={(e) => setTeamSize(e.target.value)}
-            />
+          <div className="grid gap-2 md:col-span-2">
+            <Label>Registration Type</Label>
+            <RadioGroup 
+              value={registrationType} 
+              onValueChange={(value: 'solo' | 'team' | 'both') => setRegistrationType(value)}
+              className="flex flex-col space-y-2"
+            >
+              <div className="flex items-center space-x-2 p-2 rounded-md hover:bg-gray-800">
+                <RadioGroupItem value="solo" id="edit-solo" />
+                <Label htmlFor="edit-solo" className="cursor-pointer">Solo Registration Only</Label>
+              </div>
+              <div className="flex items-center space-x-2 p-2 rounded-md hover:bg-gray-800">
+                <RadioGroupItem value="team" id="edit-team" />
+                <Label htmlFor="edit-team" className="cursor-pointer">Team Registration Only</Label>
+              </div>
+              <div className="flex items-center space-x-2 p-2 rounded-md hover:bg-gray-800">
+                <RadioGroupItem value="both" id="edit-both" />
+                <Label htmlFor="edit-both" className="cursor-pointer">Allow Both Solo & Team Registration</Label>
+              </div>
+            </RadioGroup>
           </div>
           
-          {parseInt(teamSize) > 1 && (
-            <div className="flex items-center space-x-2">
-              <Checkbox 
-                id="has-solo-option" 
-                checked={hasSoloOption} 
-                onCheckedChange={(checked) => setHasSoloOption(!!checked)}
+          {showTeamSizeInput && (
+            <div className="grid gap-2">
+              <Label htmlFor="event-team-size">Team Size</Label>
+              <Input 
+                id="event-team-size" 
+                type="number" 
+                min="2" 
+                value={teamSize} 
+                onChange={(e) => setTeamSize(e.target.value)}
               />
-              <Label htmlFor="has-solo-option">
-                Allow solo registration for this team event
-              </Label>
             </div>
           )}
           
@@ -202,7 +240,7 @@ export function EditEventDialog({ event, onUpdateEvent }: EditEventDialogProps) 
             />
           </div>
           
-          {parseInt(teamSize) > 1 && (
+          {showTeamSizeInput && (
             <div className="grid gap-2">
               <Label htmlFor="event-team-fees">Team Entry Fee (₹)</Label>
               <Input 
