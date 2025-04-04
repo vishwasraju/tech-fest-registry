@@ -1,9 +1,10 @@
 
-import { useState, useEffect, useCallback } from 'react';
-import { useParams } from 'react-router-dom';
+import { useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
 import { Event } from '@/data/events';
-import { useTeamMembers } from './useTeamMembers';
-import { useRegistrationSubmission } from './useRegistrationSubmission';
+import { REGISTRATIONS_DATA } from '@/data/registrations';
 
 interface FormData {
   name: string;
@@ -12,27 +13,16 @@ interface FormData {
   email: string;
   branch: string;
   utr: string;
-  registration_type: 'solo' | 'team';
   team_members?: Array<{
     name: string;
     usn: string;
-    branch: string;
+    branch?: string;
   }>;
 }
 
 export function useRegistrationForm(event: Event | undefined) {
   const { eventId } = useParams<{ eventId: string }>();
-  
-  // Initialize based on event configuration
-  const getInitialRegistrationType = () => {
-    if (!event) return 'solo';
-    
-    // For team-only events, default to team
-    if (event.registration_type === 'team') return 'team';
-    
-    // For both types or solo-only, default to solo
-    return 'solo';
-  };
+  const navigate = useNavigate();
   
   const [formData, setFormData] = useState<FormData>({
     name: '',
@@ -41,54 +31,128 @@ export function useRegistrationForm(event: Event | undefined) {
     email: '',
     branch: '',
     utr: '',
-    registration_type: getInitialRegistrationType(),
-    team_members: []
+    team_members: event?.team_size && event.team_size > 1 ? [] : undefined
   });
   
   const [step, setStep] = useState(1);
-  
-  const { 
-    teamMembers,
-    handleTeamMemberChange,
-    addTeamMember,
-    removeTeamMember,
-    ensureTeamSize
-  } = useTeamMembers(event);
-  
-  const { isSubmitting, handleSubmit: submitRegistration } = useRegistrationSubmission(event);
-  
-  // Update formData with teamMembers whenever they change
-  useEffect(() => {
-    setFormData(prev => ({
-      ...prev,
-      team_members: teamMembers
-    }));
-  }, [teamMembers]);
-  
-  // Memoize ensureTeamSize to prevent infinite useEffect loops
-  const memoizedEnsureTeamSize = useCallback(ensureTeamSize, [ensureTeamSize]);
-  
-  // Sync team members when registration type changes
-  useEffect(() => {
-    if (event) {
-      memoizedEnsureTeamSize(formData.registration_type);
-    }
-  }, [event, formData.registration_type, memoizedEnsureTeamSize]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   
   const handleChange = (name: string, value: string) => {
     setFormData(prev => ({ ...prev, [name]: value }));
-    
-    // Special handling for registration_type changes
-    if (name === 'registration_type') {
-      memoizedEnsureTeamSize(value as 'solo' | 'team');
-    }
+  };
+  
+  const handleTeamMemberChange = (index: number, field: string, value: string) => {
+    setFormData(prev => {
+      const updatedTeamMembers = [...(prev.team_members || [])];
+      updatedTeamMembers[index] = {
+        ...updatedTeamMembers[index],
+        [field]: value
+      };
+      return { ...prev, team_members: updatedTeamMembers };
+    });
+  };
+  
+  const addTeamMember = () => {
+    setFormData(prev => {
+      const updatedTeamMembers = [...(prev.team_members || []), { name: '', usn: '', branch: '' }];
+      return { ...prev, team_members: updatedTeamMembers };
+    });
+  };
+  
+  const removeTeamMember = (index: number) => {
+    setFormData(prev => {
+      const updatedTeamMembers = [...(prev.team_members || [])];
+      updatedTeamMembers.splice(index, 1);
+      return { ...prev, team_members: updatedTeamMembers };
+    });
   };
   
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!eventId) return;
     
-    await submitRegistration(formData, eventId);
+    if (!eventId || !event) {
+      toast.error('Event information is missing');
+      return;
+    }
+    
+    setIsSubmitting(true);
+    
+    try {
+      // Generate a unique ID for the registration
+      const registrationId = `reg-${Date.now()}`;
+      
+      // Create registration object
+      const registrationData = {
+        id: registrationId,
+        event_id: eventId,
+        name: formData.name,
+        usn: formData.usn,
+        phone: formData.phone,
+        email: formData.email,
+        branch: formData.branch,
+        utr: event.fees > 0 ? formData.utr : undefined,
+        team_members: event.team_size && event.team_size > 1 ? formData.team_members : undefined
+      };
+      
+      // Add to local storage registrations array
+      REGISTRATIONS_DATA.push(registrationData);
+      
+      // Save to Supabase
+      try {
+        // Insert registration record into Supabase
+        const { error } = await supabase
+          .from('registrations')
+          .insert(registrationData);
+        
+        if (error) {
+          console.error('Error saving to Supabase:', error);
+          // Continue with local storage even if Supabase fails
+        }
+        
+        // Also try the storage backup method as fallback
+        try {
+          // Prepare registration data for Supabase Storage
+          const supabaseRegistrationData = {
+            ...registrationData,
+            eventName: event.name,
+            registrationDate: new Date().toISOString(),
+            paymentStatus: event.fees > 0 ? (formData.utr ? 'paid' : 'pending') : 'free'
+          };
+          
+          // Save registration data to Supabase Storage
+          const fileName = `${formData.usn}_${eventId}_${Date.now()}.json`;
+          const { error: storageError } = await supabase.storage
+            .from('registrations')
+            .upload(fileName, JSON.stringify(supabaseRegistrationData), {
+              contentType: 'application/json',
+              upsert: false
+            });
+          
+          if (storageError) {
+            console.error('Error saving to Supabase Storage:', storageError);
+          }
+        } catch (error) {
+          console.log('Supabase storage error:', error);
+        }
+      } catch (error) {
+        console.log('Supabase database error:', error);
+      }
+      
+      toast.success('Registration successful!', {
+        description: 'Thank you for registering for this event!',
+      });
+      
+      setTimeout(() => {
+        navigate('/registration-success');
+      }, 1500);
+    } catch (error) {
+      console.error('Registration error:', error);
+      toast.error('Registration failed', {
+        description: 'There was a problem with your registration. Please try again.',
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
   
   const nextStep = () => {
