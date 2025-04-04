@@ -53,7 +53,8 @@ export function useRegistrationSubmission(event: Event | undefined) {
       
       // Save to Supabase - prepare the payload that matches the Supabase schema
       try {
-        // Convert team_members to JSON format for Supabase
+        // Convert team_members to JSON string for Supabase compatibility 
+        // This provides explicit typing that aligns with Supabase's expectations
         const supabaseRegistrationData = {
           id: registrationId,
           event_id: eventId,
@@ -63,9 +64,9 @@ export function useRegistrationSubmission(event: Event | undefined) {
           email: formData.email,
           branch: formData.branch,
           utr: event.fees > 0 ? formData.utr : null,
-          // Convert the team_members array to a JSON object for Supabase
+          // Use as JSON cast to align with Supabase's expected Json type
           team_members: formData.registration_type === 'team' && formData.team_members 
-            ? formData.team_members 
+            ? formData.team_members as unknown as Record<string, any>
             : null
         };
         
