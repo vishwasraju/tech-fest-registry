@@ -26,6 +26,7 @@ interface PersonalDetailsFormProps {
   onAddTeamMember?: () => void;
   onRemoveTeamMember?: (index: number) => void;
   onNext: () => void;
+  showRegistrationTypeOptions?: boolean;
 }
 
 const PersonalDetailsForm: React.FC<PersonalDetailsFormProps> = ({
@@ -35,7 +36,8 @@ const PersonalDetailsForm: React.FC<PersonalDetailsFormProps> = ({
   onTeamMemberChange,
   onAddTeamMember,
   onRemoveTeamMember,
-  onNext
+  onNext,
+  showRegistrationTypeOptions = false
 }) => {
   // Check if this is a team event (team size > 1)
   const isTeamEvent = event && event.team_size && event.team_size > 1;
@@ -92,7 +94,7 @@ const PersonalDetailsForm: React.FC<PersonalDetailsFormProps> = ({
       <h3 className="text-lg font-medium mb-2">Team Leader / Primary Participant</h3>
       
       {/* Registration Type Selection (Solo or Team) */}
-      {allowSoloRegistration && allowTeamRegistration && (
+      {showRegistrationTypeOptions && (
         <RegistrationTypeSelector
           value={formData.registration_type}
           onChange={handleRegistrationTypeChange}

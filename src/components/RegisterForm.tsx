@@ -63,6 +63,7 @@ const RegisterForm = () => {
           onAddTeamMember={addTeamMember}
           onRemoveTeamMember={removeTeamMember}
           onNext={nextStep}
+          showRegistrationTypeOptions={showRegistrationTypeOptions}
         />
       ) : (
         <PaymentForm 

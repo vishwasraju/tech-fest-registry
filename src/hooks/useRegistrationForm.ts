@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 import { Event } from '@/data/events';
 import { useTeamMembers } from './useTeamMembers';
@@ -65,19 +65,22 @@ export function useRegistrationForm(event: Event | undefined) {
     }));
   }, [teamMembers]);
   
+  // Memoize ensureTeamSize to prevent infinite useEffect loops
+  const memoizedEnsureTeamSize = useCallback(ensureTeamSize, [ensureTeamSize]);
+  
   // Sync team members when registration type changes
   useEffect(() => {
     if (event) {
-      ensureTeamSize(formData.registration_type);
+      memoizedEnsureTeamSize(formData.registration_type);
     }
-  }, [event, formData.registration_type, ensureTeamSize]);
+  }, [event, formData.registration_type, memoizedEnsureTeamSize]);
   
   const handleChange = (name: string, value: string) => {
     setFormData(prev => ({ ...prev, [name]: value }));
     
     // Special handling for registration_type changes
     if (name === 'registration_type') {
-      ensureTeamSize(value as 'solo' | 'team');
+      memoizedEnsureTeamSize(value as 'solo' | 'team');
     }
   };
   
