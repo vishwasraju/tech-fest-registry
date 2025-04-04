@@ -12,6 +12,8 @@ export interface Event {
   background_image?: string;
   category?: string;
   qr_code_url?: string;
+  team_qr_code_url?: string;
+  team_registration_fees?: number;
   coordinators?: string[];
   student_coordinators?: string[];
 }
