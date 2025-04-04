@@ -1,4 +1,3 @@
-
 import React, { useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { EVENTS_DATA } from '@/data/events';
@@ -45,7 +44,12 @@ const RegisterForm = () => {
         if (formData.team_members && formData.team_members.length > 0) {
           formData.team_members.forEach((member, index) => {
             if (index < 4) {
-              requiredTeamMembers[index] = member;
+              // Ensure branch is never undefined by providing an empty string as default
+              requiredTeamMembers[index] = { 
+                name: member.name || '', 
+                usn: member.usn || '', 
+                branch: member.branch || '' 
+              };
             }
           });
         }

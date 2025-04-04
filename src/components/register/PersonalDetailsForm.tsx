@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
@@ -9,6 +8,7 @@ import { toast } from 'sonner';
 import { X, Plus, UserRound, Users } from 'lucide-react';
 import { Event } from '@/data/events';
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { TeamMember } from '@/data/registrations';
 
 export interface PersonalFormData {
   name: string;
@@ -17,11 +17,7 @@ export interface PersonalFormData {
   email: string;
   branch: string;
   registration_type: 'solo' | 'team';
-  team_members?: Array<{
-    name: string;
-    usn: string;
-    branch?: string;
-  }>;
+  team_members?: TeamMember[];
 }
 
 interface PersonalDetailsFormProps {
@@ -250,7 +246,7 @@ const PersonalDetailsForm: React.FC<PersonalDetailsFormProps> = ({
                 <div className="md:col-span-2">
                   <Label htmlFor={`member-${index}-branch`}>Branch</Label>
                   <Select 
-                    value={member.branch || ''} 
+                    value={member.branch} 
                     onValueChange={(value) => onTeamMemberChange(index, 'branch', value)}
                   >
                     <SelectTrigger className="bg-techfest-muted text-white border-techfest-muted">

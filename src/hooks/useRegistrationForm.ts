@@ -1,10 +1,15 @@
-
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { Event } from '@/data/events';
 import { REGISTRATIONS_DATA } from '@/data/registrations';
+
+interface TeamMember {
+  name: string;
+  usn: string;
+  branch: string; // Changed from optional to required
+}
 
 interface FormData {
   name: string;
@@ -14,11 +19,7 @@ interface FormData {
   branch: string;
   utr: string;
   registration_type: 'solo' | 'team';
-  team_members?: Array<{
-    name: string;
-    usn: string;
-    branch?: string;
-  }>;
+  team_members?: TeamMember[];
 }
 
 export function useRegistrationForm(event: Event | undefined) {
