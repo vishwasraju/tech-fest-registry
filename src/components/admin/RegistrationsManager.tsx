@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Event } from '@/data/events';
 import { Registration } from '@/data/registrations';
@@ -23,8 +24,7 @@ const RegistrationsManager = ({ events, registrations: initialRegistrations }: R
     const loadRegistrations = async () => {
       setLoading(true);
       try {
-        // Use the any type to bypass the TypeScript error with Supabase
-        const { data, error } = await (supabase as any)
+        const { data, error } = await supabase
           .from('registrations')
           .select('*');
         

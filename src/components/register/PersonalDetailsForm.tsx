@@ -6,9 +6,8 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { BRANCH_OPTIONS } from '@/types/admin';
 import { toast } from 'sonner';
-import { X, Plus, UserRound, Users } from 'lucide-react';
+import { X, Plus } from 'lucide-react';
 import { Event } from '@/data/events';
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 export interface PersonalFormData {
   name: string;
@@ -16,7 +15,6 @@ export interface PersonalFormData {
   phone: string;
   email: string;
   branch: string;
-  registration_type: 'solo' | 'team';
   team_members?: Array<{
     name: string;
     usn: string;
@@ -44,9 +42,6 @@ const PersonalDetailsForm: React.FC<PersonalDetailsFormProps> = ({
   onNext
 }) => {
   const isTeamEvent = event && event.team_size && event.team_size > 1;
-  const allowSoloRegistration = event?.registration_type === 'solo' || event?.registration_type === 'both';
-  const allowTeamRegistration = event?.registration_type === 'team' || event?.registration_type === 'both';
-  const requiredTeamSize = 4; // Set to exactly 4 team members as required
   
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -57,10 +52,6 @@ const PersonalDetailsForm: React.FC<PersonalDetailsFormProps> = ({
     onDataChange(name, value);
   };
   
-  const handleRegistrationTypeChange = (value: string) => {
-    onDataChange('registration_type', value);
-  };
-  
   const handleNext = () => {
     // Basic validation
     if (!formData.name || !formData.usn || !formData.phone || !formData.email || !formData.branch) {
@@ -68,18 +59,16 @@ const PersonalDetailsForm: React.FC<PersonalDetailsFormProps> = ({
       return;
     }
     
-    // Team member validation if team registration is selected
-    if (isTeamEvent && formData.registration_type === 'team' && formData.team_members) {
-      // Check if we have exactly the required number of team members (4)
-      if (formData.team_members.length !== requiredTeamSize) {
-        toast.error(`Please add exactly ${requiredTeamSize} team members`);
+    // Team member validation
+    if (isTeamEvent && formData.team_members) {
+      if (formData.team_members.length < (event.team_size - 1)) {
+        toast.error(`Please add ${event.team_size - 1} team members`);
         return;
       }
       
-      // Check if all team member details are filled
       for (const member of formData.team_members) {
-        if (!member.name || !member.usn || !member.branch) {
-          toast.error('Please fill all team member details (name, USN, and branch)');
+        if (!member.name || !member.usn) {
+          toast.error('Please fill all team member details');
           return;
         }
       }
@@ -91,34 +80,6 @@ const PersonalDetailsForm: React.FC<PersonalDetailsFormProps> = ({
   return (
     <form className="space-y-4">
       <h3 className="text-lg font-medium mb-2">Team Leader / Primary Participant</h3>
-      
-      {/* Registration Type Selection (Solo or Team) */}
-      {isTeamEvent && allowSoloRegistration && allowTeamRegistration && (
-        <div className="mb-6">
-          <Label className="mb-2 block">Registration Type</Label>
-          <RadioGroup 
-            value={formData.registration_type} 
-            onValueChange={handleRegistrationTypeChange}
-            className="flex gap-4"
-          >
-            <div className="flex items-center space-x-2 glass p-3 rounded-lg flex-1">
-              <RadioGroupItem value="solo" id="solo" />
-              <Label htmlFor="solo" className="flex items-center cursor-pointer">
-                <UserRound size={16} className="mr-2 text-techfest-neon-blue" />
-                <span>Solo Registration</span>
-              </Label>
-            </div>
-            
-            <div className="flex items-center space-x-2 glass p-3 rounded-lg flex-1">
-              <RadioGroupItem value="team" id="team" />
-              <Label htmlFor="team" className="flex items-center cursor-pointer">
-                <Users size={16} className="mr-2 text-techfest-neon-purple" />
-                <span>Team Registration ({requiredTeamSize} members)</span>
-              </Label>
-            </div>
-          </RadioGroup>
-        </div>
-      )}
       
       <div>
         <Label htmlFor="name">Full Name</Label>
@@ -193,15 +154,13 @@ const PersonalDetailsForm: React.FC<PersonalDetailsFormProps> = ({
         />
       </div>
       
-      {/* Team Members Section - Show only if team registration is selected */}
-      {isTeamEvent && 
-       formData.registration_type === 'team' && 
-       onTeamMemberChange && (
+      {/* Team Members Section */}
+      {isTeamEvent && onTeamMemberChange && onAddTeamMember && onRemoveTeamMember && (
         <div className="mt-8">
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-lg font-medium">Team Members</h3>
             <p className="text-sm text-gray-400">
-              Required: {requiredTeamSize} members
+              Required: {event.team_size - 1} members
             </p>
           </div>
           
@@ -209,17 +168,15 @@ const PersonalDetailsForm: React.FC<PersonalDetailsFormProps> = ({
             <div key={index} className="glass p-4 rounded-lg mb-4">
               <div className="flex justify-between items-center mb-2">
                 <h4 className="font-medium">Team Member #{index + 1}</h4>
-                {formData.team_members && formData.team_members.length > requiredTeamSize && onRemoveTeamMember && (
-                  <Button 
-                    type="button" 
-                    variant="ghost" 
-                    size="sm" 
-                    onClick={() => onRemoveTeamMember(index)}
-                    className="h-8 w-8 p-0 text-gray-400 hover:text-white"
-                  >
-                    <X size={16} />
-                  </Button>
-                )}
+                <Button 
+                  type="button" 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={() => onRemoveTeamMember(index)}
+                  className="h-8 w-8 p-0 text-gray-400 hover:text-white"
+                >
+                  <X size={16} />
+                </Button>
               </div>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -269,7 +226,7 @@ const PersonalDetailsForm: React.FC<PersonalDetailsFormProps> = ({
             </div>
           ))}
           
-          {formData.team_members && formData.team_members.length < requiredTeamSize && onAddTeamMember && (
+          {formData.team_members && formData.team_members.length < (event.team_size - 1) && (
             <Button
               type="button"
               variant="outline"
@@ -277,7 +234,7 @@ const PersonalDetailsForm: React.FC<PersonalDetailsFormProps> = ({
               className="w-full mb-4 border-dashed border-gray-600 hover:border-gray-400 hover:bg-gray-800"
             >
               <Plus size={16} className="mr-2" />
-              Add Team Member ({formData.team_members.length}/{requiredTeamSize})
+              Add Team Member ({formData.team_members.length}/{event.team_size - 1})
             </Button>
           )}
         </div>

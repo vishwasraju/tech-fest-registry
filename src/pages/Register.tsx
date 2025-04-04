@@ -1,13 +1,12 @@
 
-import React, { useEffect } from 'react';
-import { useParams, Link, Navigate, useNavigate } from 'react-router-dom';
+import React from 'react';
+import { useParams, Link, Navigate } from 'react-router-dom';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import RegisterForm from '@/components/RegisterForm';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Users, UserRound } from 'lucide-react';
 import { Event } from '@/data/events';
-import { toast } from 'sonner';
 
 interface RegisterProps {
   events: Event[];
@@ -15,46 +14,10 @@ interface RegisterProps {
 
 const Register = ({ events }: RegisterProps) => {
   const { eventId } = useParams<{ eventId: string }>();
-  const navigate = useNavigate();
   const event = events.find(e => e.id === eventId);
   
-  useEffect(() => {
-    if (!event) {
-      toast.error("Event not found", {
-        description: "The event you're looking for doesn't exist or has been removed."
-      });
-      // Small delay before redirecting
-      const redirectTimer = setTimeout(() => {
-        navigate('/events', { replace: true });
-      }, 2000);
-      
-      return () => clearTimeout(redirectTimer);
-    }
-  }, [event, navigate]);
-  
   if (!event) {
-    return (
-      <div className="min-h-screen flex flex-col">
-        <Header />
-        <main className="flex-grow py-12">
-          <div className="container mx-auto px-4">
-            <div className="max-w-md mx-auto glass p-8 rounded-xl text-center">
-              <h2 className="text-2xl font-bold mb-4">Event Not Found</h2>
-              <p className="text-gray-400 mb-6">
-                The event you're looking for doesn't exist or has been removed.
-                Redirecting to events page...
-              </p>
-              <Link to="/events">
-                <Button>
-                  Go to Events
-                </Button>
-              </Link>
-            </div>
-          </div>
-        </main>
-        <Footer />
-      </div>
-    );
+    return <Navigate to="/events" replace />;
   }
   
   return (
