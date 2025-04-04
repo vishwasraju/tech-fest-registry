@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Event } from '@/data/events';
 import { ArrowRight, InfoIcon } from 'lucide-react';
+import QRCode from '@/components/QRCode';
 
 interface PaymentFormProps {
   event: Event;
@@ -61,30 +62,24 @@ const PaymentForm = ({
       
       {!isFreeEvent && (
         <>
-          {qrCodeUrl ? (
-            <div className="flex flex-col items-center glass p-6 rounded-xl mb-6">
-              <img 
-                src={qrCodeUrl} 
-                alt="Payment QR Code" 
-                className="max-w-[250px] w-full mb-4" 
-              />
-              <div className="text-center">
-                <p className="font-medium text-lg">Scan to Pay ₹{fee}</p>
-                <p className="text-sm text-gray-400">
-                  {registrationType === 'team' ? 'Team Registration' : 'Solo Registration'}
-                </p>
-              </div>
-            </div>
-          ) : (
-            <div className="flex flex-col items-center glass p-6 rounded-xl mb-6">
+          <div className="flex flex-col items-center glass p-6 rounded-xl mb-6">
+            {qrCodeUrl ? (
+              <QRCode value="payment" imageUrl={qrCodeUrl} size={250} />
+            ) : (
               <div className="bg-gray-800 p-8 rounded-lg mb-4">
                 <InfoIcon className="mx-auto w-12 h-12 text-gray-400" />
+                <p className="text-center text-gray-400 mt-2">
+                  QR code not available
+                </p>
               </div>
-              <p className="text-center text-gray-400">
-                QR code not available. Please contact the organizers for payment details.
+            )}
+            <div className="text-center mt-4">
+              <p className="font-medium text-lg">Scan to Pay ₹{fee}</p>
+              <p className="text-sm text-gray-400">
+                {registrationType === 'team' ? 'Team Registration' : 'Solo Registration'}
               </p>
             </div>
-          )}
+          </div>
           
           <div>
             <Label htmlFor="utr">UTR / Transaction Reference</Label>

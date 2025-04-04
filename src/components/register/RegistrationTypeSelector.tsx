@@ -21,7 +21,7 @@ const RegistrationTypeSelector: React.FC<RegistrationTypeSelectorProps> = ({
       <RadioGroup 
         value={value} 
         onValueChange={onChange}
-        className="flex gap-4"
+        className="flex gap-4 flex-col sm:flex-row"
       >
         <div className="flex items-center space-x-2 glass p-3 rounded-lg flex-1">
           <RadioGroupItem value="solo" id="solo" />
