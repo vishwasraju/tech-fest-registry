@@ -34,7 +34,7 @@ export function useRegistrationSubmission(event: Event | undefined) {
       // Generate a unique ID for the registration
       const registrationId = `reg-${Date.now()}`;
       
-      // Create registration object
+      // Create registration object for local storage
       const registrationData = {
         id: registrationId,
         event_id: eventId,
@@ -51,12 +51,28 @@ export function useRegistrationSubmission(event: Event | undefined) {
       // Add to local storage registrations array
       REGISTRATIONS_DATA.push(registrationData);
       
-      // Save to Supabase
+      // Save to Supabase - prepare the payload that matches the Supabase schema
       try {
+        // Convert team_members to JSON format for Supabase
+        const supabaseRegistrationData = {
+          id: registrationId,
+          event_id: eventId,
+          name: formData.name,
+          usn: formData.usn,
+          phone: formData.phone,
+          email: formData.email,
+          branch: formData.branch,
+          utr: event.fees > 0 ? formData.utr : null,
+          // Convert the team_members array to a JSON object for Supabase
+          team_members: formData.registration_type === 'team' && formData.team_members 
+            ? formData.team_members 
+            : null
+        };
+        
         // Insert registration record into Supabase
         const { error } = await supabase
           .from('registrations')
-          .insert(registrationData);
+          .insert(supabaseRegistrationData);
         
         if (error) {
           console.error('Error saving to Supabase:', error);
@@ -66,7 +82,7 @@ export function useRegistrationSubmission(event: Event | undefined) {
         // Also try the storage backup method as fallback
         try {
           // Prepare registration data for Supabase Storage
-          const supabaseRegistrationData = {
+          const supabaseStorageData = {
             ...registrationData,
             eventName: event.name,
             registrationDate: new Date().toISOString(),
@@ -77,7 +93,7 @@ export function useRegistrationSubmission(event: Event | undefined) {
           const fileName = `${formData.usn}_${eventId}_${Date.now()}.json`;
           const { error: storageError } = await supabase.storage
             .from('registrations')
-            .upload(fileName, JSON.stringify(supabaseRegistrationData), {
+            .upload(fileName, JSON.stringify(supabaseStorageData), {
               contentType: 'application/json',
               upsert: false
             });
