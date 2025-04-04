@@ -18,5 +18,5 @@ export interface QRCodeImageType {
 export const BRANCH_OPTIONS = [
   'ALL',
   'AIML', 'CSE', 'CSD', 'AIDS', 'ECE', 'AEROSPACE', 
-  'AERONAUTICAL', 'MECHANICAL', 'CIVIL', 'MBA'
+  'AERONAUTICAL', 'MECHANICAL', 'CIVIL', 'MBA','DIPLOMA','POLYTECHNIC'
 ];
