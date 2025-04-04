@@ -34,6 +34,28 @@ const RegisterForm = () => {
     }
   }, [event, navigate]);
   
+  // Use another effect to ensure team member data matches the event requirements
+  useEffect(() => {
+    if (event && formData.registration_type === 'team') {
+      if (!formData.team_members || formData.team_members.length < 4) {
+        // Ensure we have exactly 4 team members for team registrations
+        const requiredTeamMembers = Array(4).fill(0).map(() => ({ name: '', usn: '', branch: '' }));
+        
+        // If we already have some team members, preserve their data
+        if (formData.team_members && formData.team_members.length > 0) {
+          formData.team_members.forEach((member, index) => {
+            if (index < 4) {
+              requiredTeamMembers[index] = member;
+            }
+          });
+        }
+        
+        // Update the form data with the required team members
+        handleChange('team_members', JSON.stringify(requiredTeamMembers));
+      }
+    }
+  }, [event, formData.registration_type]);
+  
   if (!event) {
     return (
       <div className="text-center py-10 glass px-6 rounded-xl">
@@ -44,6 +66,9 @@ const RegisterForm = () => {
       </div>
     );
   }
+  
+  // Check if this event supports solo/team options
+  const showRegistrationTypeOptions = event.registration_type === 'both';
   
   return (
     <div className="max-w-md mx-auto glass px-6 py-8 rounded-xl">

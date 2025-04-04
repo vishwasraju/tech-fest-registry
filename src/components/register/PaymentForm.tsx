@@ -36,6 +36,11 @@ const PaymentForm = ({
   const qrCodeUrl = registrationType === 'team' && event.team_qr_code_url 
     ? event.team_qr_code_url 
     : event.qr_code_url;
+  
+  // Determine which cash prize to show
+  const cashPrize = registrationType === 'team'
+    ? event.cash_prize
+    : (event.solo_cash_prize || event.cash_prize);
     
   return (
     <form onSubmit={onSubmit} className="space-y-6">
@@ -47,6 +52,11 @@ const PaymentForm = ({
             : `Please pay ₹${fee} using the QR code below and enter your transaction reference (UTR) number.`
           }
         </p>
+        {cashPrize > 0 && (
+          <p className="text-techfest-neon-purple text-sm mt-2">
+            Cash Prize: ₹{cashPrize} for {registrationType === 'team' ? 'Team Winners' : 'Solo Winners'}
+          </p>
+        )}
       </div>
       
       {!isFreeEvent && (

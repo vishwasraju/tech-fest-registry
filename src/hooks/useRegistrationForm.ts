@@ -25,6 +25,25 @@ export function useRegistrationForm(event: Event | undefined) {
   const { eventId } = useParams<{ eventId: string }>();
   const navigate = useNavigate();
   
+  // Initialize based on event configuration
+  const getInitialRegistrationType = () => {
+    if (!event) return 'solo';
+    if (event.registration_type === 'team') return 'team';
+    return 'solo';
+  };
+  
+  const getInitialTeamMembers = () => {
+    if (!event) return [];
+    
+    // For team-only events, pre-populate 4 empty team members
+    if (event.registration_type === 'team') {
+      return Array(4).fill(0).map(() => ({ name: '', usn: '', branch: '' }));
+    }
+    
+    // For both types, return empty array and let user choose
+    return [];
+  };
+  
   const [formData, setFormData] = useState<FormData>({
     name: '',
     usn: '',
@@ -32,8 +51,8 @@ export function useRegistrationForm(event: Event | undefined) {
     email: '',
     branch: '',
     utr: '',
-    registration_type: 'solo',
-    team_members: event?.team_size && event.team_size > 1 ? [] : undefined
+    registration_type: getInitialRegistrationType(),
+    team_members: getInitialTeamMembers()
   });
   
   const [step, setStep] = useState(1);
@@ -47,12 +66,12 @@ export function useRegistrationForm(event: Event | undefined) {
       setFormData(prev => ({ ...prev, [name]: value, team_members: [] }));
     }
     
-    // If changing to team registration, initialize team members array if empty
-    if (name === 'registration_type' && value === 'team' && (!formData.team_members || formData.team_members.length === 0)) {
+    // If changing to team registration, initialize team members array with 4 empty entries
+    if (name === 'registration_type' && value === 'team') {
       setFormData(prev => ({ 
         ...prev, 
         [name]: value, 
-        team_members: [{ name: '', usn: '', branch: '' }]
+        team_members: Array(4).fill(0).map(() => ({ name: '', usn: '', branch: '' }))
       }));
     }
   };
@@ -69,14 +88,27 @@ export function useRegistrationForm(event: Event | undefined) {
   };
   
   const addTeamMember = () => {
+    // Only add if we haven't reached 4 members yet
     setFormData(prev => {
+      const currentCount = prev.team_members?.length || 0;
+      if (currentCount >= 4) {
+        return prev; // Don't add more than 4 members
+      }
+      
       const updatedTeamMembers = [...(prev.team_members || []), { name: '', usn: '', branch: '' }];
       return { ...prev, team_members: updatedTeamMembers };
     });
   };
   
   const removeTeamMember = (index: number) => {
+    // Only allow removal if we have more than 1 member for team events
     setFormData(prev => {
+      const currentCount = prev.team_members?.length || 0;
+      // For team events, we need to maintain at least 4 members
+      if (formData.registration_type === 'team' && currentCount <= 4) {
+        return prev;
+      }
+      
       const updatedTeamMembers = [...(prev.team_members || [])];
       updatedTeamMembers.splice(index, 1);
       return { ...prev, team_members: updatedTeamMembers };
@@ -108,9 +140,7 @@ export function useRegistrationForm(event: Event | undefined) {
         branch: formData.branch,
         utr: event.fees > 0 ? formData.utr : undefined,
         registration_type: formData.registration_type,
-        team_members: formData.registration_type === 'team' && event.team_size && event.team_size > 1 
-          ? formData.team_members 
-          : undefined
+        team_members: formData.registration_type === 'team' ? formData.team_members : undefined
       };
       
       // Add to local storage registrations array

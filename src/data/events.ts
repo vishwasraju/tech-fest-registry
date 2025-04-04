@@ -17,7 +17,8 @@ export interface Event {
   coordinators?: string[];
   student_coordinators?: string[];
   has_solo_option?: boolean; // Property to enable solo registration option
-  registration_type?: 'solo' | 'team' | 'both'; // New field for registration type
+  registration_type?: 'solo' | 'team' | 'both'; // Field for registration type
+  solo_cash_prize?: number; // New field for solo cash prize
 }
 
 // Initial events data

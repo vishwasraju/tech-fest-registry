@@ -1,4 +1,3 @@
-
 import React, { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
@@ -9,7 +8,6 @@ import { Plus, Upload } from 'lucide-react';
 import { toast } from 'sonner';
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
-// Add and export the background images data
 export const BACKGROUND_IMAGES = [
   { name: 'Tech Pattern', url: '/lovable-uploads/0dfb5f28-6575-4422-8a3e-b97a9c059cbd.png' },
   { name: 'Circuit Board', url: '/lovable-uploads/24fe700b-9cd0-4745-a2af-a58676eaf367.png' },
@@ -23,7 +21,6 @@ export function AddEventDialog({ onAddEvent }: AddEventDialogProps) {
   const [open, setOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   
-  // Form state
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [dateTime, setDateTime] = useState('');
@@ -33,13 +30,13 @@ export function AddEventDialog({ onAddEvent }: AddEventDialogProps) {
   const [fees, setFees] = useState('0');
   const [teamFees, setTeamFees] = useState('0');
   const [cashPrize, setCashPrize] = useState('0');
+  const [soloCashPrize, setSoloCashPrize] = useState('0');
   const [coordinators, setCoordinators] = useState('');
   const [studentCoordinators, setStudentCoordinators] = useState('');
   const [registrationType, setRegistrationType] = useState<'solo' | 'team' | 'both'>('solo');
   const [backgroundImage, setBackgroundImage] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string>('');
   
-  // Reset form
   const resetForm = () => {
     setName('');
     setDescription('');
@@ -50,6 +47,7 @@ export function AddEventDialog({ onAddEvent }: AddEventDialogProps) {
     setFees('0');
     setTeamFees('0');
     setCashPrize('0');
+    setSoloCashPrize('0');
     setCoordinators('');
     setStudentCoordinators('');
     setRegistrationType('solo');
@@ -61,20 +59,17 @@ export function AddEventDialog({ onAddEvent }: AddEventDialogProps) {
     const file = e.target.files?.[0];
     if (file) {
       setBackgroundImage(file);
-      // Create preview URL for the selected image
       const objectUrl = URL.createObjectURL(file);
       setPreviewUrl(objectUrl);
     }
   };
   
   const handleSubmit = () => {
-    // Validate form
     if (!name || !description || !dateTime || !venue) {
       toast.error("Please fill in all required fields");
       return;
     }
     
-    // Process coordinators into arrays
     const coordinatorsArray = coordinators.split(',')
       .map(coord => coord.trim())
       .filter(coord => coord.length > 0);
@@ -83,10 +78,8 @@ export function AddEventDialog({ onAddEvent }: AddEventDialogProps) {
       .map(coord => coord.trim())
       .filter(coord => coord.length > 0);
     
-    // Determine if team event should have solo option
     const hasSoloOption = registrationType === 'both';
     
-    // Create event data
     const eventData: any = {
       name,
       description,
@@ -96,22 +89,20 @@ export function AddEventDialog({ onAddEvent }: AddEventDialogProps) {
       team_size: parseInt(teamSize),
       fees: parseInt(fees),
       cash_prize: parseInt(cashPrize),
+      solo_cash_prize: parseInt(soloCashPrize),
       coordinators: coordinatorsArray,
       student_coordinators: studentCoordinatorsArray,
       registration_type: registrationType
     };
     
-    // Add team fees if it's a team event
     if (registrationType === 'team' || registrationType === 'both') {
       eventData.team_registration_fees = parseInt(teamFees);
       
-      // Add has_solo_option if registration type is 'both'
       if (registrationType === 'both') {
         eventData.has_solo_option = true;
       }
     }
     
-    // Add background image if it exists
     if (backgroundImage && previewUrl) {
       eventData.background_image = previewUrl;
     }
@@ -127,7 +118,6 @@ export function AddEventDialog({ onAddEvent }: AddEventDialogProps) {
     }
   };
   
-  // Determine if we should show team size input
   const showTeamSizeInput = registrationType === 'team' || registrationType === 'both';
   
   return (
@@ -237,13 +227,24 @@ export function AddEventDialog({ onAddEvent }: AddEventDialogProps) {
           )}
           
           <div className="grid gap-2">
-            <Label htmlFor="event-prize">Cash Prize (₹)</Label>
+            <Label htmlFor="event-prize">Team Cash Prize (₹)</Label>
             <Input 
               id="event-prize" 
               type="number" 
               min="0" 
               value={cashPrize} 
               onChange={(e) => setCashPrize(e.target.value)}
+            />
+          </div>
+          
+          <div className="grid gap-2">
+            <Label htmlFor="solo-event-prize">Solo Cash Prize (₹)</Label>
+            <Input 
+              id="solo-event-prize" 
+              type="number" 
+              min="0" 
+              value={soloCashPrize} 
+              onChange={(e) => setSoloCashPrize(e.target.value)}
             />
           </div>
           

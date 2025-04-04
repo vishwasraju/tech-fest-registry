@@ -1,11 +1,9 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Checkbox } from '@/components/ui/checkbox';
 import { Edit, Upload } from 'lucide-react';
 import { toast } from 'sonner';
 import { Event } from '@/data/events';
@@ -30,6 +28,7 @@ export function EditEventDialog({ event, onUpdateEvent }: EditEventDialogProps) 
   const [fees, setFees] = useState('0');
   const [teamFees, setTeamFees] = useState('0');
   const [cashPrize, setCashPrize] = useState('0');
+  const [soloCashPrize, setSoloCashPrize] = useState('0');
   const [coordinators, setCoordinators] = useState('');
   const [studentCoordinators, setStudentCoordinators] = useState('');
   const [registrationType, setRegistrationType] = useState<'solo' | 'team' | 'both'>('solo');
@@ -48,6 +47,7 @@ export function EditEventDialog({ event, onUpdateEvent }: EditEventDialogProps) 
       setFees(event.fees.toString());
       setTeamFees(event.team_registration_fees?.toString() || event.fees.toString());
       setCashPrize(event.cash_prize.toString());
+      setSoloCashPrize(event.solo_cash_prize?.toString() || '0');
       
       // Determine registration type from event data
       if (event.team_size > 1) {
@@ -108,6 +108,7 @@ export function EditEventDialog({ event, onUpdateEvent }: EditEventDialogProps) 
       team_size: parseInt(teamSize),
       fees: parseInt(fees),
       cash_prize: parseInt(cashPrize),
+      solo_cash_prize: parseInt(soloCashPrize),
       coordinators: coordinatorsArray,
       student_coordinators: studentCoordinatorsArray,
       registration_type: registrationType
@@ -254,13 +255,24 @@ export function EditEventDialog({ event, onUpdateEvent }: EditEventDialogProps) 
           )}
           
           <div className="grid gap-2">
-            <Label htmlFor="event-prize">Cash Prize (₹)</Label>
+            <Label htmlFor="event-prize">Team Cash Prize (₹)</Label>
             <Input 
               id="event-prize" 
               type="number" 
               min="0" 
               value={cashPrize} 
               onChange={(e) => setCashPrize(e.target.value)}
+            />
+          </div>
+          
+          <div className="grid gap-2">
+            <Label htmlFor="solo-event-prize">Solo Cash Prize (₹)</Label>
+            <Input 
+              id="solo-event-prize" 
+              type="number" 
+              min="0" 
+              value={soloCashPrize} 
+              onChange={(e) => setSoloCashPrize(e.target.value)}
             />
           </div>
           
