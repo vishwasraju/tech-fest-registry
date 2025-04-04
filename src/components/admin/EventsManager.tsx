@@ -83,7 +83,6 @@ const EventsManager = ({ events, registrations }: EventsManagerProps) => {
                           eventId={event.id} 
                           eventName={event.name}
                           currentQRUrl={event.qr_code_url}
-                          currentTeamQRUrl={event.team_qr_code_url}
                           onUpdate={handleUpdateEventQRCode}
                         />
                       )}

@@ -7,7 +7,7 @@ interface AdminContextType {
   handleAddEvent: (formData: any) => Promise<void>;
   handleDeleteEvent: (eventId: string) => Promise<void>;
   handleUpdateEventBackground: (eventId: string, backgroundImage: string) => Promise<void>;
-  handleUpdateEventQRCode: (eventId: string, qrCodeUrl: string, isTeamQR?: boolean) => Promise<void>;
+  handleUpdateEventQRCode: (eventId: string, qrCodeUrl: string) => Promise<void>;
 }
 
 interface AdminProviderProps {
@@ -63,20 +63,15 @@ export const AdminProvider: React.FC<AdminProviderProps> = ({
     toast.success('Event background updated successfully');
   };
   
-  const handleUpdateEventQRCode = async (eventId: string, qrCodeUrl: string, isTeamQR = false) => {
-    const updatedEvents = events.map(event => {
-      if (event.id === eventId) {
-        if (isTeamQR) {
-          return { ...event, team_qr_code_url: qrCodeUrl };
-        } else {
-          return { ...event, qr_code_url: qrCodeUrl };
-        }
-      }
-      return event;
-    });
+  const handleUpdateEventQRCode = async (eventId: string, qrCodeUrl: string) => {
+    const updatedEvents = events.map(event => 
+      event.id === eventId 
+        ? { ...event, qr_code_url: qrCodeUrl } 
+        : event
+    );
     
     await onUpdateEvents(updatedEvents);
-    toast.success(`${isTeamQR ? 'Team' : 'Solo'} QR code updated successfully`);
+    toast.success('Event QR code updated successfully');
   };
 
   return (

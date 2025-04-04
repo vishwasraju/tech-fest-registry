@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from 'sonner';
 import { uploadFile } from '@/utils/storageUtils';
 
@@ -13,51 +12,25 @@ interface QRCodeUploadDialogProps {
   eventId: string;
   eventName: string;
   currentQRUrl?: string;
-  currentTeamQRUrl?: string;
-  onUpdate: (eventId: string, qrCodeUrl: string, isTeamQR?: boolean) => void;
+  onUpdate: (eventId: string, qrCodeUrl: string) => void;
 }
 
-const QRCodeUploadDialog = ({ 
-  eventId, 
-  eventName, 
-  currentQRUrl, 
-  currentTeamQRUrl, 
-  onUpdate 
-}: QRCodeUploadDialogProps) => {
+const QRCodeUploadDialog = ({ eventId, eventName, currentQRUrl, onUpdate }: QRCodeUploadDialogProps) => {
   const [open, setOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState('solo');
-  
-  // Solo QR state
-  const [soloPreviewUrl, setSoloPreviewUrl] = useState(currentQRUrl || '');
-  const [soloSelectedFile, setSoloSelectedFile] = useState<File | null>(null);
-  
-  // Team QR state
-  const [teamPreviewUrl, setTeamPreviewUrl] = useState(currentTeamQRUrl || '');
-  const [teamSelectedFile, setTeamSelectedFile] = useState<File | null>(null);
-  
+  const [previewUrl, setPreviewUrl] = useState(currentQRUrl || '');
   const [isUploading, setIsUploading] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   
-  const handleSoloFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
-      setSoloSelectedFile(file);
-      setSoloPreviewUrl(URL.createObjectURL(file));
-    }
-  };
-  
-  const handleTeamFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
-      setTeamSelectedFile(file);
-      setTeamPreviewUrl(URL.createObjectURL(file));
+      setSelectedFile(file);
+      setPreviewUrl(URL.createObjectURL(file));
     }
   };
   
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    const isTeamQR = activeTab === 'team';
-    const selectedFile = isTeamQR ? teamSelectedFile : soloSelectedFile;
     
     if (!selectedFile) {
       toast.error('Please select a file to upload');
@@ -67,13 +40,13 @@ const QRCodeUploadDialog = ({
     setIsUploading(true);
     try {
       // Upload file to Supabase Storage
-      const filePath = `${eventId}/${isTeamQR ? 'team_' : ''}${selectedFile.name}`;
+      const filePath = `${eventId}/${selectedFile.name}`;
       const uploadedUrl = await uploadFile(selectedFile, 'qr_codes', filePath);
       
       if (uploadedUrl) {
-        onUpdate(eventId, uploadedUrl, isTeamQR);
+        onUpdate(eventId, uploadedUrl);
         setOpen(false);
-        toast.success(`${isTeamQR ? 'Team' : 'Solo'} QR code uploaded successfully`);
+        toast.success('QR code uploaded and updated successfully');
       } else {
         toast.error('Failed to upload QR code');
       }
@@ -92,107 +65,57 @@ const QRCodeUploadDialog = ({
           size="sm" 
           variant="outline"
           className="h-8 w-8 p-0 border-gray-600"
-          title="Update QR Codes"
+          title="Update QR Code"
         >
           <QrCode size={14} />
         </Button>
       </DialogTrigger>
       <DialogContent className="glass border-gray-700 text-white">
         <DialogHeader>
-          <DialogTitle>Upload Payment QR Codes</DialogTitle>
+          <DialogTitle>Upload Payment QR Code</DialogTitle>
           <DialogDescription className="text-gray-400">
-            Upload QR code images for {eventName}
+            Upload a QR code image for {eventName}
           </DialogDescription>
         </DialogHeader>
         
-        <Tabs defaultValue="solo" value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid grid-cols-2">
-            <TabsTrigger value="solo">Solo Registration</TabsTrigger>
-            <TabsTrigger value="team">Team Registration</TabsTrigger>
-          </TabsList>
+        <form onSubmit={handleSubmit} className="space-y-4 mt-4">
+          <div>
+            <Label htmlFor="qrcode-file">Upload QR Code Image</Label>
+            <Input
+              id="qrcode-file"
+              type="file"
+              accept="image/*"
+              onChange={handleFileChange}
+              className="bg-techfest-muted text-white border-techfest-muted"
+            />
+            <p className="text-xs text-gray-400 mt-1">
+              Recommended: Square image in JPG or PNG format
+            </p>
+          </div>
           
-          <TabsContent value="solo">
-            <form onSubmit={handleSubmit} className="space-y-4 mt-4">
-              <div>
-                <Label htmlFor="solo-qrcode-file">Upload Solo QR Code Image</Label>
-                <Input
-                  id="solo-qrcode-file"
-                  type="file"
-                  accept="image/*"
-                  onChange={handleSoloFileChange}
-                  className="bg-techfest-muted text-white border-techfest-muted"
+          {previewUrl && (
+            <div className="text-center">
+              <p className="text-sm text-gray-400 mb-2">Preview:</p>
+              <div className="bg-white p-2 rounded-lg mx-auto w-48 h-48">
+                <img 
+                  src={previewUrl} 
+                  alt="QR Code Preview" 
+                  className="w-full h-full object-contain"
+                  onError={() => {
+                    setPreviewUrl('');
+                    toast.error('Invalid image URL');
+                  }}
                 />
-                <p className="text-xs text-gray-400 mt-1">
-                  Used for individual registrations
-                </p>
               </div>
-              
-              {soloPreviewUrl && (
-                <div className="text-center">
-                  <p className="text-sm text-gray-400 mb-2">Preview:</p>
-                  <div className="bg-white p-2 rounded-lg mx-auto w-48 h-48">
-                    <img 
-                      src={soloPreviewUrl} 
-                      alt="Solo QR Code Preview" 
-                      className="w-full h-full object-contain"
-                      onError={() => {
-                        setSoloPreviewUrl('');
-                        toast.error('Invalid image URL');
-                      }}
-                    />
-                  </div>
-                </div>
-              )}
-              
-              <DialogFooter>
-                <Button type="submit" disabled={isUploading}>
-                  {isUploading ? 'Uploading...' : 'Upload Solo QR Code'}
-                </Button>
-              </DialogFooter>
-            </form>
-          </TabsContent>
+            </div>
+          )}
           
-          <TabsContent value="team">
-            <form onSubmit={handleSubmit} className="space-y-4 mt-4">
-              <div>
-                <Label htmlFor="team-qrcode-file">Upload Team QR Code Image</Label>
-                <Input
-                  id="team-qrcode-file"
-                  type="file"
-                  accept="image/*"
-                  onChange={handleTeamFileChange}
-                  className="bg-techfest-muted text-white border-techfest-muted"
-                />
-                <p className="text-xs text-gray-400 mt-1">
-                  Used for team registrations
-                </p>
-              </div>
-              
-              {teamPreviewUrl && (
-                <div className="text-center">
-                  <p className="text-sm text-gray-400 mb-2">Preview:</p>
-                  <div className="bg-white p-2 rounded-lg mx-auto w-48 h-48">
-                    <img 
-                      src={teamPreviewUrl} 
-                      alt="Team QR Code Preview" 
-                      className="w-full h-full object-contain"
-                      onError={() => {
-                        setTeamPreviewUrl('');
-                        toast.error('Invalid image URL');
-                      }}
-                    />
-                  </div>
-                </div>
-              )}
-              
-              <DialogFooter>
-                <Button type="submit" disabled={isUploading}>
-                  {isUploading ? 'Uploading...' : 'Upload Team QR Code'}
-                </Button>
-              </DialogFooter>
-            </form>
-          </TabsContent>
-        </Tabs>
+          <DialogFooter>
+            <Button type="submit" disabled={isUploading}>
+              {isUploading ? 'Uploading...' : 'Upload QR Code'}
+            </Button>
+          </DialogFooter>
+        </form>
       </DialogContent>
     </Dialog>
   );

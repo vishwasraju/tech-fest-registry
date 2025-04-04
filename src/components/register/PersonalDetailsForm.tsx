@@ -1,13 +1,13 @@
-import React, { useState } from 'react';
+
+import React from 'react';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { BRANCH_OPTIONS } from '@/types/admin';
 import { toast } from 'sonner';
-import { X, Plus, UserRound, Users } from 'lucide-react';
+import { X, Plus } from 'lucide-react';
 import { Event } from '@/data/events';
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 export interface PersonalFormData {
   name: string;
@@ -15,7 +15,6 @@ export interface PersonalFormData {
   phone: string;
   email: string;
   branch: string;
-  registration_type: 'solo' | 'team';
   team_members?: Array<{
     name: string;
     usn: string;
@@ -43,7 +42,6 @@ const PersonalDetailsForm: React.FC<PersonalDetailsFormProps> = ({
   onNext
 }) => {
   const isTeamEvent = event && event.team_size && event.team_size > 1;
-  const hasSoloOption = event?.has_solo_option;
   
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -54,10 +52,6 @@ const PersonalDetailsForm: React.FC<PersonalDetailsFormProps> = ({
     onDataChange(name, value);
   };
   
-  const handleRegistrationTypeChange = (value: string) => {
-    onDataChange('registration_type', value);
-  };
-  
   const handleNext = () => {
     // Basic validation
     if (!formData.name || !formData.usn || !formData.phone || !formData.email || !formData.branch) {
@@ -65,8 +59,8 @@ const PersonalDetailsForm: React.FC<PersonalDetailsFormProps> = ({
       return;
     }
     
-    // Team member validation if team registration is selected
-    if (isTeamEvent && formData.registration_type === 'team' && formData.team_members) {
+    // Team member validation
+    if (isTeamEvent && formData.team_members) {
       if (formData.team_members.length < (event.team_size - 1)) {
         toast.error(`Please add ${event.team_size - 1} team members`);
         return;
@@ -86,34 +80,6 @@ const PersonalDetailsForm: React.FC<PersonalDetailsFormProps> = ({
   return (
     <form className="space-y-4">
       <h3 className="text-lg font-medium mb-2">Team Leader / Primary Participant</h3>
-      
-      {/* Registration Type Selection (Solo or Team) */}
-      {isTeamEvent && hasSoloOption && (
-        <div className="mb-6">
-          <Label className="mb-2 block">Registration Type</Label>
-          <RadioGroup 
-            value={formData.registration_type} 
-            onValueChange={handleRegistrationTypeChange}
-            className="flex gap-4"
-          >
-            <div className="flex items-center space-x-2 glass p-3 rounded-lg flex-1">
-              <RadioGroupItem value="solo" id="solo" />
-              <Label htmlFor="solo" className="flex items-center cursor-pointer">
-                <UserRound size={16} className="mr-2 text-techfest-neon-blue" />
-                <span>Solo Registration</span>
-              </Label>
-            </div>
-            
-            <div className="flex items-center space-x-2 glass p-3 rounded-lg flex-1">
-              <RadioGroupItem value="team" id="team" />
-              <Label htmlFor="team" className="flex items-center cursor-pointer">
-                <Users size={16} className="mr-2 text-techfest-neon-purple" />
-                <span>Team Registration ({event.team_size} members)</span>
-              </Label>
-            </div>
-          </RadioGroup>
-        </div>
-      )}
       
       <div>
         <Label htmlFor="name">Full Name</Label>
@@ -188,10 +154,8 @@ const PersonalDetailsForm: React.FC<PersonalDetailsFormProps> = ({
         />
       </div>
       
-      {/* Team Members Section - Show only if team registration is selected */}
-      {isTeamEvent && 
-       ((hasSoloOption && formData.registration_type === 'team') || !hasSoloOption) && 
-       onTeamMemberChange && onAddTeamMember && onRemoveTeamMember && (
+      {/* Team Members Section */}
+      {isTeamEvent && onTeamMemberChange && onAddTeamMember && onRemoveTeamMember && (
         <div className="mt-8">
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-lg font-medium">Team Members</h3>

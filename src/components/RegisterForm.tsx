@@ -47,7 +47,6 @@ const RegisterForm = () => {
         <PaymentForm 
           event={event}
           utr={formData.utr}
-          registrationType={formData.registration_type}
           onDataChange={handleChange}
           onBack={previousStep}
           onSubmit={handleSubmit}

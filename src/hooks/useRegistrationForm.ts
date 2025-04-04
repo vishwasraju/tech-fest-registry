@@ -13,7 +13,6 @@ interface FormData {
   email: string;
   branch: string;
   utr: string;
-  registration_type: 'solo' | 'team';
   team_members?: Array<{
     name: string;
     usn: string;
@@ -32,7 +31,6 @@ export function useRegistrationForm(event: Event | undefined) {
     email: '',
     branch: '',
     utr: '',
-    registration_type: 'solo',
     team_members: event?.team_size && event.team_size > 1 ? [] : undefined
   });
   
@@ -41,20 +39,6 @@ export function useRegistrationForm(event: Event | undefined) {
   
   const handleChange = (name: string, value: string) => {
     setFormData(prev => ({ ...prev, [name]: value }));
-    
-    // If changing to solo registration, clear team members
-    if (name === 'registration_type' && value === 'solo') {
-      setFormData(prev => ({ ...prev, [name]: value, team_members: [] }));
-    }
-    
-    // If changing to team registration, initialize team members array if empty
-    if (name === 'registration_type' && value === 'team' && (!formData.team_members || formData.team_members.length === 0)) {
-      setFormData(prev => ({ 
-        ...prev, 
-        [name]: value, 
-        team_members: [{ name: '', usn: '', branch: '' }]
-      }));
-    }
   };
   
   const handleTeamMemberChange = (index: number, field: string, value: string) => {
@@ -107,10 +91,7 @@ export function useRegistrationForm(event: Event | undefined) {
         email: formData.email,
         branch: formData.branch,
         utr: event.fees > 0 ? formData.utr : undefined,
-        registration_type: formData.registration_type,
-        team_members: formData.registration_type === 'team' && event.team_size && event.team_size > 1 
-          ? formData.team_members 
-          : undefined
+        team_members: event.team_size && event.team_size > 1 ? formData.team_members : undefined
       };
       
       // Add to local storage registrations array
