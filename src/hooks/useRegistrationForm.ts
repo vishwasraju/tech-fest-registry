@@ -26,7 +26,11 @@ export function useRegistrationForm(event: Event | undefined) {
   // Initialize based on event configuration
   const getInitialRegistrationType = () => {
     if (!event) return 'solo';
+    
+    // For team-only events, default to team
     if (event.registration_type === 'team') return 'team';
+    
+    // For both types or solo-only, default to solo
     return 'solo';
   };
   

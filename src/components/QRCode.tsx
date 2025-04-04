@@ -15,8 +15,21 @@ const QRCode: React.FC<QRCodeProps> = ({ value, size = 150, imageUrl }) => {
         <img 
           src={imageUrl} 
           alt="Payment QR Code" 
-          className="max-w-full max-h-full"
+          className="max-w-full max-h-full object-contain"
           style={{ maxWidth: size, maxHeight: size }}
+          onError={(e) => {
+            console.error("Error loading QR image:", e);
+            // Fallback to text-based QR
+            (e.target as HTMLImageElement).style.display = 'none';
+            // Show error message or fallback
+            const parent = (e.target as HTMLElement).parentElement;
+            if (parent) {
+              const fallback = document.createElement('div');
+              fallback.textContent = "QR image failed to load";
+              fallback.className = "text-red-500 text-sm";
+              parent.appendChild(fallback);
+            }
+          }}
         />
       ) : (
         <QRCodeLib 

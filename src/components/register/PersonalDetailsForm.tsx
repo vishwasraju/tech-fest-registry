@@ -37,10 +37,15 @@ const PersonalDetailsForm: React.FC<PersonalDetailsFormProps> = ({
   onRemoveTeamMember,
   onNext
 }) => {
+  // Check if this is a team event (team size > 1)
   const isTeamEvent = event && event.team_size && event.team_size > 1;
+  
+  // Check registration type options
   const allowSoloRegistration = event?.registration_type === 'solo' || event?.registration_type === 'both';
   const allowTeamRegistration = event?.registration_type === 'team' || event?.registration_type === 'both';
-  const requiredTeamSize = 4; // Set to exactly 4 team members as required
+  
+  // Set required team size
+  const requiredTeamSize = event?.team_size || 4;
   
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -64,7 +69,7 @@ const PersonalDetailsForm: React.FC<PersonalDetailsFormProps> = ({
     
     // Team member validation if team registration is selected
     if (isTeamEvent && formData.registration_type === 'team' && formData.team_members) {
-      // Check if we have exactly the required number of team members (4)
+      // Check if we have exactly the required number of team members
       if (formData.team_members.length !== requiredTeamSize) {
         toast.error(`Please add exactly ${requiredTeamSize} team members`);
         return;
@@ -87,7 +92,7 @@ const PersonalDetailsForm: React.FC<PersonalDetailsFormProps> = ({
       <h3 className="text-lg font-medium mb-2">Team Leader / Primary Participant</h3>
       
       {/* Registration Type Selection (Solo or Team) */}
-      {isTeamEvent && allowSoloRegistration && allowTeamRegistration && (
+      {allowSoloRegistration && allowTeamRegistration && (
         <RegistrationTypeSelector
           value={formData.registration_type}
           onChange={handleRegistrationTypeChange}
