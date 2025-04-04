@@ -5,9 +5,10 @@ import { toast } from 'sonner';
 
 interface AdminContextType {
   handleAddEvent: (formData: any) => Promise<void>;
+  handleEditEvent: (eventId: string, formData: any) => Promise<void>;
   handleDeleteEvent: (eventId: string) => Promise<void>;
   handleUpdateEventBackground: (eventId: string, backgroundImage: string) => Promise<void>;
-  handleUpdateEventQRCode: (eventId: string, qrCodeUrl: string) => Promise<void>;
+  handleUpdateEventQRCode: (eventId: string, qrCodeUrl: string, isTeamQR?: boolean) => Promise<void>;
 }
 
 interface AdminProviderProps {
@@ -39,6 +40,18 @@ export const AdminProvider: React.FC<AdminProviderProps> = ({
     toast.success('Event added successfully');
   };
   
+  const handleEditEvent = async (eventId: string, formData: any) => {
+    // Update the existing event with new form data
+    const updatedEvents = events.map(event => 
+      event.id === eventId 
+        ? { ...event, ...formData } 
+        : event
+    );
+    
+    await onUpdateEvents(updatedEvents);
+    toast.success('Event updated successfully');
+  };
+  
   const handleDeleteEvent = async (eventId: string) => {
     // Filter out the deleted event
     const updatedEvents = events.filter(event => event.id !== eventId);
@@ -63,20 +76,26 @@ export const AdminProvider: React.FC<AdminProviderProps> = ({
     toast.success('Event background updated successfully');
   };
   
-  const handleUpdateEventQRCode = async (eventId: string, qrCodeUrl: string) => {
-    const updatedEvents = events.map(event => 
-      event.id === eventId 
-        ? { ...event, qr_code_url: qrCodeUrl } 
-        : event
-    );
+  const handleUpdateEventQRCode = async (eventId: string, qrCodeUrl: string, isTeamQR = false) => {
+    const updatedEvents = events.map(event => {
+      if (event.id === eventId) {
+        if (isTeamQR) {
+          return { ...event, team_qr_code_url: qrCodeUrl };
+        } else {
+          return { ...event, qr_code_url: qrCodeUrl };
+        }
+      }
+      return event;
+    });
     
     await onUpdateEvents(updatedEvents);
-    toast.success('Event QR code updated successfully');
+    toast.success(`${isTeamQR ? 'Team' : 'Solo'} QR code updated successfully`);
   };
 
   return (
     <AdminContext.Provider value={{
       handleAddEvent,
+      handleEditEvent,
       handleDeleteEvent,
       handleUpdateEventBackground,
       handleUpdateEventQRCode

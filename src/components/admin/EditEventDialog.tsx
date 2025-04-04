@@ -1,26 +1,24 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Plus, Upload } from 'lucide-react';
+import { Edit, Upload } from 'lucide-react';
 import { toast } from 'sonner';
+import { Event } from '@/data/events';
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
-export const BACKGROUND_IMAGES = [
-  { name: 'Tech Pattern', url: '/lovable-uploads/0dfb5f28-6575-4422-8a3e-b97a9c059cbd.png' },
-  { name: 'Circuit Board', url: '/lovable-uploads/24fe700b-9cd0-4745-a2af-a58676eaf367.png' },
-];
-
-interface AddEventDialogProps {
-  onAddEvent: (data: any) => void;
+interface EditEventDialogProps {
+  event: Event;
+  onUpdateEvent: (eventId: string, data: any) => Promise<void>;
 }
 
-export function AddEventDialog({ onAddEvent }: AddEventDialogProps) {
+export function EditEventDialog({ event, onUpdateEvent }: EditEventDialogProps) {
   const [open, setOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   
+  // Form state
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [dateTime, setDateTime] = useState('');
@@ -37,39 +35,58 @@ export function AddEventDialog({ onAddEvent }: AddEventDialogProps) {
   const [backgroundImage, setBackgroundImage] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string>('');
   
-  const resetForm = () => {
-    setName('');
-    setDescription('');
-    setDateTime('');
-    setVenue('');
-    setRules('');
-    setTeamSize('1');
-    setFees('0');
-    setTeamFees('0');
-    setCashPrize('0');
-    setSoloCashPrize('0');
-    setCoordinators('');
-    setStudentCoordinators('');
-    setRegistrationType('solo');
-    setBackgroundImage(null);
-    setPreviewUrl('');
-  };
+  // Load event data into form when dialog opens
+  useEffect(() => {
+    if (open) {
+      setName(event.name);
+      setDescription(event.description);
+      setDateTime(event.date_time);
+      setVenue(event.venue);
+      setRules(event.rules);
+      setTeamSize(event.team_size.toString());
+      setFees(event.fees.toString());
+      setTeamFees(event.team_registration_fees?.toString() || event.fees.toString());
+      setCashPrize(event.cash_prize.toString());
+      setSoloCashPrize(event.solo_cash_prize?.toString() || '0');
+      
+      // Determine registration type from event data
+      if (event.team_size > 1) {
+        if (event.has_solo_option) {
+          setRegistrationType('both');
+        } else {
+          setRegistrationType('team');
+        }
+      } else {
+        setRegistrationType('solo');
+      }
+      
+      setCoordinators(event.coordinators?.join(', ') || '');
+      setStudentCoordinators(event.student_coordinators?.join(', ') || '');
+      
+      if (event.background_image) {
+        setPreviewUrl(event.background_image);
+      }
+    }
+  }, [open, event]);
   
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       setBackgroundImage(file);
+      // Create preview URL for the selected image
       const objectUrl = URL.createObjectURL(file);
       setPreviewUrl(objectUrl);
     }
   };
   
   const handleSubmit = () => {
+    // Validate form
     if (!name || !description || !dateTime || !venue) {
       toast.error("Please fill in all required fields");
       return;
     }
     
+    // Process coordinators into arrays
     const coordinatorsArray = coordinators.split(',')
       .map(coord => coord.trim())
       .filter(coord => coord.length > 0);
@@ -78,8 +95,10 @@ export function AddEventDialog({ onAddEvent }: AddEventDialogProps) {
       .map(coord => coord.trim())
       .filter(coord => coord.length > 0);
     
+    // Determine if team event should have solo option
     const hasSoloOption = registrationType === 'both';
     
+    // Create event data
     const eventData: any = {
       name,
       description,
@@ -95,20 +114,25 @@ export function AddEventDialog({ onAddEvent }: AddEventDialogProps) {
       registration_type: registrationType
     };
     
+    // Add team fees if it's a team event
     if (registrationType === 'team' || registrationType === 'both') {
       eventData.team_registration_fees = parseInt(teamFees);
       
+      // Add has_solo_option if registration type is 'both'
       if (registrationType === 'both') {
         eventData.has_solo_option = true;
       }
     }
     
-    if (backgroundImage && previewUrl) {
+    // Add background image if it exists and was newly uploaded
+    if (backgroundImage) {
+      eventData.background_image = previewUrl;
+    } else if (previewUrl) {
+      // If there's a preview URL but no new background image, it's using the existing one
       eventData.background_image = previewUrl;
     }
     
-    onAddEvent(eventData);
-    resetForm();
+    onUpdateEvent(event.id, eventData);
     setOpen(false);
   };
   
@@ -118,21 +142,25 @@ export function AddEventDialog({ onAddEvent }: AddEventDialogProps) {
     }
   };
   
+  // Determine if we should show team size input
   const showTeamSizeInput = registrationType === 'team' || registrationType === 'both';
   
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button>
-          <Plus size={16} className="mr-2" />
-          Add Event
+        <Button 
+          size="sm" 
+          variant="outline"
+          className="h-8 w-8 p-0 border-gray-600"
+        >
+          <Edit size={14} />
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Add New Event</DialogTitle>
+          <DialogTitle>Edit Event: {event.name}</DialogTitle>
           <DialogDescription>
-            Fill in the details for the new event.
+            Update the details for this event.
           </DialogDescription>
         </DialogHeader>
         
@@ -175,16 +203,16 @@ export function AddEventDialog({ onAddEvent }: AddEventDialogProps) {
               className="flex flex-col space-y-2"
             >
               <div className="flex items-center space-x-2 p-2 rounded-md hover:bg-gray-800">
-                <RadioGroupItem value="solo" id="solo" />
-                <Label htmlFor="solo" className="cursor-pointer">Solo Registration Only</Label>
+                <RadioGroupItem value="solo" id="edit-solo" />
+                <Label htmlFor="edit-solo" className="cursor-pointer">Solo Registration Only</Label>
               </div>
               <div className="flex items-center space-x-2 p-2 rounded-md hover:bg-gray-800">
-                <RadioGroupItem value="team" id="team" />
-                <Label htmlFor="team" className="cursor-pointer">Team Registration Only</Label>
+                <RadioGroupItem value="team" id="edit-team" />
+                <Label htmlFor="edit-team" className="cursor-pointer">Team Registration Only</Label>
               </div>
               <div className="flex items-center space-x-2 p-2 rounded-md hover:bg-gray-800">
-                <RadioGroupItem value="both" id="both" />
-                <Label htmlFor="both" className="cursor-pointer">Allow Both Solo & Team Registration</Label>
+                <RadioGroupItem value="both" id="edit-both" />
+                <Label htmlFor="edit-both" className="cursor-pointer">Allow Both Solo & Team Registration</Label>
               </div>
             </RadioGroup>
           </div>
@@ -327,7 +355,7 @@ export function AddEventDialog({ onAddEvent }: AddEventDialogProps) {
             Cancel
           </Button>
           <Button onClick={handleSubmit}>
-            Add Event
+            Update Event
           </Button>
         </DialogFooter>
       </DialogContent>

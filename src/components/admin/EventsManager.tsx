@@ -6,6 +6,7 @@ import { Event } from '@/data/events';
 import { Registration } from '@/data/registrations';
 import { Button } from '@/components/ui/button';
 import { AddEventDialog } from './AddEventDialog';
+import { EditEventDialog } from './EditEventDialog';
 import BackgroundImageDialog from './BackgroundImageDialog';
 import ConfirmDeleteDialog from './ConfirmDeleteDialog';
 import QRCodeUploadDialog from './QRCodeUploadDialog';
@@ -18,7 +19,8 @@ interface EventsManagerProps {
 
 const EventsManager = ({ events, registrations }: EventsManagerProps) => {
   const { 
-    handleAddEvent, 
+    handleAddEvent,
+    handleEditEvent, 
     handleDeleteEvent, 
     handleUpdateEventBackground, 
     handleUpdateEventQRCode 
@@ -54,7 +56,14 @@ const EventsManager = ({ events, registrations }: EventsManagerProps) => {
                   <td className="py-3 px-4 text-center">{event.date_time}</td>
                   <td className="py-3 px-4 text-center">{event.venue}</td>
                   <td className="py-3 px-4 text-center">
-                    {event.fees > 0 ? `₹${event.fees}` : 'Free'}
+                    {event.fees > 0 ? (
+                      <>
+                        Solo: ₹{event.fees}
+                        {event.team_registration_fees && event.team_size > 1 && (
+                          <div>Team: ₹{event.team_registration_fees}</div>
+                        )}
+                      </>
+                    ) : 'Free'}
                   </td>
                   <td className="py-3 px-4 text-center">
                     {event.cash_prize > 0 ? `₹${event.cash_prize}` : '-'}
@@ -71,6 +80,11 @@ const EventsManager = ({ events, registrations }: EventsManagerProps) => {
                         </Button>
                       </Link>
                       
+                      <EditEventDialog
+                        event={event}
+                        onUpdateEvent={handleEditEvent}
+                      />
+                      
                       <BackgroundImageDialog 
                         eventId={event.id} 
                         eventName={event.name}
@@ -83,6 +97,7 @@ const EventsManager = ({ events, registrations }: EventsManagerProps) => {
                           eventId={event.id} 
                           eventName={event.name}
                           currentQRUrl={event.qr_code_url}
+                          currentTeamQRUrl={event.team_qr_code_url}
                           onUpdate={handleUpdateEventQRCode}
                         />
                       )}
