@@ -48,6 +48,7 @@ const RegisterForm = () => {
           onRemoveTeamMember={removeTeamMember}
           onGameSelection={handleGameSelection}
           isGamingEvent={isGamingEvent}
+          onNext={nextStep}
         />
       ) : (
         <PaymentForm 
