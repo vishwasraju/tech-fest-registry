@@ -25,20 +25,13 @@ const GameSelectionSection: React.FC<GameSelectionSectionProps> = ({
         onValueChange={onGameSelection}
         className="space-y-3"
       >
-        <div className={`flex items-center p-3 rounded-md transition-colors ${selectedGame === 'PUBG' ? 'bg-techfest-muted/60' : 'hover:bg-gray-800/30'}`}>
-          <RadioGroupItem value="PUBG" id="pubg" className="mr-3" />
-          <Label htmlFor="pubg" className="flex-1 cursor-pointer">
-            <div className="font-medium">PUBG</div>
-            <div className="text-xs text-gray-400">PlayerUnknown's Battlegrounds</div>
-          </Label>
+        <div className="flex items-center space-x-2">
+          <RadioGroupItem value="PUBG" id="pubg" />
+          <Label htmlFor="pubg">PUBG</Label>
         </div>
-        
-        <div className={`flex items-center p-3 rounded-md transition-colors ${selectedGame === 'FREE_FIRE' ? 'bg-techfest-muted/60' : 'hover:bg-gray-800/30'}`}>
-          <RadioGroupItem value="FREE_FIRE" id="free-fire" className="mr-3" />
-          <Label htmlFor="free-fire" className="flex-1 cursor-pointer">
-            <div className="font-medium">Free Fire</div>
-            <div className="text-xs text-gray-400">Garena Free Fire</div>
-          </Label>
+        <div className="flex items-center space-x-2">
+          <RadioGroupItem value="FREE_FIRE" id="free-fire" />
+          <Label htmlFor="free-fire">Free Fire</Label>
         </div>
       </RadioGroup>
     </div>

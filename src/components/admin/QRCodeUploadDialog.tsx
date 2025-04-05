@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { QrCode, Upload } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -20,10 +20,6 @@ const QRCodeUploadDialog = ({ eventId, eventName, currentQRUrl, onUpdate }: QRCo
   const [previewUrl, setPreviewUrl] = useState(currentQRUrl || '');
   const [isUploading, setIsUploading] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [sampleQRs, setSampleQRs] = useState([
-    '/lovable-uploads/e53e9cc3-ee21-4857-9d8c-f59dc043ad89.png',
-    '/lovable-uploads/979fb83b-05ce-4df0-9f6b-960b03105840.png'
-  ]);
   
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -31,22 +27,6 @@ const QRCodeUploadDialog = ({ eventId, eventName, currentQRUrl, onUpdate }: QRCo
       setSelectedFile(file);
       setPreviewUrl(URL.createObjectURL(file));
     }
-  };
-
-  const handleSampleSelect = (sampleUrl: string) => {
-    // Create a File object from the sample URL
-    fetch(sampleUrl)
-      .then(res => res.blob())
-      .then(blob => {
-        const filename = sampleUrl.split('/').pop() || 'qr-code.png';
-        const file = new File([blob], filename, { type: 'image/png' });
-        setSelectedFile(file);
-        setPreviewUrl(sampleUrl);
-      })
-      .catch(err => {
-        console.error('Error fetching sample QR:', err);
-        toast.error('Could not load sample QR code');
-      });
   };
   
   const handleSubmit = async (e: React.FormEvent) => {
@@ -111,29 +91,6 @@ const QRCodeUploadDialog = ({ eventId, eventName, currentQRUrl, onUpdate }: QRCo
             <p className="text-xs text-gray-400 mt-1">
               Recommended: Square image in JPG or PNG format
             </p>
-          </div>
-          
-          {/* Sample QR Codes Section */}
-          <div>
-            <Label className="block mb-2">Or select a sample QR code:</Label>
-            <div className="grid grid-cols-2 gap-4">
-              {sampleQRs.map((url, index) => (
-                <div 
-                  key={index} 
-                  className={`bg-white p-2 rounded-lg cursor-pointer ${previewUrl === url ? 'ring-2 ring-techfest-neon-blue' : ''}`}
-                  onClick={() => handleSampleSelect(url)}
-                >
-                  <img 
-                    src={url} 
-                    alt={`Sample QR Code ${index + 1}`} 
-                    className="w-full h-auto"
-                  />
-                  <div className="text-center text-xs text-gray-800 mt-1">
-                    {url.includes('e53e9cc3') ? '₹100.00' : '₹50.00'}
-                  </div>
-                </div>
-              ))}
-            </div>
           </div>
           
           {previewUrl && (

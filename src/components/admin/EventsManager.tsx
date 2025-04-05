@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Eye, Edit, QrCode } from 'lucide-react';
+import { Eye, Edit } from 'lucide-react';
 import { Event } from '@/data/events';
 import { Registration } from '@/data/registrations';
 import { Button } from '@/components/ui/button';
@@ -86,26 +86,12 @@ const EventsManager = ({ events, registrations }: EventsManagerProps) => {
                       />
                       
                       {event.fees > 0 && (
-                        <>
-                          <QRCodeUploadDialog 
-                            eventId={event.id} 
-                            eventName={event.name}
-                            currentQRUrl={event.qr_code_url}
-                            onUpdate={handleUpdateEventQRCode}
-                          />
-                          
-                          {event.team_size > 1 && (
-                            <QRCodeUploadDialog 
-                              eventId={`${event.id}_team`}
-                              eventName={`${event.name} (Team)`}
-                              currentQRUrl={event.team_qr_code_url}
-                              onUpdate={(_, url) => {
-                                // Update the team QR code URL
-                                handleUpdateEventQRCode(event.id, url, true);
-                              }}
-                            />
-                          )}
-                        </>
+                        <QRCodeUploadDialog 
+                          eventId={event.id} 
+                          eventName={event.name}
+                          currentQRUrl={event.qr_code_url}
+                          onUpdate={handleUpdateEventQRCode}
+                        />
                       )}
                       
                       <ConfirmDeleteDialog 
