@@ -6,8 +6,9 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { BRANCH_OPTIONS } from '@/types/admin';
 import { toast } from 'sonner';
-import { X, Plus } from 'lucide-react';
+import { X, Plus, GamepadIcon } from 'lucide-react';
 import { Event } from '@/data/events';
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 export interface PersonalFormData {
   name: string;
@@ -20,6 +21,7 @@ export interface PersonalFormData {
     usn: string;
     branch?: string;
   }>;
+  game_selection?: string;
 }
 
 interface PersonalDetailsFormProps {
@@ -29,6 +31,8 @@ interface PersonalDetailsFormProps {
   onTeamMemberChange?: (index: number, field: string, value: string) => void;
   onAddTeamMember?: () => void;
   onRemoveTeamMember?: (index: number) => void;
+  onGameSelection?: (game: string) => void;
+  isGamingEvent?: boolean;
   onNext: () => void;
 }
 
@@ -39,8 +43,12 @@ const PersonalDetailsForm: React.FC<PersonalDetailsFormProps> = ({
   onTeamMemberChange,
   onAddTeamMember,
   onRemoveTeamMember,
+  onGameSelection,
+  isGamingEvent,
   onNext
 }) => {
+  // Only show team members section if team_size is greater than 1
+  // A team_size of 0 means individual participant (no team)
   const isTeamEvent = event && event.team_size && event.team_size > 1;
   
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -72,6 +80,12 @@ const PersonalDetailsForm: React.FC<PersonalDetailsFormProps> = ({
           return;
         }
       }
+    }
+    
+    // Gaming event validation
+    if (isGamingEvent && !formData.game_selection) {
+      toast.error('Please select a game');
+      return;
     }
     
     onNext();
@@ -154,7 +168,32 @@ const PersonalDetailsForm: React.FC<PersonalDetailsFormProps> = ({
         />
       </div>
       
-      {/* Team Members Section */}
+      {/* Game Selection for Gaming Events */}
+      {isGamingEvent && onGameSelection && (
+        <div className="mt-6 p-4 glass rounded-lg">
+          <div className="flex items-center mb-3">
+            <GamepadIcon size={18} className="mr-2 text-techfest-neon-purple" />
+            <h3 className="text-lg font-medium">Select Game</h3>
+          </div>
+          
+          <RadioGroup
+            value={formData.game_selection}
+            onValueChange={onGameSelection}
+            className="space-y-3"
+          >
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="PUBG" id="pubg" />
+              <Label htmlFor="pubg">PUBG</Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="FREE_FIRE" id="free-fire" />
+              <Label htmlFor="free-fire">Free Fire</Label>
+            </div>
+          </RadioGroup>
+        </div>
+      )}
+      
+      {/* Team Members Section - Only show if team_size > 1 */}
       {isTeamEvent && onTeamMemberChange && onAddTeamMember && onRemoveTeamMember && (
         <div className="mt-8">
           <div className="flex justify-between items-center mb-4">

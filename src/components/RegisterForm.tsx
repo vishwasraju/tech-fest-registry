@@ -20,12 +20,17 @@ const RegisterForm = () => {
     previousStep,
     handleTeamMemberChange,
     addTeamMember,
-    removeTeamMember
+    removeTeamMember,
+    handleGameSelection
   } = useRegistrationForm(event);
   
   if (!event) {
     return <div className="text-center py-10">Event not found</div>;
   }
+  
+  const isGamingEvent = event.name.toLowerCase().includes('gaming') || 
+                        event.description.toLowerCase().includes('pubg') ||
+                        event.description.toLowerCase().includes('free fire');
   
   return (
     <div className="max-w-md mx-auto glass px-6 py-8 rounded-xl">
@@ -41,7 +46,8 @@ const RegisterForm = () => {
           onTeamMemberChange={handleTeamMemberChange}
           onAddTeamMember={addTeamMember}
           onRemoveTeamMember={removeTeamMember}
-          onNext={nextStep}
+          onGameSelection={handleGameSelection}
+          isGamingEvent={isGamingEvent}
         />
       ) : (
         <PaymentForm 

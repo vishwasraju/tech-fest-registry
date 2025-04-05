@@ -9,6 +9,7 @@ import { AddEventDialog } from './AddEventDialog';
 import BackgroundImageDialog from './BackgroundImageDialog';
 import ConfirmDeleteDialog from './ConfirmDeleteDialog';
 import QRCodeUploadDialog from './QRCodeUploadDialog';
+import { EditEventDialog } from './EditEventDialog';
 import { useAdmin } from '@/contexts/AdminContext';
 
 interface EventsManagerProps {
@@ -21,7 +22,8 @@ const EventsManager = ({ events, registrations }: EventsManagerProps) => {
     handleAddEvent, 
     handleDeleteEvent, 
     handleUpdateEventBackground, 
-    handleUpdateEventQRCode 
+    handleUpdateEventQRCode,
+    handleEditEvent
   } = useAdmin();
 
   return (
@@ -70,6 +72,11 @@ const EventsManager = ({ events, registrations }: EventsManagerProps) => {
                           <Eye size={14} />
                         </Button>
                       </Link>
+                      
+                      <EditEventDialog 
+                        event={event}
+                        onEditEvent={handleEditEvent}
+                      />
                       
                       <BackgroundImageDialog 
                         eventId={event.id} 

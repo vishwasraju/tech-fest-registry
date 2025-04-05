@@ -18,6 +18,7 @@ interface FormData {
     usn: string;
     branch?: string;
   }>;
+  game_selection?: string;
 }
 
 export function useRegistrationForm(event: Event | undefined) {
@@ -31,7 +32,8 @@ export function useRegistrationForm(event: Event | undefined) {
     email: '',
     branch: '',
     utr: '',
-    team_members: event?.team_size && event.team_size > 1 ? [] : undefined
+    team_members: event?.team_size && event.team_size > 1 ? [] : undefined,
+    game_selection: undefined
   });
   
   const [step, setStep] = useState(1);
@@ -39,6 +41,10 @@ export function useRegistrationForm(event: Event | undefined) {
   
   const handleChange = (name: string, value: string) => {
     setFormData(prev => ({ ...prev, [name]: value }));
+  };
+  
+  const handleGameSelection = (game: string) => {
+    setFormData(prev => ({ ...prev, game_selection: game }));
   };
   
   const handleTeamMemberChange = (index: number, field: string, value: string) => {
@@ -91,7 +97,8 @@ export function useRegistrationForm(event: Event | undefined) {
         email: formData.email,
         branch: formData.branch,
         utr: event.fees > 0 ? formData.utr : undefined,
-        team_members: event.team_size && event.team_size > 1 ? formData.team_members : undefined
+        team_members: event.team_size && event.team_size > 1 ? formData.team_members : undefined,
+        game_selection: formData.game_selection
       };
       
       // Add to local storage registrations array
@@ -174,6 +181,7 @@ export function useRegistrationForm(event: Event | undefined) {
     previousStep,
     handleTeamMemberChange,
     addTeamMember,
-    removeTeamMember
+    removeTeamMember,
+    handleGameSelection
   };
 }
