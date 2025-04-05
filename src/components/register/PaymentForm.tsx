@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
@@ -23,6 +23,27 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
   onSubmit,
   isSubmitting
 }) => {
+  const [qrImageLoaded, setQrImageLoaded] = useState(false);
+  const [qrUrl, setQrUrl] = useState<string | undefined>(undefined);
+  
+  useEffect(() => {
+    // Determine which QR code URL to use
+    const isTeamEvent = event.team_size && event.team_size > 1;
+    const url = isTeamEvent && event.team_qr_code_url 
+      ? event.team_qr_code_url 
+      : event.qr_code_url;
+    
+    setQrUrl(url);
+    
+    // Pre-load the image to check if it works
+    if (url) {
+      const img = new Image();
+      img.onload = () => setQrImageLoaded(true);
+      img.onerror = () => setQrImageLoaded(false);
+      img.src = url;
+    }
+  }, [event]);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     onDataChange(name, value);
@@ -48,19 +69,15 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
             
             <div className="bg-white p-3 rounded-lg mx-auto w-48 h-48 mb-4">
               <QRCode 
-                value={`upi://pay?pa=example@upi&pn=TechFest&am=${feesToPay}`} 
-                imageUrl={
-                  // Use a team-specific QR code if available, otherwise use the regular one
-                  isTeamEvent && event.team_qr_code_url 
-                    ? event.team_qr_code_url 
-                    : event.qr_code_url
-                }
+                value={`upi://pay?pa=rakesharush123-1@okhdfcbank&pn=TechFest&am=${feesToPay}`} 
+                imageUrl={qrUrl}
               />
             </div>
             
             <div className="text-center text-xs text-gray-500 mb-6">
-              <p>UPI ID: example@upi</p>
-              <p>Account Name: Tech Fest 2K25</p>
+              <p>UPI ID: rakesharush123-1@okhdfcbank</p>
+              <p>Account Name: Rakesh V</p>
+              {!qrUrl && <p className="text-red-400 mt-2">No QR code available. Please use the UPI ID to make payment.</p>}
             </div>
             
             <div>

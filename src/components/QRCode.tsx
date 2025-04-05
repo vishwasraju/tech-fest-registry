@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import QRCodeLib from 'react-qr-code';
 
 interface QRCodeProps {
@@ -9,14 +9,17 @@ interface QRCodeProps {
 }
 
 const QRCode: React.FC<QRCodeProps> = ({ value, size = 150, imageUrl }) => {
+  const [imageError, setImageError] = useState(false);
+  
   return (
     <div className="flex items-center justify-center w-full h-full bg-white p-2 rounded-lg">
-      {imageUrl ? (
+      {imageUrl && !imageError ? (
         <img 
           src={imageUrl} 
           alt="Payment QR Code" 
-          className="max-w-full max-h-full"
+          className="max-w-full max-h-full object-contain"
           style={{ maxWidth: size, maxHeight: size }}
+          onError={() => setImageError(true)}
         />
       ) : (
         <QRCodeLib 
