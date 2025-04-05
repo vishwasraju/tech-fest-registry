@@ -110,6 +110,7 @@ export const AdminProvider: React.FC<AdminProviderProps> = ({
   };
   
   const handleEditEvent = async (eventId: string, formData: any) => {
+    console.log("Editing event:", eventId, formData);
     const updatedEvents = events.map(event => 
       event.id === eventId 
         ? { ...event, ...formData } 

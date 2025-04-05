@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Eye } from 'lucide-react';
+import { Eye, Edit } from 'lucide-react';
 import { Event } from '@/data/events';
 import { Registration } from '@/data/registrations';
 import { Button } from '@/components/ui/button';
@@ -75,7 +75,7 @@ const EventsManager = ({ events, registrations }: EventsManagerProps) => {
                       
                       <EditEventDialog 
                         event={event}
-                        onEditEvent={handleEditEvent}
+                        onEditEvent={(eventId, formData) => handleEditEvent(eventId, formData)}
                       />
                       
                       <BackgroundImageDialog 

@@ -11,6 +11,15 @@ interface DashboardOverviewProps {
 }
 
 const DashboardOverview = ({ events, registrations }: DashboardOverviewProps) => {
+  // Get total registration count
+  const totalRegistrations = registrations.length;
+  
+  // Get paid registrations count
+  const paidRegistrations = registrations.filter(reg => {
+    const event = events.find(e => e.id === reg.event_id);
+    return event && event.fees > 0;
+  }).length;
+  
   // Get registration counts by branch
   const registrationsByBranch = BRANCH_OPTIONS.filter(branch => branch !== 'ALL').map(branch => {
     const count = registrations.filter(reg => reg.branch === branch).length;
@@ -31,7 +40,7 @@ const DashboardOverview = ({ events, registrations }: DashboardOverviewProps) =>
         <div className="glass p-6 rounded-xl">
           <h3 className="text-lg font-semibold mb-2">Total Registrations</h3>
           <div className="flex items-end justify-between">
-            <span className="text-3xl font-bold">{registrations.length}</span>
+            <span className="text-3xl font-bold">{totalRegistrations}</span>
             <Users size={24} className="text-techfest-neon-purple" />
           </div>
         </div>
@@ -39,12 +48,7 @@ const DashboardOverview = ({ events, registrations }: DashboardOverviewProps) =>
         <div className="glass p-6 rounded-xl">
           <h3 className="text-lg font-semibold mb-2">Paid Registrations</h3>
           <div className="flex items-end justify-between">
-            <span className="text-3xl font-bold">
-              {registrations.filter(reg => {
-                const event = events.find(e => e.id === reg.event_id);
-                return event && event.fees > 0;
-              }).length}
-            </span>
+            <span className="text-3xl font-bold">{paidRegistrations}</span>
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-techfest-neon-pink">
               <circle cx="12" cy="12" r="10" />
               <path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8" />

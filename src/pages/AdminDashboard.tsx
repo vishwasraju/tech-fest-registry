@@ -20,6 +20,8 @@ import RegistrationsManager from '@/components/admin/RegistrationsManager';
 import SponsorsManager from '@/components/admin/SponsorsManager';
 import AdminPasswordChange from '@/components/admin/AdminPasswordChange';
 import { AdminProvider } from '@/contexts/AdminContext';
+import { supabase } from '@/integrations/supabase/client';
+import { Registration } from '@/data/registrations';
 
 interface AdminDashboardProps {
   events: Event[];
@@ -39,8 +41,9 @@ const AdminDashboard = ({ events, onUpdateEvents }: AdminDashboardProps) => {
   
   // Local state
   const [activeTab, setActiveTab] = useState('overview');
-  const [registrations, setRegistrations] = useState(REGISTRATIONS_DATA);
+  const [registrations, setRegistrations] = useState<Registration[]>(REGISTRATIONS_DATA);
   
+  // Combined loading state
   const isLoading = authLoading || sponsorsLoading;
   
   if (!isAuthenticated) {
