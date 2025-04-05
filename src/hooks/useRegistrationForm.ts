@@ -25,6 +25,9 @@ export function useRegistrationForm(event: Event | undefined) {
   const { eventId } = useParams<{ eventId: string }>();
   const navigate = useNavigate();
   
+  // Initialize team_members array only if this is a team event (team_size > 1)
+  const isTeamEvent = event && event.team_size > 1;
+  
   const [formData, setFormData] = useState<FormData>({
     name: '',
     usn: '',
@@ -32,7 +35,7 @@ export function useRegistrationForm(event: Event | undefined) {
     email: '',
     branch: '',
     utr: '',
-    team_members: event?.team_size && event.team_size > 1 ? [] : undefined,
+    team_members: isTeamEvent ? [] : undefined,
     game_selection: undefined
   });
   
@@ -97,7 +100,7 @@ export function useRegistrationForm(event: Event | undefined) {
         email: formData.email,
         branch: formData.branch,
         utr: event.fees > 0 ? formData.utr : undefined,
-        team_members: event.team_size && event.team_size > 1 ? formData.team_members : undefined,
+        team_members: event.team_size > 1 ? formData.team_members : undefined,
         game_selection: formData.game_selection
       };
       

@@ -49,7 +49,7 @@ const PersonalDetailsForm: React.FC<PersonalDetailsFormProps> = ({
 }) => {
   // Only show team members section if team_size is greater than 1
   // A team_size of 0 means individual participant (no team)
-  const isTeamEvent = event && event.team_size && event.team_size > 1;
+  const isTeamEvent = event && event.team_size > 1;
   
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -69,8 +69,8 @@ const PersonalDetailsForm: React.FC<PersonalDetailsFormProps> = ({
     
     // Team member validation
     if (isTeamEvent && formData.team_members) {
-      if (formData.team_members.length < (event.team_size - 1)) {
-        toast.error(`Please add ${event.team_size - 1} team members`);
+      if (formData.team_members.length < (event!.team_size - 1)) {
+        toast.error(`Please add ${event!.team_size - 1} team members`);
         return;
       }
       
@@ -136,6 +136,8 @@ const PersonalDetailsForm: React.FC<PersonalDetailsFormProps> = ({
                 {branch}
               </SelectItem>
             ))}
+            <SelectItem value="DIPLOMA" className="hover:bg-gray-800">DIPLOMA</SelectItem>
+            <SelectItem value="POLYTECHNIC" className="hover:bg-gray-800">POLYTECHNIC</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -199,7 +201,7 @@ const PersonalDetailsForm: React.FC<PersonalDetailsFormProps> = ({
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-lg font-medium">Team Members</h3>
             <p className="text-sm text-gray-400">
-              Required: {event.team_size - 1} members
+              Required: {event!.team_size - 1} members
             </p>
           </div>
           
@@ -258,6 +260,8 @@ const PersonalDetailsForm: React.FC<PersonalDetailsFormProps> = ({
                           {branch}
                         </SelectItem>
                       ))}
+                      <SelectItem value="DIPLOMA" className="hover:bg-gray-800">DIPLOMA</SelectItem>
+                      <SelectItem value="POLYTECHNIC" className="hover:bg-gray-800">POLYTECHNIC</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -265,7 +269,7 @@ const PersonalDetailsForm: React.FC<PersonalDetailsFormProps> = ({
             </div>
           ))}
           
-          {formData.team_members && formData.team_members.length < (event.team_size - 1) && (
+          {formData.team_members && formData.team_members.length < (event!.team_size - 1) && (
             <Button
               type="button"
               variant="outline"
@@ -273,7 +277,7 @@ const PersonalDetailsForm: React.FC<PersonalDetailsFormProps> = ({
               className="w-full mb-4 border-dashed border-gray-600 hover:border-gray-400 hover:bg-gray-800"
             >
               <Plus size={16} className="mr-2" />
-              Add Team Member ({formData.team_members.length}/{event.team_size - 1})
+              Add Team Member ({formData.team_members.length}/{event!.team_size - 1})
             </Button>
           )}
         </div>
