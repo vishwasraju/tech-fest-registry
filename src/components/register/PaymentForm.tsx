@@ -33,15 +33,8 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
       ? event.team_qr_code_url 
       : event.qr_code_url;
     
+    console.log("Using QR code URL:", url, "for event:", event.name);
     setQrUrl(url);
-    
-    // Pre-load the image to check if it works
-    if (url) {
-      const img = new Image();
-      img.onload = () => setQrImageLoaded(true);
-      img.onerror = () => setQrImageLoaded(false);
-      img.src = url;
-    }
   }, [event]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -71,6 +64,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
               <QRCode 
                 value={`upi://pay?pa=rakesharush123-1@okhdfcbank&pn=TechFest&am=${feesToPay}`} 
                 imageUrl={qrUrl}
+                size={180}
               />
             </div>
             

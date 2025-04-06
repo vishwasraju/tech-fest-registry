@@ -30,6 +30,9 @@ const QRCodeUploadDialog = ({ eventId, eventName, currentQRUrl, onUpdate }: QRCo
   const [previewUrl, setPreviewUrl] = useState<string>('');
   const fileInputRef = useRef<HTMLInputElement>(null);
   
+  // Check if this is a team QR code (eventId contains "_team")
+  const isTeam = eventId.includes('_team');
+  
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -56,12 +59,24 @@ const QRCodeUploadDialog = ({ eventId, eventName, currentQRUrl, onUpdate }: QRCo
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (selectedQR === 'custom' && previewUrl) {
-      onUpdate(eventId, previewUrl);
+    let qrCodeUrl = '';
+    
+    if (selectedQR === 'custom' && customQR) {
+      // For custom uploaded QR code, use the preview URL
+      // Later this will be replaced with the uploaded file URL
+      qrCodeUrl = previewUrl;
     } else if (selectedQR && selectedQR !== 'custom') {
-      onUpdate(eventId, selectedQR);
+      qrCodeUrl = selectedQR;
+    } else {
+      toast.error('Please select or upload a QR code');
+      return;
     }
     
+    // Extract the real event ID (without "_team" suffix if present)
+    const actualEventId = isTeam ? eventId.replace('_team', '') : eventId;
+    
+    // Call the update function with the QR code URL and isTeam flag
+    onUpdate(actualEventId, qrCodeUrl, isTeam);
     setOpen(false);
   };
   
@@ -98,7 +113,7 @@ const QRCodeUploadDialog = ({ eventId, eventName, currentQRUrl, onUpdate }: QRCo
                   <img 
                     src={qr.url} 
                     alt={qr.name} 
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-contain"
                   />
                 </div>
                 <div className="p-2 text-center bg-gray-800">
@@ -136,7 +151,7 @@ const QRCodeUploadDialog = ({ eventId, eventName, currentQRUrl, onUpdate }: QRCo
                 <img 
                   src={previewUrl} 
                   alt="Custom QR code" 
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-contain"
                 />
               </div>
             </div>
@@ -149,7 +164,7 @@ const QRCodeUploadDialog = ({ eventId, eventName, currentQRUrl, onUpdate }: QRCo
                 <img 
                   src={currentQRUrl} 
                   alt="Current QR code" 
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-contain"
                 />
               </div>
             </div>
