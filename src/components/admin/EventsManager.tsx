@@ -11,7 +11,6 @@ import ConfirmDeleteDialog from './ConfirmDeleteDialog';
 import QRCodeUploadDialog from './QRCodeUploadDialog';
 import { EditEventDialog } from './EditEventDialog';
 import { useAdmin } from '@/contexts/AdminContext';
-import { toast } from 'sonner';
 
 interface EventsManagerProps {
   events: Event[];
@@ -100,7 +99,10 @@ const EventsManager = ({ events, registrations }: EventsManagerProps) => {
                               eventId={`${event.id}_team`}
                               eventName={`${event.name} (Team)`}
                               currentQRUrl={event.team_qr_code_url}
-                              onUpdate={handleUpdateEventQRCode}
+                              onUpdate={(eventId, url, isTeam) => {
+                                // Update the team QR code URL
+                                handleUpdateEventQRCode(event.id, url, true);
+                              }}
                             />
                           )}
                         </>

@@ -3,17 +3,16 @@ import React, { useState, useRef } from 'react';
 import { QrCode, Upload } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { toast } from 'sonner';
 
 // QR code sample images
 const SAMPLE_QR_CODES = [
   {
-    name: 'UPI QR ₹100',
-    url: '/lovable-uploads/c9165f1d-2549-443c-8662-3b5f411dea9d.png'
+    name: 'UPI 1',
+    url: '/lovable-uploads/52204412-75bf-4c5a-8291-863ee5b054bc.png'
   },
   {
-    name: 'UPI QR ₹50',
-    url: '/lovable-uploads/5ab26a22-0974-4278-9090-3f1ad55a996f.png'
+    name: 'UPI 2',
+    url: '/lovable-uploads/24fe700b-9cd0-4745-a2af-a58676eaf367.png'
   }
 ];
 
@@ -30,9 +29,6 @@ const QRCodeUploadDialog = ({ eventId, eventName, currentQRUrl, onUpdate }: QRCo
   const [customQR, setCustomQR] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string>('');
   const fileInputRef = useRef<HTMLInputElement>(null);
-  
-  // Check if this is a team QR code (eventId contains "_team")
-  const isTeam = eventId.includes('_team');
   
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -60,24 +56,12 @@ const QRCodeUploadDialog = ({ eventId, eventName, currentQRUrl, onUpdate }: QRCo
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    let qrCodeUrl = '';
-    
-    if (selectedQR === 'custom' && customQR) {
-      // For custom uploaded QR code, use the preview URL
-      // Later this will be replaced with the uploaded file URL
-      qrCodeUrl = previewUrl;
+    if (selectedQR === 'custom' && previewUrl) {
+      onUpdate(eventId, previewUrl);
     } else if (selectedQR && selectedQR !== 'custom') {
-      qrCodeUrl = selectedQR;
-    } else {
-      toast.error('Please select or upload a QR code');
-      return;
+      onUpdate(eventId, selectedQR);
     }
     
-    // Extract the real event ID (without "_team" suffix if present)
-    const actualEventId = isTeam ? eventId.replace('_team', '') : eventId;
-    
-    // Call the update function with the QR code URL and isTeam flag
-    onUpdate(actualEventId, qrCodeUrl, isTeam);
     setOpen(false);
   };
   
@@ -114,7 +98,7 @@ const QRCodeUploadDialog = ({ eventId, eventName, currentQRUrl, onUpdate }: QRCo
                   <img 
                     src={qr.url} 
                     alt={qr.name} 
-                    className="w-full h-full object-contain"
+                    className="w-full h-full object-cover"
                   />
                 </div>
                 <div className="p-2 text-center bg-gray-800">
@@ -152,7 +136,7 @@ const QRCodeUploadDialog = ({ eventId, eventName, currentQRUrl, onUpdate }: QRCo
                 <img 
                   src={previewUrl} 
                   alt="Custom QR code" 
-                  className="w-full h-full object-contain"
+                  className="w-full h-full object-cover"
                 />
               </div>
             </div>
@@ -165,7 +149,7 @@ const QRCodeUploadDialog = ({ eventId, eventName, currentQRUrl, onUpdate }: QRCo
                 <img 
                   src={currentQRUrl} 
                   alt="Current QR code" 
-                  className="w-full h-full object-contain"
+                  className="w-full h-full object-cover"
                 />
               </div>
             </div>

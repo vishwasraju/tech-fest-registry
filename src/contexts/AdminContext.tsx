@@ -99,8 +99,6 @@ export const AdminProvider: React.FC<AdminProviderProps> = ({
   };
   
   const handleUpdateEventQRCode = async (eventId: string, qrCodeUrl: string, isTeam?: boolean) => {
-    console.log("Updating QR code:", eventId, qrCodeUrl, isTeam ? "team" : "individual");
-    
     const updatedEvents = events.map(event => {
       if (event.id === eventId) {
         if (isTeam) {
