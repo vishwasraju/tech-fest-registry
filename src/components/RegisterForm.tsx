@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { EVENTS_DATA } from '@/data/events';
 import PersonalDetailsForm from '@/components/register/PersonalDetailsForm';
@@ -8,7 +8,13 @@ import { useRegistrationForm } from '@/hooks/useRegistrationForm';
 
 const RegisterForm = () => {
   const { eventId } = useParams<{ eventId: string }>();
-  const event = EVENTS_DATA.find(e => e.id === eventId);
+  const [event, setEvent] = useState<Event | undefined>(undefined);
+  
+  useEffect(() => {
+    // Try to find the event by ID from the EVENTS_DATA
+    const foundEvent = EVENTS_DATA.find(e => e.id === eventId);
+    setEvent(foundEvent);
+  }, [eventId]);
   
   const {
     formData,
