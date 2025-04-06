@@ -22,14 +22,14 @@ export interface Event {
 export const EVENTS_DATA: Event[] = [
   {
     id: "event-1",
-    name: "Hackathon",
-    description: "A 24-hour coding marathon where teams of programmers collaborate to build innovative software solutions. Push your coding skills to the limit and compete for prizes!",
-    date_time: "March 15, 2025 - 10:00 AM",
-    venue: "Main Auditorium",
-    rules: "1. Teams of 3-4 members.\n2. Bring your own laptops and necessary equipment.\n3. Internet access will be provided.\n4. Projects must be original work created during the event.\n5. Final presentations will be 5 minutes per team.",
+    name: "BATTLE ZONE",
+    description: "Unleash your inner gamer! Join the ultimate gaming showdown",
+    date_time: "09-APRIL-2025",
+    venue: "AIML",
+    rules: " ",
     team_size: 4,
-    fees: 500,
-    cash_prize: 10000,
+    fees: 100,
+    cash_prize: 0,
     category: "CSE",
     background_image: "https://images.unsplash.com/photo-1487058792275-0ad4aaf24ca7"
   },
