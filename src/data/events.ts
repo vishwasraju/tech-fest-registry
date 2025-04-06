@@ -20,11 +20,11 @@ export interface Event {
 
 // Initial events data
 export const EVENTS_DATA: Event[] = [
-{
+  {
     id: "event-1",
     name: "BATTLE ZONE",
     description: "Unleash your inner gamer! Join the ultimate gaming showdown",
-    date_time: "2025-04-09",
+    date_time: "2025-04-09T10:00:00", // Consistent date format
     venue: "AIML",
     rules: "",
     team_size: 4,
@@ -37,7 +37,7 @@ export const EVENTS_DATA: Event[] = [
     id: "event-2",
     name: "Codeblitz",
     description: "CodeBlitz is an on-spot debugging challenge where participants analyze and fix code errors under time constraints, testing their problem-solving skills and coding efficiency.",
-    date_time: "2025-04-09",
+    date_time: "2025-04-09T10:00:00", // Consistent date format
     venue: "AIML",
     rules: "",
     team_size: 1,
@@ -49,8 +49,8 @@ export const EVENTS_DATA: Event[] = [
   {
     id: "event-3",
     name: "Code Free Creation",
-    description: "Code Free Creation is an innovative competition where participants build projects using no-code or low-code platforms, showcasing creativity and problem-solving without traditional programming.",
-    date_time: "2025-04-09",
+    description: "Code Free Creation is an innovative competition where participants build projects using no-code or low-code platforms, showcasing creativity and problem-solving without traditional coding.",
+    date_time: "2025-04-09T10:00:00", // Consistent date format
     venue: "AIML",
     rules: "",
     team_size: 1,
@@ -63,7 +63,7 @@ export const EVENTS_DATA: Event[] = [
     id: "event-4",
     name: "VidSprint",
     description: "VidSprint is an on-spot videography competition where participants capture, edit, and present a compelling short video within a limited time, showcasing creativity, storytelling, and technical skills.",
-    date_time: "2025-04-09",
+    date_time: "2025-04-09T10:00:00", // Consistent date format
     venue: "AIML",
     rules: "",
     team_size: 1,
@@ -75,9 +75,9 @@ export const EVENTS_DATA: Event[] = [
     id: "event-5",
     name: "Robotics Challenge",
     description: "Build and program robots to navigate an obstacle course and complete specific tasks. Showcase your robotics and automation skills!",
-    date_time: "March 19, 2025 - 10:00 AM",
+    date_time: "2025-03-19T10:00:00", // Consistent date format
     venue: "Robotics Lab",
-    rules: "1. Teams of 3-5 members.\n2. Robots must be pre-built and brought to the event.\n3. No remote controls allowed - robots must be autonomous.\n4. Maximum robot dimensions: 30cm x 30cm x 30cm.\n5. Time limit for course completion: 5 minutes.",
+    rules: "1. Teams of 3-5 members.\n2. Robots must be pre-built and brought to the event.\n3. No remote controls allowed - robots must be autonomous.\n4. Maximum robot dimensions: 30cm x 30cm x 30cm.",
     team_size: 5,
     fees: 800,
     cash_prize: 12000,
@@ -88,9 +88,9 @@ export const EVENTS_DATA: Event[] = [
     id: "event-6",
     name: "Paper Presentation",
     description: "Present your research papers or innovative ideas in computer science, information technology, or related engineering fields.",
-    date_time: "March 20, 2025 - 9:00 AM",
+    date_time: "2025-03-20T09:00:00", // Consistent date format
     venue: "Conference Hall",
-    rules: "1. Individual or team of 2 allowed.\n2. Abstract submission deadline: March 1, 2025.\n3. Selected participants will be notified by March 5, 2025.\n4. Presentation time: 8 minutes + 2 minutes Q&A.\n5. Judging based on innovation, research quality, and presentation skills.",
+    rules: "1. Individual or team of 2 allowed.\n2. Abstract submission deadline: March 1, 2025.\n3. Selected participants will be notified by March 5, 2025.\n4. Presentation time: 8 minutes + 2 minutes for Q&A.",
     team_size: 2,
     fees: 0,
     cash_prize: 4000,
@@ -100,9 +100,9 @@ export const EVENTS_DATA: Event[] = [
     id: "event-7",
     name: "Bug Bounty",
     description: "Find bugs and vulnerabilities in a sample application. Test your cybersecurity skills and compete to discover the most critical issues.",
-    date_time: "March 20, 2025 - 2:00 PM",
+    date_time: "2025-03-20T14:00:00", // Consistent date format
     venue: "Network Security Lab",
-    rules: "1. Individual participation only.\n2. Time limit: 4 hours.\n3. Participants must document all discovered vulnerabilities.\n4. Points awarded based on severity and number of bugs found.\n5. Ethical hacking principles must be followed.",
+    rules: "1. Individual participation only.\n2. Time limit: 4 hours.\n3. Participants must document all discovered vulnerabilities.\n4. Points awarded based on severity and number of bugs found.",
     team_size: 1,
     fees: 250,
     cash_prize: 7000,
@@ -113,9 +113,9 @@ export const EVENTS_DATA: Event[] = [
     id: "event-8",
     name: "Technical Debate",
     description: "Engage in structured debates on controversial tech topics like AI ethics, data privacy, and the future of technology.",
-    date_time: "March 21, 2025 - 10:00 AM",
+    date_time: "2025-03-21T10:00:00", // Consistent date format
     venue: "Seminar Hall",
-    rules: "1. Teams of 2 members.\n2. Topics will be announced 3 days before the event.\n3. Each team gets 5 minutes for opening arguments, 3 minutes for rebuttal, and 2 minutes for closing.\n4. Judges' decision will be final.\n5. Professional and respectful conduct is required.",
+    rules: "1. Teams of 2 members.\n2. Topics will be announced 3 days before the event.\n3. Each team gets 5 minutes for opening arguments, 3 minutes for rebuttal, and 2 minutes for closing.\n4. Points awarded based on clarity, relevance, and presentation skills.",
     team_size: 2,
     fees: 0,
     cash_prize: 2500,
@@ -190,3 +190,4 @@ export const saveEventsToStorage = async (events: Event[]): Promise<boolean> => 
     return false;
   }
 };
+
