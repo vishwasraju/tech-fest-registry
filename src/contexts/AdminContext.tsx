@@ -9,7 +9,7 @@ interface AdminContextType {
   handleAddEvent: (formData: any) => Promise<void>;
   handleDeleteEvent: (eventId: string) => Promise<void>;
   handleUpdateEventBackground: (eventId: string, backgroundImage: string | File) => Promise<void>;
-  handleUpdateEventQRCode: (eventId: string, qrCodeUrl: string) => Promise<void>;
+  handleUpdateEventQRCode: (eventId: string, qrCodeUrl: string, isTeam?: boolean) => Promise<void>;
   handleEditEvent: (eventId: string, formData: any) => Promise<void>;
 }
 

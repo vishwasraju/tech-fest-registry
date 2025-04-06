@@ -12,7 +12,7 @@ interface QRCodeUploadDialogProps {
   eventId: string;
   eventName: string;
   currentQRUrl?: string;
-  onUpdate: (eventId: string, qrCodeUrl: string) => void;
+  onUpdate: (eventId: string, qrCodeUrl: string, isTeam?: boolean) => void;
 }
 
 const QRCodeUploadDialog = ({ eventId, eventName, currentQRUrl, onUpdate }: QRCodeUploadDialogProps) => {
