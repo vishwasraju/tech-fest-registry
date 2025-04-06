@@ -54,7 +54,7 @@ const PersonalDetailsForm: React.FC<PersonalDetailsFormProps> = ({
       return;
     }
     
-    // Team member validation
+    // Team member validation - only if it's a team event with team_size > 1
     if (isTeamEvent && formData.team_members) {
       if (formData.team_members.length < (event!.team_size - 1)) {
         toast.error(`Please add ${event!.team_size - 1} team members`);

@@ -90,6 +90,14 @@ export function useRegistrationForm(event: Event | undefined) {
       // Generate a unique ID for the registration
       const registrationId = `reg-${Date.now()}`;
       
+      // Calculate fee to use for payment
+      let fee = 0;
+      if (event.team_size > 1 && event.team_registration_fees !== undefined) {
+        fee = event.team_registration_fees;
+      } else if (event.fees !== undefined) {
+        fee = event.fees;
+      }
+      
       // Create registration object
       const registrationData = {
         id: registrationId,
@@ -99,7 +107,7 @@ export function useRegistrationForm(event: Event | undefined) {
         phone: formData.phone,
         email: formData.email,
         branch: formData.branch,
-        utr: event.fees > 0 ? formData.utr : undefined,
+        utr: fee > 0 ? formData.utr : undefined,
         team_members: event.team_size > 1 ? formData.team_members : undefined,
         game_selection: formData.game_selection
       };
@@ -127,7 +135,7 @@ export function useRegistrationForm(event: Event | undefined) {
             ...registrationData,
             eventName: event.name,
             registrationDate: new Date().toISOString(),
-            paymentStatus: event.fees > 0 ? (formData.utr ? 'paid' : 'pending') : 'free'
+            paymentStatus: fee > 0 ? (formData.utr ? 'paid' : 'pending') : 'free'
           };
           
           // Save registration data to Supabase Storage
