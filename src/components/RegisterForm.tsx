@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { Event, EVENTS_DATA } from '@/data/events';
+import { EVENTS_DATA } from '@/data/events';
 import PersonalDetailsForm from '@/components/register/PersonalDetailsForm';
 import PaymentForm from '@/components/register/PaymentForm';
 import { useRegistrationForm } from '@/hooks/useRegistrationForm';
