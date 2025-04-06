@@ -1,4 +1,3 @@
-
 export interface Event {
   id: string;
   name: string;
@@ -24,7 +23,7 @@ export const EVENTS_DATA: Event[] = [
     id: "event-1",
     name: "BATTLE ZONE",
     description: "Unleash your inner gamer! Join the ultimate gaming showdown",
-    date_time: "2025-04-09T10:00:00", // Consistent date format
+    date_time: "2025-04-09T10:00:00",
     venue: "AIML",
     rules: "",
     team_size: 4,
@@ -37,7 +36,7 @@ export const EVENTS_DATA: Event[] = [
     id: "event-2",
     name: "Codeblitz",
     description: "CodeBlitz is an on-spot debugging challenge where participants analyze and fix code errors under time constraints, testing their problem-solving skills and coding efficiency.",
-    date_time: "2025-04-09T10:00:00", // Consistent date format
+    date_time: "2025-04-09T10:00:00",
     venue: "AIML",
     rules: "",
     team_size: 1,
@@ -50,7 +49,7 @@ export const EVENTS_DATA: Event[] = [
     id: "event-3",
     name: "Code Free Creation",
     description: "Code Free Creation is an innovative competition where participants build projects using no-code or low-code platforms, showcasing creativity and problem-solving without traditional coding.",
-    date_time: "2025-04-09T10:00:00", // Consistent date format
+    date_time: "2025-04-09T10:00:00",
     venue: "AIML",
     rules: "",
     team_size: 1,
@@ -63,7 +62,7 @@ export const EVENTS_DATA: Event[] = [
     id: "event-4",
     name: "VidSprint",
     description: "VidSprint is an on-spot videography competition where participants capture, edit, and present a compelling short video within a limited time, showcasing creativity, storytelling, and technical skills.",
-    date_time: "2025-04-09T10:00:00", // Consistent date format
+    date_time: "2025-04-09T10:00:00",
     venue: "AIML",
     rules: "",
     team_size: 1,
@@ -74,8 +73,8 @@ export const EVENTS_DATA: Event[] = [
   {
     id: "event-5",
     name: "DeptVerse(TEAM)",
-    description: "DeptVerse is a presentation competition where participants create a PPT showcasing how AI is transforming their department, highlighting innovations, real-world applications, and future possibilities",
-    date_time: "2025-04-09T10:00:00", // Consistent date format
+    description: "DeptVerse is a presentation competition where participants create a PPT showcasing how AI is transforming their department, highlighting innovations, real-world applications, and future potential.",
+    date_time: "2025-04-09T10:00:00",
     venue: "AIML",
     rules: "",
     team_size: 4,
@@ -87,8 +86,8 @@ export const EVENTS_DATA: Event[] = [
   {
     id: "event-6",
     name: "DeptVerse(SOLO)",
-    description: "DeptVerse is a presentation competition where participants create a PPT showcasing how AI is transforming their department, highlighting innovations, real-world applications, and future possibilities",
-    date_time: "2025-04-09T10:00:00", // Consistent date format
+    description: "DeptVerse is a presentation competition where participants create a PPT showcasing how AI is transforming their department, highlighting innovations, real-world applications, and future potential.",
+    date_time: "2025-04-09T10:00:00",
     venue: "AIML",
     rules: "",
     team_size: 1,
@@ -166,4 +165,3 @@ export const saveEventsToStorage = async (events: Event[]): Promise<boolean> => 
     return false;
   }
 };
-
