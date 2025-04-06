@@ -73,53 +73,29 @@ export const EVENTS_DATA: Event[] = [
   },
   {
     id: "event-5",
-    name: "Robotics Challenge",
-    description: "Build and program robots to navigate an obstacle course and complete specific tasks. Showcase your robotics and automation skills!",
-    date_time: "2025-03-19T10:00:00", // Consistent date format
-    venue: "Robotics Lab",
-    rules: "1. Teams of 3-5 members.\n2. Robots must be pre-built and brought to the event.\n3. No remote controls allowed - robots must be autonomous.\n4. Maximum robot dimensions: 30cm x 30cm x 30cm.",
-    team_size: 5,
-    fees: 800,
-    cash_prize: 12000,
-    category: "ECE",
+    name: "DeptVerse(TEAM)",
+    description: "DeptVerse is a presentation competition where participants create a PPT showcasing how AI is transforming their department, highlighting innovations, real-world applications, and future possibilities",
+    date_time: "2025-04-09T10:00:00", // Consistent date format
+    venue: "AIML",
+    rules: "",
+    team_size: 4,
+    fees: 100,
+    cash_prize: 0,
+    category: "AIML",
     background_image: "https://images.unsplash.com/photo-1485827404703-89b55fcc595e"
   },
   {
     id: "event-6",
-    name: "Paper Presentation",
-    description: "Present your research papers or innovative ideas in computer science, information technology, or related engineering fields.",
-    date_time: "2025-03-20T09:00:00", // Consistent date format
-    venue: "Conference Hall",
-    rules: "1. Individual or team of 2 allowed.\n2. Abstract submission deadline: March 1, 2025.\n3. Selected participants will be notified by March 5, 2025.\n4. Presentation time: 8 minutes + 2 minutes for Q&A.",
-    team_size: 2,
-    fees: 0,
-    cash_prize: 4000,
-    category: "MBA"
-  },
-  {
-    id: "event-7",
-    name: "Bug Bounty",
-    description: "Find bugs and vulnerabilities in a sample application. Test your cybersecurity skills and compete to discover the most critical issues.",
-    date_time: "2025-03-20T14:00:00", // Consistent date format
-    venue: "Network Security Lab",
-    rules: "1. Individual participation only.\n2. Time limit: 4 hours.\n3. Participants must document all discovered vulnerabilities.\n4. Points awarded based on severity and number of bugs found.",
+    name: "DeptVerse(SOLO)",
+    description: "DeptVerse is a presentation competition where participants create a PPT showcasing how AI is transforming their department, highlighting innovations, real-world applications, and future possibilities",
+    date_time: "2025-04-09T10:00:00", // Consistent date format
+    venue: "AIML",
+    rules: "",
     team_size: 1,
-    fees: 250,
-    cash_prize: 7000,
-    category: "CSE",
-    background_image: "https://images.unsplash.com/photo-1518770660439-4636190af475"
-  },
-  {
-    id: "event-8",
-    name: "Technical Debate",
-    description: "Engage in structured debates on controversial tech topics like AI ethics, data privacy, and the future of technology.",
-    date_time: "2025-03-21T10:00:00", // Consistent date format
-    venue: "Seminar Hall",
-    rules: "1. Teams of 2 members.\n2. Topics will be announced 3 days before the event.\n3. Each team gets 5 minutes for opening arguments, 3 minutes for rebuttal, and 2 minutes for closing.\n4. Points awarded based on clarity, relevance, and presentation skills.",
-    team_size: 2,
-    fees: 0,
-    cash_prize: 2500,
-    category: "AIML"
+    fees: 50,
+    cash_prize: 0,
+    category: "MBA",
+    background_image: "https://images.unsplash.com/photo-1485827404703-89b55fcc595e"
   }
 ];
 
