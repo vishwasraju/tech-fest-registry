@@ -1,11 +1,11 @@
 
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { useParams, Link } from 'react-router-dom';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { Calendar, User, MapPin, Trophy, CreditCard, Users } from 'lucide-react';
-import { Event, EVENTS_DATA } from '@/data/events';
+import { Event } from '@/data/events';
 
 interface EventDetailsProps {
   events: Event[];
@@ -13,19 +13,7 @@ interface EventDetailsProps {
 
 const EventDetails = ({ events }: EventDetailsProps) => {
   const { eventId } = useParams<{ eventId: string }>();
-  const [event, setEvent] = useState<Event | undefined>();
-  
-  useEffect(() => {
-    // First check in the props
-    let foundEvent = events.find(e => e.id === eventId);
-    
-    // If not found in props, check in the default events data
-    if (!foundEvent) {
-      foundEvent = EVENTS_DATA.find(e => e.id === eventId);
-    }
-    
-    setEvent(foundEvent);
-  }, [eventId, events]);
+  const event = events.find(e => e.id === eventId);
   
   if (!event) {
     return (
