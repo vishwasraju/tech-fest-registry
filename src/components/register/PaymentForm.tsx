@@ -33,15 +33,8 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
       ? event.team_qr_code_url 
       : event.qr_code_url;
     
+    console.log("Using QR code URL:", url, "for event:", event.name);
     setQrUrl(url);
-    
-    // Pre-load the image to check if it works
-    if (url) {
-      const img = new Image();
-      img.onload = () => setQrImageLoaded(true);
-      img.onerror = () => setQrImageLoaded(false);
-      img.src = url;
-    }
   }, [event]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -60,17 +53,11 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
       {feesToPay > 0 ? (
         <>
           <div className="text-center mb-4">
-            <p className="text-sm text-gray-400 mb-4">
-              Please pay ₹{feesToPay} to complete your registration. 
-              {isTeamEvent && 
-                " This is a team registration fee (one payment covers the entire team)."}
-              <br />Scan the QR code below:
-            </p>
-            
             <div className="bg-white p-3 rounded-lg mx-auto w-48 h-48 mb-4">
               <QRCode 
                 value={`upi://pay?pa=rakesharush123-1@okhdfcbank&pn=TechFest&am=${feesToPay}`} 
                 imageUrl={qrUrl}
+                size={180}
               />
             </div>
             
