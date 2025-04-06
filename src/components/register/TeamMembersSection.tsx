@@ -29,6 +29,11 @@ const TeamMembersSection: React.FC<TeamMembersSectionProps> = ({
   onAddTeamMember,
   onRemoveTeamMember
 }) => {
+  // If team_size is 0 or 1, consider it as individual event (no team members)
+  if (event.team_size <= 1) {
+    return null;
+  }
+
   return (
     <div className="mt-8">
       <div className="flex justify-between items-center mb-4">

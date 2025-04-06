@@ -8,12 +8,12 @@ import { toast } from 'sonner';
 // QR code sample images
 const SAMPLE_QR_CODES = [
   {
-    name: 'UPI 1',
-    url: '/lovable-uploads/52204412-75bf-4c5a-8291-863ee5b054bc.png'
+    name: 'UPI QR ₹100',
+    url: '/lovable-uploads/c9165f1d-2549-443c-8662-3b5f411dea9d.png'
   },
   {
-    name: 'UPI 2',
-    url: '/lovable-uploads/24fe700b-9cd0-4745-a2af-a58676eaf367.png'
+    name: 'UPI QR ₹50',
+    url: '/lovable-uploads/5ab26a22-0974-4278-9090-3f1ad55a996f.png'
   }
 ];
 

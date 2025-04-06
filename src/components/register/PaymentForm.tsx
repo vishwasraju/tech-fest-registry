@@ -43,23 +43,20 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
   };
 
   const isTeamEvent = event.team_size && event.team_size > 1;
-  const eventFees = event.fees || 0;
   
-  // If it's a team event and has team_registration_fees set, use that instead
-  const feesToPay = isTeamEvent && event.team_registration_fees !== undefined ? event.team_registration_fees : eventFees;
+  // Calculate fees to display
+  let feesToPay = 0;
+  if (isTeamEvent && event.team_registration_fees !== undefined) {
+    feesToPay = event.team_registration_fees;
+  } else if (event.fees !== undefined) {
+    feesToPay = event.fees;
+  }
 
   return (
     <form onSubmit={onSubmit} className="space-y-6">
       {feesToPay > 0 ? (
         <>
           <div className="text-center mb-4">
-            <p className="text-sm text-gray-400 mb-4">
-              Please pay ₹{feesToPay} to complete your registration. 
-              {isTeamEvent && 
-                " This is a team registration fee (one payment covers the entire team)."}
-              <br />Scan the QR code below:
-            </p>
-            
             <div className="bg-white p-3 rounded-lg mx-auto w-48 h-48 mb-4">
               <QRCode 
                 value={`upi://pay?pa=rakesharush123-1@okhdfcbank&pn=TechFest&am=${feesToPay}`} 

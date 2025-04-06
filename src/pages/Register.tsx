@@ -1,20 +1,28 @@
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams, Link, Navigate } from 'react-router-dom';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import RegisterForm from '@/components/RegisterForm';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Users, UserRound } from 'lucide-react';
-import { Event } from '@/data/events';
+import { Event, EVENTS_DATA } from '@/data/events';
 
-interface RegisterProps {
-  events: Event[];
-}
-
-const Register = ({ events }: RegisterProps) => {
+const Register = ({ events }: { events: Event[] }) => {
   const { eventId } = useParams<{ eventId: string }>();
-  const event = events.find(e => e.id === eventId);
+  const [event, setEvent] = useState<Event | undefined>();
+  
+  useEffect(() => {
+    // First check in the props
+    let foundEvent = events.find(e => e.id === eventId);
+    
+    // If not found in props, check in the default events data
+    if (!foundEvent) {
+      foundEvent = EVENTS_DATA.find(e => e.id === eventId);
+    }
+    
+    setEvent(foundEvent);
+  }, [eventId, events]);
   
   if (!event) {
     return <Navigate to="/events" replace />;
