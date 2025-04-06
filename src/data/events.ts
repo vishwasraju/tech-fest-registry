@@ -20,13 +20,13 @@ export interface Event {
 
 // Initial events data
 export const EVENTS_DATA: Event[] = [
-  {
+{
     id: "event-1",
     name: "BATTLE ZONE",
     description: "Unleash your inner gamer! Join the ultimate gaming showdown",
     date_time: "09-APRIL-2025",
     venue: "AIML",
-    rules: " ",
+    rules: "rul",
     team_size: 4,
     fees: 100,
     cash_prize: 0,
@@ -42,7 +42,7 @@ export const EVENTS_DATA: Event[] = [
     rules: " ",
     team_size: 1,
     fees: 50,
-    cash_prize: ,
+    cash_prize:0,
     category: "CSE",
     background_image: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5"
   },
