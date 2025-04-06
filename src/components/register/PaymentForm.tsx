@@ -53,13 +53,6 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
       {feesToPay > 0 ? (
         <>
           <div className="text-center mb-4">
-            <p className="text-sm text-gray-400 mb-4">
-              Please pay ₹{feesToPay} to complete your registration. 
-              {isTeamEvent && 
-                " This is a team registration fee (one payment covers the entire team)."}
-              <br />Scan the QR code below:
-            </p>
-            
             <div className="bg-white p-3 rounded-lg mx-auto w-48 h-48 mb-4">
               <QRCode 
                 value={`upi://pay?pa=rakesharush123-1@okhdfcbank&pn=TechFest&am=${feesToPay}`} 
