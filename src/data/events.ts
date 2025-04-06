@@ -30,7 +30,7 @@ export const EVENTS_DATA: Event[] = [
     fees: 100,
     cash_prize: 0,
     category: "CSE",
-    background_image: "https://images.unsplash.com/photo-1487058792275-0ad4aaf24ca7"
+    background_image: "https://nonwsmuudvxiowfqpmor.supabase.co/storage/v1/object/public/qr_codes//p-u-b-g-vs-free-fire-comparison-3vp8zypvwa7j3rhf.jpg"
   },
   {
     id: "event-2",
