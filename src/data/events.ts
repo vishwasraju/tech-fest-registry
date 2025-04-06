@@ -95,6 +95,19 @@ export const EVENTS_DATA: Event[] = [
     cash_prize: 0,
     category: "MBA",
     background_image: "https://images.unsplash.com/photo-1485827404703-89b55fcc595e"
+  },
+   {
+    id: "event-7",
+    name: "DeptVerse(solo)",
+    description: "DeptVerse is a presentation competition where participants create a PPT showcasing how AI is transforming their department, highlighting innovations, real-world applications, and future potential.",
+    date_time: "2025-04-09T10:00:00",
+    venue: "AIML",
+    rules: "",
+    team_size: 1,
+    fees: 50,
+    cash_prize: 0,
+    category: "AIML",
+    background_image: "https://images.unsplash.com/photo-1485827404703-89b55fcc595e"
   }
 ];
 
