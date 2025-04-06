@@ -36,7 +36,7 @@ export const EVENTS_DATA: Event[] = [
   {
     id: "event-2",
     name: "Codeblitz",
-    description: "CodeBlitz is an on-spot debugging challenge where participants analyze and fix code errors under time constraints, testing their problem-solving skills and coding efficiency. 🖥️⚡",
+    description: "CodeBlitz is an on-spot debugging challenge where participants analyze and fix code errors under time constraints, testing their problem-solving skills and coding efficiency.",
     date_time: "09-APRIL-2025",
     venue: "AIML",
     rules: " ",
