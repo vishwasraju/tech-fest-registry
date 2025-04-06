@@ -1,12 +1,20 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import { QrCode, Upload } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
-import { toast } from 'sonner';
-import { uploadFile } from '@/utils/storageUtils';
+
+// QR code sample images
+const SAMPLE_QR_CODES = [
+  {
+    name: 'UPI 1',
+    url: '/lovable-uploads/52204412-75bf-4c5a-8291-863ee5b054bc.png'
+  },
+  {
+    name: 'UPI 2',
+    url: '/lovable-uploads/24fe700b-9cd0-4745-a2af-a58676eaf367.png'
+  }
+];
 
 interface QRCodeUploadDialogProps {
   eventId: string;
@@ -17,65 +25,44 @@ interface QRCodeUploadDialogProps {
 
 const QRCodeUploadDialog = ({ eventId, eventName, currentQRUrl, onUpdate }: QRCodeUploadDialogProps) => {
   const [open, setOpen] = useState(false);
-  const [previewUrl, setPreviewUrl] = useState(currentQRUrl || '');
-  const [isUploading, setIsUploading] = useState(false);
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [sampleQRs, setSampleQRs] = useState([
-    '/lovable-uploads/e53e9cc3-ee21-4857-9d8c-f59dc043ad89.png',
-    '/lovable-uploads/979fb83b-05ce-4df0-9f6b-960b03105840.png'
-  ]);
+  const [selectedQR, setSelectedQR] = useState<string>(currentQRUrl || '');
+  const [customQR, setCustomQR] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string>('');
+  const fileInputRef = useRef<HTMLInputElement>(null);
   
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
-      setSelectedFile(file);
-      setPreviewUrl(URL.createObjectURL(file));
+    const file = e.target.files?.[0];
+    if (file) {
+      setCustomQR(file);
+      // Create preview URL for the selected image
+      const objectUrl = URL.createObjectURL(file);
+      setPreviewUrl(objectUrl);
+      setSelectedQR('custom');
     }
-  };
-
-  const handleSampleSelect = (sampleUrl: string) => {
-    // Create a File object from the sample URL
-    fetch(sampleUrl)
-      .then(res => res.blob())
-      .then(blob => {
-        const filename = sampleUrl.split('/').pop() || 'qr-code.png';
-        const file = new File([blob], filename, { type: 'image/png' });
-        setSelectedFile(file);
-        setPreviewUrl(sampleUrl);
-      })
-      .catch(err => {
-        console.error('Error fetching sample QR:', err);
-        toast.error('Could not load sample QR code');
-      });
   };
   
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleButtonClick = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  };
+  
+  const handleSampleQRSelect = (url: string) => {
+    setSelectedQR(url);
+    setPreviewUrl('');
+    setCustomQR(null);
+  };
+  
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!selectedFile) {
-      toast.error('Please select a file to upload');
-      return;
+    if (selectedQR === 'custom' && previewUrl) {
+      onUpdate(eventId, previewUrl);
+    } else if (selectedQR && selectedQR !== 'custom') {
+      onUpdate(eventId, selectedQR);
     }
     
-    setIsUploading(true);
-    try {
-      // Upload file to Supabase Storage
-      const filePath = `${eventId}/${selectedFile.name}`;
-      const uploadedUrl = await uploadFile(selectedFile, 'qr_codes', filePath);
-      
-      if (uploadedUrl) {
-        onUpdate(eventId, uploadedUrl);
-        setOpen(false);
-        toast.success('QR code uploaded and updated successfully');
-      } else {
-        toast.error('Failed to upload QR code');
-      }
-    } catch (error) {
-      console.error('Upload error:', error);
-      toast.error('Failed to upload QR code');
-    } finally {
-      setIsUploading(false);
-    }
+    setOpen(false);
   };
   
   return (
@@ -85,7 +72,6 @@ const QRCodeUploadDialog = ({ eventId, eventName, currentQRUrl, onUpdate }: QRCo
           size="sm" 
           variant="outline"
           className="h-8 w-8 p-0 border-gray-600"
-          title="Update QR Code"
         >
           <QrCode size={14} />
         </Button>
@@ -94,69 +80,83 @@ const QRCodeUploadDialog = ({ eventId, eventName, currentQRUrl, onUpdate }: QRCo
         <DialogHeader>
           <DialogTitle>Upload Payment QR Code</DialogTitle>
           <DialogDescription className="text-gray-400">
-            Upload a QR code image for {eventName}
+            Set the payment QR code for {eventName}
           </DialogDescription>
         </DialogHeader>
         
         <form onSubmit={handleSubmit} className="space-y-4 mt-4">
+          <div className="grid grid-cols-2 gap-4 mb-4">
+            {SAMPLE_QR_CODES.map((qr) => (
+              <div 
+                key={qr.url}
+                className={`cursor-pointer rounded-lg overflow-hidden border-2 ${
+                  selectedQR === qr.url ? 'border-techfest-neon-blue' : 'border-gray-700'
+                }`}
+                onClick={() => handleSampleQRSelect(qr.url)}
+              >
+                <div className="h-40 overflow-hidden">
+                  <img 
+                    src={qr.url} 
+                    alt={qr.name} 
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div className="p-2 text-center bg-gray-800">
+                  <span className="text-sm">{qr.name}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+          
           <div>
-            <Label htmlFor="qrcode-file">Upload QR Code Image</Label>
-            <Input
-              id="qrcode-file"
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-medium mb-2">Or upload your own QR code</span>
+            </div>
+            <input
               type="file"
+              ref={fileInputRef}
+              className="hidden"
               accept="image/*"
               onChange={handleFileChange}
-              className="bg-techfest-muted text-white border-techfest-muted"
             />
-            <p className="text-xs text-gray-400 mt-1">
-              Recommended: Square image in JPG or PNG format
-            </p>
+            <Button 
+              type="button" 
+              variant="outline" 
+              className="w-full" 
+              onClick={handleButtonClick}
+            >
+              <Upload size={16} className="mr-2" />
+              {customQR ? 'Change Image' : 'Upload Image'}
+            </Button>
           </div>
           
-          {/* Sample QR Codes Section */}
-          <div>
-            <Label className="block mb-2">Or select a sample QR code:</Label>
-            <div className="grid grid-cols-2 gap-4">
-              {sampleQRs.map((url, index) => (
-                <div 
-                  key={index} 
-                  className={`bg-white p-2 rounded-lg cursor-pointer ${previewUrl === url ? 'ring-2 ring-techfest-neon-blue' : ''}`}
-                  onClick={() => handleSampleSelect(url)}
-                >
-                  <img 
-                    src={url} 
-                    alt={`Sample QR Code ${index + 1}`} 
-                    className="w-full h-auto"
-                  />
-                  <div className="text-center text-xs text-gray-800 mt-1">
-                    {url.includes('e53e9cc3') ? '₹100.00' : '₹50.00'}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-          
-          {previewUrl && (
-            <div className="text-center">
-              <p className="text-sm text-gray-400 mb-2">Preview:</p>
-              <div className="bg-white p-2 rounded-lg mx-auto w-48 h-48">
+          {selectedQR === 'custom' && previewUrl && (
+            <div className="mt-4">
+              <div className="h-40 rounded-lg overflow-hidden">
                 <img 
                   src={previewUrl} 
-                  alt="QR Code Preview" 
-                  className="w-full h-full object-contain"
-                  onError={() => {
-                    setPreviewUrl('');
-                    toast.error('Invalid image URL');
-                  }}
+                  alt="Custom QR code" 
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            </div>
+          )}
+          
+          {currentQRUrl && (
+            <div className="mt-4">
+              <div className="text-sm text-gray-400 mb-2">Current QR Code:</div>
+              <div className="h-40 rounded-lg overflow-hidden">
+                <img 
+                  src={currentQRUrl} 
+                  alt="Current QR code" 
+                  className="w-full h-full object-cover"
                 />
               </div>
             </div>
           )}
           
           <DialogFooter>
-            <Button type="submit" disabled={isUploading}>
-              {isUploading ? 'Uploading...' : 'Upload QR Code'}
-            </Button>
+            <Button type="submit">Save QR Code</Button>
           </DialogFooter>
         </form>
       </DialogContent>

@@ -98,15 +98,22 @@ export const AdminProvider: React.FC<AdminProviderProps> = ({
     toast.success('Event background updated successfully');
   };
   
-  const handleUpdateEventQRCode = async (eventId: string, qrCodeUrl: string) => {
-    const updatedEvents = events.map(event => 
-      event.id === eventId 
-        ? { ...event, qr_code_url: qrCodeUrl } 
-        : event
-    );
+  const handleUpdateEventQRCode = async (eventId: string, qrCodeUrl: string, isTeam?: boolean) => {
+    const updatedEvents = events.map(event => {
+      if (event.id === eventId) {
+        if (isTeam) {
+          // For team QR code updates
+          return { ...event, team_qr_code_url: qrCodeUrl };
+        } else {
+          // For individual QR code updates
+          return { ...event, qr_code_url: qrCodeUrl };
+        }
+      }
+      return event;
+    });
     
     await onUpdateEvents(updatedEvents);
-    toast.success('Event QR code updated successfully');
+    toast.success(`Event QR code updated successfully ${isTeam ? '(Team)' : ''}`);
   };
   
   const handleEditEvent = async (eventId: string, formData: any) => {

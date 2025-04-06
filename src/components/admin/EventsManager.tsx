@@ -99,7 +99,7 @@ const EventsManager = ({ events, registrations }: EventsManagerProps) => {
                               eventId={`${event.id}_team`}
                               eventName={`${event.name} (Team)`}
                               currentQRUrl={event.team_qr_code_url}
-                              onUpdate={(eventId, url) => {
+                              onUpdate={(eventId, url, isTeam) => {
                                 // Update the team QR code URL
                                 handleUpdateEventQRCode(event.id, url, true);
                               }}
