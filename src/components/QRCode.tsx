@@ -26,8 +26,6 @@ const QRCode: React.FC<QRCodeProps> = ({ value, size = 150, imageUrl }) => {
         console.error('Failed to load QR code image:', imageUrl);
       };
       img.src = imageUrl;
-    } else {
-      setIsLoading(false);
     }
   }, [imageUrl]);
 
