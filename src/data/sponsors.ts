@@ -18,52 +18,52 @@ export const SPONSORS_DATA: Sponsor[] = [
   },
   {
     id: "sponsor-2",
-    name: "InnovateSystems",
+    name: "CAUVERY TATA",
     tier: "Gold",
-    logo_url: "https://via.placeholder.com/150?text=InnovateSystems",
+    logo_url: "https://nonwsmuudvxiowfqpmor.supabase.co/storage/v1/object/public/qr_codes//Screenshot%202025-04-06%20232644.png",
     website_url: "https://example.com"
   },
   {
     id: "sponsor-3",
-    name: "DevPartners",
+    name: "CAUVERY TATA",
     tier: "Silver",
-    logo_url: "https://via.placeholder.com/150?text=DevPartners",
+    logo_url: "https://nonwsmuudvxiowfqpmor.supabase.co/storage/v1/object/public/qr_codes//Screenshot%202025-04-06%20232644.png",
     website_url: "https://example.com"
   },
   // New sponsors
   {
     id: "sponsor-4",
-    name: "Tech Innovators",
+    name: "CAUVERY TATA",
     tier: "Gold",
-    logo_url: "https://via.placeholder.com/150?text=Tech+Innovators",
+    logo_url: "https://nonwsmuudvxiowfqpmor.supabase.co/storage/v1/object/public/qr_codes//Screenshot%202025-04-06%20232644.png",
     website_url: "https://techinnovators.com"
   },
   {
     id: "sponsor-5",
-    name: "Code Masters",
+    name: "CAUVERY TATA",
     tier: "Silver",
-    logo_url: "https://via.placeholder.com/150?text=Code+Masters",
+    logo_url: "https://nonwsmuudvxiowfqpmor.supabase.co/storage/v1/object/public/qr_codes//Screenshot%202025-04-06%20232644.png",
     website_url: "https://codemasters.com"
   },
   {
     id: "sponsor-6",
-    name: "Future Tech",
+    name: "CAUVERY TATA",
     tier: "Bronze",
-    logo_url: "https://via.placeholder.com/150?text=Future+Tech",
+    logo_url: "https://nonwsmuudvxiowfqpmor.supabase.co/storage/v1/object/public/qr_codes//Screenshot%202025-04-06%20232644.png",
     website_url: "https://futuretech.com"
   },
   {
     id: "sponsor-7",
-    name: "Code Masters",
+    name: "CAUVERY TATA",
     tier: "Silver",
-    logo_url: "https://via.placeholder.com/150?text=Code+Masters",
+    logo_url: "https://nonwsmuudvxiowfqpmor.supabase.co/storage/v1/object/public/qr_codes//Screenshot%202025-04-06%20232644.png",
     website_url: "https://codemasters.com"
   },
   {
     id: "sponsor-8",
-    name: "Future Tech",
+    name: "CAUVERY TATA",
     tier: "Bronze",
-    logo_url: "https://via.placeholder.com/150?text=Future+Tech",
+    logo_url: "https://nonwsmuudvxiowfqpmor.supabase.co/storage/v1/object/public/qr_codes//Screenshot%202025-04-06%20232644.png",
     website_url: "https://futuretech.com"
   }
 ];
