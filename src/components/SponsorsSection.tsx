@@ -7,7 +7,7 @@ const NEW_SPONSORS = [
     id: "sponsor-1",
     name: "NAMMA HONDA",
     tier: "Platinum",
-    logo_url: "https://nonwsmuudvxiowfqpmor.supabase.co/storage/v1/object/public/qr_codes//AU%20GOLD.png",
+    logo_url: "https://nonwsmuudvxiowfqpmor.supabase.co/storage/v1/object/public/qr_codes//honda.png",
     website_url: "https://example.com"
   },
   {
