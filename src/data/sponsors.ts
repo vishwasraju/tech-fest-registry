@@ -11,7 +11,7 @@ export interface Sponsor {
 export const SPONSORS_DATA: Sponsor[] = [
   {
     id: "sponsor-1",
-    name: "TechCorp",
+    name: "CAUVERY TATA",
     tier: "Platinum",
     logo_url: "https://nonwsmuudvxiowfqpmor.supabase.co/storage/v1/object/public/qr_codes//Screenshot%202025-04-06%20232644.png",
     website_url: "https://example.com"
