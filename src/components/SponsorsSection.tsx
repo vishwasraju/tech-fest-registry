@@ -1,10 +1,9 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { loadSponsorsFromStorage, Sponsor } from '@/data/sponsors';
 
 // Define new sponsors directly within the file
-const NEW_SPONSORS: Sponsor[] = [
-   {
+const NEW_SPONSORS = [
+  {
     id: "sponsor-1",
     name: "NAMMA HONDA",
     tier: "Platinum",
@@ -64,17 +63,12 @@ const NEW_SPONSORS: Sponsor[] = [
 ];
 
 const SponsorsSection = () => {
-  const { data: sponsors = [], isLoading } = useQuery<Sponsor[]>({
-    queryKey: ['sponsors'],
-    queryFn: loadSponsorsFromStorage,
-  });
+  // Removed useQuery code
+  const sponsors = NEW_SPONSORS;
 
-  if (isLoading || sponsors.length === 0) {
+  if (sponsors.length === 0) {
     return null;
   }
-
-  // Combine existing and new sponsors
-  const allSponsors = [...sponsors, ...NEW_SPONSORS];
 
   return (
     <section id="sponsors" className="py-16 bg-gradient-to-b from-black to-techfest-dark relative">
@@ -89,7 +83,7 @@ const SponsorsSection = () => {
         </div>
         
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
-          {allSponsors.map((sponsor) => (
+          {sponsors.map((sponsor) => (
             <div 
               key={sponsor.id} 
               className="flex flex-col items-center group"
