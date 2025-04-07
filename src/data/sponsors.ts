@@ -29,6 +29,28 @@ export const SPONSORS_DATA: Sponsor[] = [
     tier: "Silver",
     logo_url: "https://via.placeholder.com/150?text=DevPartners",
     website_url: "https://example.com"
+  },
+  // New sponsors
+  {
+    id: "sponsor-4",
+    name: "Tech Innovators",
+    tier: "Gold",
+    logo_url: "https://via.placeholder.com/150?text=Tech+Innovators",
+    website_url: "https://techinnovators.com"
+  },
+  {
+    id: "sponsor-5",
+    name: "Code Masters",
+    tier: "Silver",
+    logo_url: "https://via.placeholder.com/150?text=Code+Masters",
+    website_url: "https://codemasters.com"
+  },
+  {
+    id: "sponsor-6",
+    name: "Future Tech",
+    tier: "Bronze",
+    logo_url: "https://via.placeholder.com/150?text=Future+Tech",
+    website_url: "https://futuretech.com"
   }
 ];
 
