@@ -12,7 +12,7 @@ export const SPONSORS_DATA: Sponsor[] = [
     id: "sponsor-1",
     name: "CAUVERY TATA",
     tier: "Platinum",
-    logo_url: "supabase/TATA.png",
+    logo_url: "https://www.google.com/imgres?q=image&imgurl=https%3A%2F%2Fwww.bigfootdigital.co.uk%2Fwp-content%2Fuploads%2F2020%2F07%2Fimage-optimisation-scaled.jpg&imgrefurl=https%3A%2F%2Fwww.bigfootdigital.co.uk%2Fhow-to-optimise-images&docid=dTbNgrJF6xXg5M&tbnid=s_UYcOUl07ucGM&vet=12ahUKEwjO267_usWMAxWuSmwGHeJzJlMQM3oECFIQAA..i&w=2560&h=1707&hcb=2&ved=2ahUKEwjO267_usWMAxWuSmwGHeJzJlMQM3oECFIQAA",
     website_url: "https://example.com"
   },
   {
