@@ -1,4 +1,3 @@
-
 export interface Sponsor {
   id: string;
   name: string;
@@ -76,21 +75,21 @@ export const loadSponsorsFromStorage = async (): Promise<Sponsor[]> => {
     if (cachedSponsors) {
       return JSON.parse(cachedSponsors);
     }
-    
+
     // If not in localStorage, try to load from Supabase Storage
     const { supabase } = await import('@/integrations/supabase/client');
-    
+
     const { data, error } = await supabase.storage
       .from('registrations')
       .download('sponsors.json');
-      
+
     if (error || !data) {
       console.log('No saved sponsors found, using default data');
       // Save the default sponsors to storage for future use
       await saveSponsorsToStorage(SPONSORS_DATA);
       return SPONSORS_DATA;
     }
-    
+
     const sponsors: Sponsor[] = JSON.parse(await data.text());
     // Update localStorage for quick access next time
     localStorage.setItem('techfest-sponsors', JSON.stringify(sponsors));
@@ -105,17 +104,17 @@ export const loadSponsorsFromStorage = async (): Promise<Sponsor[]> => {
 export const saveSponsorsToStorage = async (sponsors: Sponsor[]): Promise<boolean> => {
   try {
     const { supabase } = await import('@/integrations/supabase/client');
-    
+
     // Convert sponsors to JSON string
     const sponsorsJson = JSON.stringify(sponsors);
-    
+
     // Save to localStorage for quick access
     localStorage.setItem('techfest-sponsors', sponsorsJson);
-    
+
     // Create a blob from the JSON string
     const blob = new Blob([sponsorsJson], { type: 'application/json' });
     const file = new File([blob], 'sponsors.json', { type: 'application/json' });
-    
+
     // Upload to Supabase Storage
     const { error } = await supabase.storage
       .from('registrations')
@@ -123,12 +122,12 @@ export const saveSponsorsToStorage = async (sponsors: Sponsor[]): Promise<boolea
         cacheControl: '3600',
         upsert: true
       });
-      
+
     if (error) {
       console.error('Error saving sponsors:', error);
       return false;
     }
-    
+
     return true;
   } catch (error) {
     console.error('Error saving sponsors:', error);
