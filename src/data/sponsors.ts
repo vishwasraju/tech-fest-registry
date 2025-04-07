@@ -51,6 +51,20 @@ export const SPONSORS_DATA: Sponsor[] = [
     tier: "Bronze",
     logo_url: "https://via.placeholder.com/150?text=Future+Tech",
     website_url: "https://futuretech.com"
+  },
+  {
+    id: "sponsor-7",
+    name: "Code Masters",
+    tier: "Silver",
+    logo_url: "https://via.placeholder.com/150?text=Code+Masters",
+    website_url: "https://codemasters.com"
+  },
+  {
+    id: "sponsor-8",
+    name: "Future Tech",
+    tier: "Bronze",
+    logo_url: "https://via.placeholder.com/150?text=Future+Tech",
+    website_url: "https://futuretech.com"
   }
 ];
 
