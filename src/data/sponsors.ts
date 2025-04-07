@@ -13,7 +13,7 @@ export const SPONSORS_DATA: Sponsor[] = [
     id: "sponsor-1",
     name: "TechCorp",
     tier: "Platinum",
-    logo_url: "https://via.placeholder.com/150?text=TechCorp",
+    logo_url: "https://nonwsmuudvxiowfqpmor.supabase.co/storage/v1/object/public/qr_codes//Screenshot%202025-04-06%20232644.png",
     website_url: "https://example.com"
   },
   {
