@@ -10,9 +10,9 @@ export interface Sponsor {
 export const SPONSORS_DATA: Sponsor[] = [
   {
     id: "sponsor-1",
-    name: "CAUVERY TATA",
+    name: "NAMMA HONDA",
     tier: "Platinum",
-    logo_url: "https://www.google.com/imgres?q=image&imgurl=https%3A%2F%2Fwww.bigfootdigital.co.uk%2Fwp-content%2Fuploads%2F2020%2F07%2Fimage-optimisation-scaled.jpg&imgrefurl=https%3A%2F%2Fwww.bigfootdigital.co.uk%2Fhow-to-optimise-images&docid=dTbNgrJF6xXg5M&tbnid=s_UYcOUl07ucGM&vet=12ahUKEwjO267_usWMAxWuSmwGHeJzJlMQM3oECFIQAA..i&w=2560&h=1707&hcb=2&ved=2ahUKEwjO267_usWMAxWuSmwGHeJzJlMQM3oECFIQAA",
+    logo_url: "https://nonwsmuudvxiowfqpmor.supabase.co/storage/v1/object/public/qr_codes//AU%20GOLD.png",
     website_url: "https://example.com"
   },
   {
@@ -24,7 +24,7 @@ export const SPONSORS_DATA: Sponsor[] = [
   },
   {
     id: "sponsor-3",
-    name: "CAUVERY TATA",
+    name: "VRDDHI HOMES",
     tier: "Platinum",
     logo_url: "https://nonwsmuudvxiowfqpmor.supabase.co/storage/v1/object/public/qr_codes//Screenshot%202025-04-06%20232644.png",
     website_url: "https://example.com"
