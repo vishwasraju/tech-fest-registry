@@ -18,14 +18,14 @@ export const SPONSORS_DATA: Sponsor[] = [
   {
     id: "sponsor-2",
     name: "CAUVERY TATA",
-    tier: "Gold",
+    tier: "Platinum",
     logo_url: "https://nonwsmuudvxiowfqpmor.supabase.co/storage/v1/object/public/qr_codes//Screenshot%202025-04-06%20232644.png",
     website_url: "https://example.com"
   },
   {
     id: "sponsor-3",
     name: "CAUVERY TATA",
-    tier: "Silver",
+    tier: "Platinum",
     logo_url: "https://nonwsmuudvxiowfqpmor.supabase.co/storage/v1/object/public/qr_codes//Screenshot%202025-04-06%20232644.png",
     website_url: "https://example.com"
   },
@@ -33,35 +33,35 @@ export const SPONSORS_DATA: Sponsor[] = [
   {
     id: "sponsor-4",
     name: "CAUVERY TATA",
-    tier: "Gold",
+    tier: "Platinum",
     logo_url: "https://nonwsmuudvxiowfqpmor.supabase.co/storage/v1/object/public/qr_codes//Screenshot%202025-04-06%20232644.png",
     website_url: "https://techinnovators.com"
   },
   {
     id: "sponsor-5",
     name: "CAUVERY TATA",
-    tier: "Silver",
+    tier: "Platinum",
     logo_url: "https://nonwsmuudvxiowfqpmor.supabase.co/storage/v1/object/public/qr_codes//Screenshot%202025-04-06%20232644.png",
     website_url: "https://codemasters.com"
   },
   {
     id: "sponsor-6",
     name: "CAUVERY TATA",
-    tier: "Bronze",
+    tier: "Platinum",
     logo_url: "https://nonwsmuudvxiowfqpmor.supabase.co/storage/v1/object/public/qr_codes//Screenshot%202025-04-06%20232644.png",
     website_url: "https://futuretech.com"
   },
   {
     id: "sponsor-7",
     name: "CAUVERY TATA",
-    tier: "Silver",
+    tier: "Platinum",
     logo_url: "https://nonwsmuudvxiowfqpmor.supabase.co/storage/v1/object/public/qr_codes//Screenshot%202025-04-06%20232644.png",
     website_url: "https://codemasters.com"
   },
   {
     id: "sponsor-8",
     name: "CAUVERY TATA",
-    tier: "Bronze",
+    tier: "Platinum",
     logo_url: "https://nonwsmuudvxiowfqpmor.supabase.co/storage/v1/object/public/qr_codes//Screenshot%202025-04-06%20232644.png",
     website_url: "https://futuretech.com"
   }
