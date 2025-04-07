@@ -15,7 +15,7 @@ const NEW_SPONSORS: Sponsor[] = [
     id: "sponsor-10",
     name: "New Sponsor 2",
     tier: "Silver",
-    logo_url: "https://example.com/new-sponsor-2.png",
+    logo_url: "https://nonwsmuudvxiowfqpmor.supabase.co/storage/v1/object/public/qr_codes//AU%20GOLD.png",
     website_url: "https://new-sponsor-2.com"
   }
   // Add more sponsors as needed...
