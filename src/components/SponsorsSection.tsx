@@ -4,21 +4,63 @@ import { loadSponsorsFromStorage, Sponsor } from '@/data/sponsors';
 
 // Define new sponsors directly within the file
 const NEW_SPONSORS: Sponsor[] = [
-  {
-    id: "sponsor-9",
-    name: "New Sponsor 1",
-    tier: "Gold",
-    logo_url: "https://example.com/new-sponsor-1.png",
-    website_url: "https://new-sponsor-1.com"
+   {
+    id: "sponsor-1",
+    name: "NAMMA HONDA",
+    tier: "Platinum",
+    logo_url: "https://nonwsmuudvxiowfqpmor.supabase.co/storage/v1/object/public/qr_codes//AU%20GOLD.png",
+    website_url: "https://example.com"
   },
   {
-    id: "sponsor-10",
-    name: "New Sponsor 2",
-    tier: "Silver",
-    logo_url: "https://nonwsmuudvxiowfqpmor.supabase.co/storage/v1/object/public/qr_codes//AU%20GOLD.png",
-    website_url: "https://new-sponsor-2.com"
+    id: "sponsor-2",
+    name: "CAUVERY TATA",
+    tier: "Platinum",
+    logo_url: "https://nonwsmuudvxiowfqpmor.supabase.co/storage/v1/object/public/qr_codes//Screenshot%202025-04-06%20232644.png",
+    website_url: "https://example.com"
+  },
+  {
+    id: "sponsor-3",
+    name: "VRDDHI HOMES",
+    tier: "Platinum",
+    logo_url: "https://nonwsmuudvxiowfqpmor.supabase.co/storage/v1/object/public/qr_codes//Screenshot%202025-04-06%20232644.png",
+    website_url: "https://example.com"
+  },
+  // New sponsors
+  {
+    id: "sponsor-4",
+    name: "CAUVERY TATA",
+    tier: "Platinum",
+    logo_url: "https://nonwsmuudvxiowfqpmor.supabase.co/storage/v1/object/public/qr_codes//Screenshot%202025-04-06%20232644.png",
+    website_url: "https://techinnovators.com"
+  },
+  {
+    id: "sponsor-5",
+    name: "CAUVERY TATA",
+    tier: "Platinum",
+    logo_url: "https://nonwsmuudvxiowfqpmor.supabase.co/storage/v1/object/public/qr_codes//Screenshot%202025-04-06%20232644.png",
+    website_url: "https://codemasters.com"
+  },
+  {
+    id: "sponsor-6",
+    name: "CAUVERY TATA",
+    tier: "Platinum",
+    logo_url: "https://nonwsmuudvxiowfqpmor.supabase.co/storage/v1/object/public/qr_codes//Screenshot%202025-04-06%20232644.png",
+    website_url: "https://futuretech.com"
+  },
+  {
+    id: "sponsor-7",
+    name: "CAUVERY TATA",
+    tier: "Platinum",
+    logo_url: "https://nonwsmuudvxiowfqpmor.supabase.co/storage/v1/object/public/qr_codes//Screenshot%202025-04-06%20232644.png",
+    website_url: "https://codemasters.com"
+  },
+  {
+    id: "sponsor-8",
+    name: "CAUVERY TATA",
+    tier: "Platinum",
+    logo_url: "https://nonwsmuudvxiowfqpmor.supabase.co/storage/v1/object/public/qr_codes//Screenshot%202025-04-06%20232644.png",
+    website_url: "https://futuretech.com"
   }
-  // Add more sponsors as needed...
 ];
 
 const SponsorsSection = () => {
