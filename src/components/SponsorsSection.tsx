@@ -14,50 +14,50 @@ const NEW_SPONSORS = [
     id: "sponsor-2",
     name: "CAUVERY TATA",
     tier: "Platinum",
-    logo_url: "https://nonwsmuudvxiowfqpmor.supabase.co/storage/v1/object/public/qr_codes//Screenshot%202025-04-06%20232644.png",
+    logo_url: "https://nonwsmuudvxiowfqpmor.supabase.co/storage/v1/object/public/qr_codes//TATA.png",
     website_url: "https://example.com"
   },
   {
     id: "sponsor-3",
     name: "VRDDHI HOMES",
     tier: "Platinum",
-    logo_url: "https://nonwsmuudvxiowfqpmor.supabase.co/storage/v1/object/public/qr_codes//Screenshot%202025-04-06%20232644.png",
+    logo_url: "https://nonwsmuudvxiowfqpmor.supabase.co/storage/v1/object/public/qr_codes//homes.png",
     website_url: "https://example.com"
   },
   // New sponsors
   {
     id: "sponsor-4",
-    name: "CAUVERY TATA",
+    name: "SRIHANS OFFICE FURNITURE",
     tier: "Platinum",
-    logo_url: "https://nonwsmuudvxiowfqpmor.supabase.co/storage/v1/object/public/qr_codes//Screenshot%202025-04-06%20232644.png",
+    logo_url: "https://nonwsmuudvxiowfqpmor.supabase.co/storage/v1/object/public/qr_codes//furn.png",
     website_url: "https://techinnovators.com"
   },
   {
     id: "sponsor-5",
-    name: "CAUVERY TATA",
+    name: "NAYARA",
     tier: "Platinum",
-    logo_url: "https://nonwsmuudvxiowfqpmor.supabase.co/storage/v1/object/public/qr_codes//Screenshot%202025-04-06%20232644.png",
+    logo_url: "https://nonwsmuudvxiowfqpmor.supabase.co/storage/v1/object/public/qr_codes//nayara.png",
     website_url: "https://codemasters.com"
   },
   {
     id: "sponsor-6",
-    name: "CAUVERY TATA",
+    name: "AU GOLD",
     tier: "Platinum",
-    logo_url: "https://nonwsmuudvxiowfqpmor.supabase.co/storage/v1/object/public/qr_codes//Screenshot%202025-04-06%20232644.png",
+    logo_url: "https://nonwsmuudvxiowfqpmor.supabase.co/storage/v1/object/public/qr_codes//AU%20GOLD.png",
     website_url: "https://futuretech.com"
   },
   {
     id: "sponsor-7",
-    name: "CAUVERY TATA",
+    name: "PUNJAB NATIONAL BANK",
     tier: "Platinum",
-    logo_url: "https://nonwsmuudvxiowfqpmor.supabase.co/storage/v1/object/public/qr_codes//Screenshot%202025-04-06%20232644.png",
+    logo_url: "https://nonwsmuudvxiowfqpmor.supabase.co/storage/v1/object/public/qr_codes//pnb.png",
     website_url: "https://codemasters.com"
   },
   {
     id: "sponsor-8",
-    name: "CAUVERY TATA",
+    name: "SAGAR MOBILES",
     tier: "Platinum",
-    logo_url: "https://nonwsmuudvxiowfqpmor.supabase.co/storage/v1/object/public/qr_codes//Screenshot%202025-04-06%20232644.png",
+    logo_url: "https://nonwsmuudvxiowfqpmor.supabase.co/storage/v1/object/public/qr_codes//Sagar%20mobils.png",
     website_url: "https://futuretech.com"
   }
 ];
