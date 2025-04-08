@@ -21,7 +21,7 @@ export interface Event {
 export const EVENTS_DATA: Event[] = [
   {
     id: "event-1",
-    name: "BATTLE ZONE",
+    name: "BATTLE ZONE(BGMI/FREE_FIRE)",
     description: "Unleash your inner gamer! Join the ultimate gaming showdown",
     date_time: "2025-04-09T10:00:00",
     venue: "AIML",
